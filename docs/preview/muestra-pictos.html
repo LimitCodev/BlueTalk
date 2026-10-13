@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BlueTalk — Vista previa de pictogramas (Mulberry + paleta pastel)</title>
+<style>
+  :root {
+    --bg: #F3FAFF;
+    --surface: #FFFFFF;
+    --primary: #7FC9EA;
+    --primary-ink: #12333B;
+    --text: #1F3A44;
+    --border: #DCEEF7;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  header {
+    background: var(--surface);
+    border-bottom: 3px solid var(--primary);
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  header h1 { font-size: 20px; margin: 0; }
+  header .tag {
+    background: var(--primary);
+    color: var(--primary-ink);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  main { padding: 24px; max-width: 1100px; margin: 0 auto; }
+  h2 { font-size: 16px; margin: 28px 0 12px; color: var(--text); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 8px 10px;
+    text-align: center;
+    min-height: 104px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(127,201,234,.35); }
+  .card img { width: 56px; height: 56px; }
+  .card span { font-size: 14px; font-weight: 600; line-height: 1.1; }
+  .barra {
+    position: sticky;
+    bottom: 0;
+    background: var(--surface);
+    border-top: 3px solid var(--primary);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .barra .ficha {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  .barra .ficha img { width: 28px; height: 28px; }
+  .btn {
+    background: var(--primary);
+    color: var(--primary-ink);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 48px; /* target táctil mínimo */
+  }
+  .btn.secundario { background: var(--border); }
+  .nota {
+    background: var(--surface);
+    border-left: 4px solid var(--primary);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 16px 0;
+  }
+  .creditos { font-size: 12px; color: #5B7683; margin-top: 32px; }
+  /* Modo calma: escala de grises total */
+  body.calma { filter: grayscale(1); }
+  body.calma .card:hover { box-shadow: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>BlueTalk</h1>
+  <span class="tag">Vista previa · Mulberry + pastel</span>
+  <button class="btn" style="margin-left:auto" onclick="document.body.classList.toggle('calma')">Modo calma</button>
+</header>
+
+<main>
+  <div class="nota">
+    <strong>Vista previa real:</strong> estos son los pictogramas <em>Mulberry Symbols</em> (CC BY-SA 4.0,
+    uso comercial permitido) sobre la paleta celeste pastel de BlueTalk. Toca un picto para agregarlo a la
+    barra de frase, como lo haría el niño. El botón <em>Modo calma</em> pasa toda la UI a escala de grises.
+    El botón <em>Leer</em> en la app real pronuncia la frase con voz TTS en español.
+  </div>
+
+  <h2>Emociones</h2>
+  <div class="grid" data-cat="emociones"></div>
+
+  <h2>Comida y bebida</h2>
+  <div class="grid" data-cat="comida"></div>
+
+  <h2>Animales</h2>
+  <div class="grid" data-cat="animales"></div>
+
+  <h2>Acciones</h2>
+  <div class="grid" data-cat="acciones"></div>
+
+  <h2>Familia y lugares</h2>
+  <div class="grid" data-cat="familia"></div>
+
+  <p class="creditos">
+    Pictogramas: Mulberry Symbols © Steve Lee, licenciados bajo
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.
+    Vista previa sin conexión (archivos locales en <code>assets/pictos/muestra/</code>).
+  </p>
+</main>
+
+<div class="barra" id="barra">
+  <button class="btn secundario" onclick="frase=[];pintar()">Borrar todo</button>
+  <div id="fichas" style="display:flex;gap:8px;flex-wrap:wrap;flex:1"></div>
+  <button class="btn" onclick="leer()">🔊 Leer</button>
+</div>
+
+<script>
+  const SETS = {
+    emociones: [
+      ["happy_man","Feliz"],["sad_man","Triste"],["angry_man","Enojado"],
+      ["afraid_man","Asustado"],["worried_man","Preocupado"],["confused_man","Confundido"]
+    ],
+    comida: [
+      ["apple","Manzana"],["bread","Pan"],["milk","Leche"],
+      ["water","Agua"],["hot_chocolate","Chocolate caliente"]
+    ],
+    animales: [
+      ["cat","Gato"],["dog","Perro"],["bird","Pájaro"],["fish","Pez"]
+    ],
+    acciones: [
+      ["eat_,_to","Comer"],["drink_,_to","Beber"],["sleep_male_,_to","Dormir"],
+      ["play_,_to","Jugar"],["run_,_to","Correr"],["jump_,_to","Saltar"],
+      ["walk_,_to","Caminar"],["read_,_to","Leer"],["write_,_to","Escribir"],
+      ["help_,_to","Ayudar"],["dance_,_to","Bailar"],["sing_,_to","Cantar"]
+    ],
+    familia: [
+      ["mum_parent","Mamá"],["dad_parent","Papá"],["family","Familia"],["baby","Bebé"],
+      ["house","Casa"],["school_1","Escuela"],["chair","Silla"],["table","Mesa"],
+      ["toilets","Baño"]
+    ]
+  };
+
+  let frase = [];
+
+  for (const [cat, items] of Object.entries(SETS)) {
+    const grid = document.querySelector(`.grid[data-cat="${cat}"]`);
+    for (const [file, label] of items) {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `<img src="../../assets/pictos/muestra/${file}.svg" alt="${label}" onerror="this.style.opacity=.15"><span>${label}</span>`;
+      card.onclick = () => { frase.push([file, label]); pintar(); };
+      grid.appendChild(card);
+    }
+  }
+
+  function pintar() {
+    document.getElementById("fichas").innerHTML = frase
+      .map(([f, l], i) => `<span class="ficha"><img src="../../assets/pictos/muestra/${f}.svg" alt="">${l}</span>`)
+      .join("");
+  }
+
+  function leer() {
+    if (!frase.length) return;
+    const texto = frase.map(([, l]) => l).join(" ");
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(texto);
+    u.lang = "es-ES";
+    speechSynthesis.speak(u);
+  }
+</script>
+</body>
+</html>
