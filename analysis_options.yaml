@@ -1,0 +1,8 @@
+# Lints del proyecto: flutter_lints + reglas extra del plan 01.
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    prefer_const_constructors: true
+    avoid_print: true
+    unawaited_futures: true

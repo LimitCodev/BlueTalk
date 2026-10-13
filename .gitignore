@@ -1,44 +1,49 @@
 # Flutter / Dart
 .dart_tool/
 .packages
-build/
 .flutter-plugins
 .flutter-plugins-dependencies
-pubspec.lock
-*.g.dart
-*.freezed.dart
+.pub-cache/
+.pub/
+build/
+/coverage/
+**/doc/api/
+*.iml
+.idea/
+.vscode/
 
-# Android
+# Builds, symbolos y obfuscacion
+app.*.symbols
+app.*.map.json
+split-debug-info/
+*.apk
+*.aab
+*.aab.idsig
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Android / firmas (nunca subir claves)
 android/.gradle/
 android/local.properties
 android/key.properties
 *.keystore
 *.jks
-android/app/debug/
-android/app/profile/
-android/app/release/
-.gradle/
 captures/
-*.apk
-*.aab
-*.aab.idsig
-
-# IntelliJ / VS Code
-.idea/
-*.iml
-.vscode/
-
-# Símbolos de build (obfuscado) — guardarlos fuera del repo
-split-debug-info/
 
 # Supabase / secretos
 .env
 .env.*
 supabase/.temp/
 
-# SO
+# SO / varios
 .DS_Store
 Thumbs.db
+*.log
+*.swp
+.history
 
 # OpenCode
 .opencode/state/
+
+# Nota: pubspec.lock y los .g.dart generados SÍ se commitean (es una app, no un paquete)
