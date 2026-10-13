@@ -38,7 +38,7 @@ final storyRepoProvider = Provider<StoryRepo>(
 );
 
 final gameProgressRepoProvider = Provider<GameProgressRepo>(
-  (ref) => InMemoryGameProgressRepo(),
+  (ref) => PrefsGameProgressRepo(ref.watch(sharedPreferencesProvider)),
 );
 
 final scheduleRepoProvider = Provider<ScheduleRepo>(
@@ -46,11 +46,11 @@ final scheduleRepoProvider = Provider<ScheduleRepo>(
 );
 
 final wellbeingRepoProvider = Provider<WellbeingRepo>(
-  (ref) => InMemoryWellbeingRepo(),
+  (ref) => PrefsWellbeingRepo(ref.watch(sharedPreferencesProvider)),
 );
 
 final usageRepoProvider = Provider<UsageRepo>(
-  (ref) => InMemoryUsageRepo(),
+  (ref) => PrefsUsageRepo(ref.watch(sharedPreferencesProvider)),
 );
 
 final settingsRepoProvider = Provider<SettingsRepo>(

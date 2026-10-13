@@ -148,8 +148,10 @@ void main() {
       expect(after, hasLength(6));
     });
 
-    test('bienestar: moods y hábitos', () async {
-      final repo = InMemoryWellbeingRepo();
+    test('bienestar: moods y hábitos persisten', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repo = PrefsWellbeingRepo(prefs);
       final hoy = DateTime(2026, 10, 13);
 
       await repo.addMood(MoodEntry(id: 'm1', date: hoy, mood: 4));
@@ -160,25 +162,37 @@ void main() {
       final habits = await repo.habits();
       expect(habits, hasLength(1), reason: 'saveHabit debe reemplazar, no duplicar');
       expect(habits.single.done, isTrue);
+
+      // Nueva instancia (app reiniciada): lo escrito sigue ahí.
+      final fresh = PrefsWellbeingRepo(await SharedPreferences.getInstance());
+      expect(await fresh.moods(), hasLength(1));
+      expect((await fresh.habits()).single.done, isTrue);
     });
 
-    test('uso: registra eventos', () async {
-      final repo = InMemoryUsageRepo();
-      await repo.record(
-        UsageEvent(
-          id: 'u1',
-          type: 'picto_tap',
-          createdAt: DateTime(2026, 10, 13),
-          data: {'picto': 'apple'},
-        ),
-      );
+    test('uso: registra eventos y recorta a 200', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repo = PrefsUsageRepo(prefs);
+
+      for (var i = 0; i < 205; i++) {
+        await repo.record(
+          UsageEvent(
+            id: 'u$i',
+            type: 'picto_tap',
+            createdAt: DateTime(2026, 10, 13),
+            data: {'picto': 'apple'},
+          ),
+        );
+      }
+
       final events = await repo.events();
-      expect(events, hasLength(1));
-      expect(events.single.data['picto'], 'apple');
+      expect(events, hasLength(200), reason: 'tope para no engordar en gama baja');
+      expect(events.last.id, 'u204', reason: 'se conservan los más recientes');
     });
 
-    test('avance de juegos: guarda y recupera', () async {
-      final repo = InMemoryGameProgressRepo();
+    test('avance de juegos: persiste entre reinicios', () async {
+      SharedPreferences.setMockInitialValues({});
+      final repo = PrefsGameProgressRepo(await SharedPreferences.getInstance());
       await repo.saveProgress(const GameProgress(gameId: 'memoria', level: 3, stars: 2));
 
       final progress = await repo.progress('memoria');
@@ -186,6 +200,10 @@ void main() {
       expect(progress!.level, 3);
       expect(progress.stars, 2);
       expect(await repo.progress('otro'), isNull);
+
+      final fresh =
+          PrefsGameProgressRepo(await SharedPreferences.getInstance());
+      expect((await fresh.progress('memoria'))?.level, 3);
     });
 
     test('prefs corruptas: perfil y ajustes no rompen el arranque', () async {

@@ -26,6 +26,20 @@ Map<String, dynamic>? _tryDecodeObject(String raw) {
   }
 }
 
+/// Igual que [_tryDecodeObject] pero para listas de mapas.
+List<Map<String, dynamic>> _tryDecodeList(String raw) {
+  try {
+    final decoded = jsonDecode(raw);
+    if (decoded is! List<dynamic>) return [];
+    return [
+      for (final row in decoded)
+        if (row is Map) Map<String, dynamic>.from(row),
+    ];
+  } on FormatException {
+    return [];
+  }
+}
+
 const _profileKey = 'bluetalk_profile';
 const _settingsKey = 'bluetalk_settings';
 
@@ -94,16 +108,43 @@ class SeedStoryRepo implements StoryRepo {
       (await stories()).firstWhereOrNull((s) => s.id == id);
 }
 
-/// Avance de juegos en memoria (se migrará a Drift cuando toque).
-class InMemoryGameProgressRepo implements GameProgressRepo {
-  final _byGame = <String, GameProgress>{};
+/// Avance de juegos persistido en SharedPreferences.
+///
+/// Interim hasta Drift (mismo contrato, la feature no se entera).
+class PrefsGameProgressRepo implements GameProgressRepo {
+  PrefsGameProgressRepo(this._prefs);
+
+  static const _key = 'bluetalk_game_progress';
+
+  final SharedPreferences _prefs;
+  Map<String, GameProgress>? _cache;
+
+  Future<Map<String, GameProgress>> _load() async {
+    final cached = _cache;
+    if (cached != null) return cached;
+    final raw = _prefs.getString(_key);
+    final map = <String, GameProgress>{};
+    if (raw != null) {
+      for (final entry in _tryDecodeList(raw)) {
+        final progress = GameProgress.fromMap(entry);
+        map[progress.gameId] = progress;
+      }
+    }
+    return _cache = map;
+  }
 
   @override
-  Future<GameProgress?> progress(String gameId) async => _byGame[gameId];
+  Future<GameProgress?> progress(String gameId) async =>
+      (await _load())[gameId];
 
   @override
   Future<void> saveProgress(GameProgress progress) async {
-    _byGame[progress.gameId] = progress;
+    final map = await _load();
+    map[progress.gameId] = progress;
+    await _prefs.setString(
+      _key,
+      jsonEncode([for (final p in map.values) p.toMap()]),
+    );
   }
 }
 
@@ -138,36 +179,106 @@ class SeedScheduleRepo implements ScheduleRepo {
   }
 }
 
-/// Humor y hábitos en memoria (persistencia real llega con Drift).
-class InMemoryWellbeingRepo implements WellbeingRepo {
-  final _moods = <MoodEntry>[];
-  final _habits = <HabitEntry>[];
+/// Humor y hábitos persistidos en SharedPreferences (interim hasta Drift).
+class PrefsWellbeingRepo implements WellbeingRepo {
+  PrefsWellbeingRepo(this._prefs);
+
+  static const _moodsKey = 'bluetalk_moods';
+  static const _habitsKey = 'bluetalk_habits';
+
+  final SharedPreferences _prefs;
+  List<MoodEntry>? _moods;
+  Map<String, HabitEntry>? _habits;
+
+  Future<List<MoodEntry>> _loadMoods() async {
+    final cached = _moods;
+    if (cached != null) return cached;
+    final raw = _prefs.getString(_moodsKey);
+    return _moods = raw == null
+        ? []
+        : [for (final row in _tryDecodeList(raw)) MoodEntry.fromMap(row)];
+  }
+
+  Future<Map<String, HabitEntry>> _loadHabits() async {
+    final cached = _habits;
+    if (cached != null) return cached;
+    final raw = _prefs.getString(_habitsKey);
+    final map = <String, HabitEntry>{};
+    if (raw != null) {
+      for (final row in _tryDecodeList(raw)) {
+        final habit = HabitEntry.fromMap(row);
+        map[habit.id] = habit;
+      }
+    }
+    return _habits = map;
+  }
 
   @override
-  Future<List<MoodEntry>> moods() async => List.unmodifiable(_moods);
+  Future<List<MoodEntry>> moods() async =>
+      List.unmodifiable(await _loadMoods());
 
   @override
-  Future<void> addMood(MoodEntry entry) async => _moods.add(entry);
+  Future<void> addMood(MoodEntry entry) async {
+    final list = await _loadMoods();
+    list.add(entry);
+    await _prefs.setString(
+      _moodsKey,
+      jsonEncode([for (final m in list) m.toMap()]),
+    );
+  }
 
   @override
-  Future<List<HabitEntry>> habits() async => List.unmodifiable(_habits);
+  Future<List<HabitEntry>> habits() async =>
+      (await _loadHabits()).values.toList();
 
   @override
   Future<void> saveHabit(HabitEntry entry) async {
-    _habits.removeWhere((h) => h.id == entry.id);
-    _habits.add(entry);
+    final map = await _loadHabits();
+    map[entry.id] = entry;
+    await _prefs.setString(
+      _habitsKey,
+      jsonEncode([for (final h in map.values) h.toMap()]),
+    );
   }
 }
 
-/// Eventos de uso en memoria para estadísticas.
-class InMemoryUsageRepo implements UsageRepo {
-  final _events = <UsageEvent>[];
+/// Eventos de uso persistidos para el dashboard del modo padre.
+///
+/// Se guardan los últimos [_maxEvents] para no engordar el JSON en gama baja
+/// (el dashboard solo necesita la sesión reciente).
+class PrefsUsageRepo implements UsageRepo {
+  PrefsUsageRepo(this._prefs);
+
+  static const _key = 'bluetalk_usage';
+  static const _maxEvents = 200;
+
+  final SharedPreferences _prefs;
+  List<UsageEvent>? _cache;
+
+  Future<List<UsageEvent>> _load() async {
+    final cached = _cache;
+    if (cached != null) return cached;
+    final raw = _prefs.getString(_key);
+    return _cache = raw == null
+        ? []
+        : [for (final row in _tryDecodeList(raw)) UsageEvent.fromMap(row)];
+  }
 
   @override
-  Future<void> record(UsageEvent event) async => _events.add(event);
+  Future<void> record(UsageEvent event) async {
+    final list = await _load();
+    list.add(event);
+    if (list.length > _maxEvents) {
+      list.removeRange(0, list.length - _maxEvents);
+    }
+    await _prefs.setString(
+      _key,
+      jsonEncode([for (final e in list) e.toMap()]),
+    );
+  }
 
   @override
-  Future<List<UsageEvent>> events() async => List.unmodifiable(_events);
+  Future<List<UsageEvent>> events() async => List.unmodifiable(await _load());
 }
 
 /// Ajustes persistidos en SharedPreferences (JSON).
