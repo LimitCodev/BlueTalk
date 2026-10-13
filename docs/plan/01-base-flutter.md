@@ -10,12 +10,12 @@
 - [x] Contratos + repos mock con seeds (paso 6) y flag `USE_SUPABASE` (`9f67c02`)
 - [x] Onboarding real (paso 7) (`7b5e08e`)
 - [x] Ajustes completo: voz TTS placeholder, tamaño de texto, créditos (paso 8) (`f94baca`)
-- [ ] `pubspec.yaml` con TODAS las deps de Olas 2–3 y congelado
-- [ ] ⚠️ **Android SDK instalado** — bloquea `flutter run` y el APK (`flutter doctor` lo reporta)
+- [x] `pubspec.yaml` con TODAS las deps de Olas 2–3 y congelado (`6c24de1`)
+- [ ] ⚠️ **Android SDK instalado** — bloquea `flutter run` y el APK (`flutter doctor` lo reporta). **Único pendiente de Ola 1.**
 
 Estado de calidad: `flutter analyze` 0 issues · `flutter test` 53/53 · commits sin push (push por hito).
 
-**Retomada rápida:** el paso 6–8 ya está. Siguiente: congelar `pubspec.yaml` con las deps de Olas 2–3 (lista en el último bullet de "Alcance detallado" de este plan y en plan 09 §13) e instalar Android SDK.
+**Retomada rápida:** los pasos 1–8 y el congelado del pubspec (paso 9) ya están. **Ola 1 solo queda instalar el Android SDK** (`flutter doctor` guía; tras eso `flutter run` en dispositivo/emulador y se puede abrir Ola 2). Los agentes de la Ola 2 pueden partir ya: estructura, contratos (`lib/data/contracts/repos.dart`), seeds (`assets/seed/`) y DI (`lib/app/di.dart`) están firmes.
 
 **Depende de:** aprobación del plan 00.
 **Alimenta a:** todos los demás agentes (Ola 2 no empieza hasta que este termine).
