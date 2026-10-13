@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'core/theme/app_theme.dart';
+import 'app/app.dart';
+import 'app/di.dart';
 
-void main() {
-  runApp(const BlueTalkApp());
-}
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-class BlueTalkApp extends StatelessWidget {
-  const BlueTalkApp({super.key});
+  // Carga el flag de modo calma antes del primer frame (sin parpadeo).
+  final prefs = await SharedPreferences.getInstance();
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BlueTalk',
-      theme: buildBlueTalkTheme(),
-      home: const Scaffold(
-        body: Center(
-          child: Text('BlueTalk'),
-        ),
-      ),
-    );
-  }
+  runApp(
+    ProviderScope(
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      child: const BlueTalkApp(),
+    ),
+  );
 }
