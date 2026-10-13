@@ -3,8 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:bluetalk/data/models/app_settings.dart';
 import 'package:bluetalk/data/models/category.dart';
 import 'package:bluetalk/data/models/child_profile.dart';
+import 'package:bluetalk/data/models/game_progress.dart';
+import 'package:bluetalk/data/models/habit_entry.dart';
+import 'package:bluetalk/data/models/mood_entry.dart';
+import 'package:bluetalk/data/models/observation_rule.dart';
 import 'package:bluetalk/data/models/pictogram.dart';
 import 'package:bluetalk/data/models/schedule_entry.dart';
+import 'package:bluetalk/data/models/story.dart';
+import 'package:bluetalk/data/models/usage_event.dart';
 
 void main() {
   group('ChildProfile', () {
@@ -93,6 +99,107 @@ void main() {
       final back = AppSettings.fromMap(const {'ttsRate': 1});
       expect(back.ttsRate, 1.0);
       expect(back.remindersEnabled, isTrue);
+    });
+  });
+
+  group('Story', () {
+    test('roundtrip conserva páginas', () {
+      const story = Story(
+        id: 'cuento1',
+        title: 'El gato perdido',
+        coverPictoId: 'cat',
+        pages: ['El gato sale a jugar', 'El gato tiene hambre'],
+      );
+      final back = Story.fromMap(story.toMap());
+      expect(back.toMap(), story.toMap());
+      expect(back.pages, hasLength(2));
+    });
+
+    test('páginas ausentes queda lista vacía', () {
+      final back = Story.fromMap(const {'id': 's', 'title': 'T'});
+      expect(back.pages, isEmpty);
+    });
+  });
+
+  group('GameProgress', () {
+    test('roundtrip y defaults', () {
+      const progress = GameProgress(gameId: 'memoria', level: 3, stars: 2);
+      expect(GameProgress.fromMap(progress.toMap()).toMap(), progress.toMap());
+
+      final back = GameProgress.fromMap(const {'gameId': 'memoria'});
+      expect(back.level, 1);
+      expect(back.stars, 0);
+    });
+  });
+
+  group('MoodEntry', () {
+    test('roundtrip con fecha en epoch', () {
+      final entry = MoodEntry(
+        id: 'm1',
+        date: DateTime.fromMillisecondsSinceEpoch(1700000000000),
+        mood: 4,
+      );
+      final back = MoodEntry.fromMap(entry.toMap());
+      expect(back.toMap(), entry.toMap());
+      expect(back.mood, 4);
+    });
+
+    test('mood ausente usa 3 (neutral)', () {
+      final back = MoodEntry.fromMap(const {'id': 'm2', 'date': 0});
+      expect(back.mood, 3);
+    });
+  });
+
+  group('HabitEntry', () {
+    test('roundtrip conserva todo', () {
+      final entry = HabitEntry(
+        id: 'h1',
+        date: DateTime.fromMillisecondsSinceEpoch(1700000000000),
+        title: 'Tomar agua',
+        pictoId: 'water',
+        done: true,
+      );
+      final back = HabitEntry.fromMap(entry.toMap());
+      expect(back.toMap(), entry.toMap());
+      expect(back.done, isTrue);
+    });
+
+    test('done ausente es false', () {
+      final back = HabitEntry.fromMap(
+        const {'id': 'h2', 'date': 0, 'title': 'Descansar'},
+      );
+      expect(back.done, isFalse);
+    });
+  });
+
+  group('UsageEvent', () {
+    test('roundtrip conserva data', () {
+      final event = UsageEvent(
+        id: 'u1',
+        type: 'picto_tap',
+        createdAt: DateTime.fromMillisecondsSinceEpoch(1700000000000),
+        data: const {'pictoId': 'apple'},
+      );
+      final back = UsageEvent.fromMap(event.toMap());
+      expect(back.toMap(), event.toMap());
+      expect(back.data['pictoId'], 'apple');
+    });
+
+    test('data ausente queda vacío', () {
+      final back = UsageEvent.fromMap(
+        const {'id': 'u2', 'type': 'story_done', 'createdAt': 0},
+      );
+      expect(back.data, isEmpty);
+    });
+  });
+
+  group('ObservationRule', () {
+    test('roundtrip y enabled por defecto true', () {
+      const rule = ObservationRule(id: 'r1', label: 'Pocos pictogramas usados');
+      expect(ObservationRule.fromMap(rule.toMap()).toMap(), rule.toMap());
+
+      final back = ObservationRule.fromMap(const {'id': 'r2', 'label': 'L'});
+      expect(back.enabled, isTrue);
     });
   });
 }
