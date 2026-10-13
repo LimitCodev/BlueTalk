@@ -390,7 +390,10 @@ class _CategoryGrid extends ConsumerWidget {
       padding: const EdgeInsets.all(12),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 128,
-        mainAxisExtent: 112,
+        // 112 desbordaba con etiquetas de 2 líneas (52 de icono + 6 +
+        // 2×22 de texto = 102 > 100 útiles tras el padding). 120 deja
+        // margen también con el textScaler del sistema.
+        mainAxisExtent: 120,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
       ),
@@ -464,7 +467,10 @@ class _PictoGrid extends ConsumerWidget {
       padding: const EdgeInsets.all(12),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 128,
-        mainAxisExtent: 112,
+        // 112 desbordaba con etiquetas de 2 líneas (52 de icono + 6 +
+        // 2×22 de texto = 102 > 100 útiles tras el padding). 120 deja
+        // margen también con el textScaler del sistema.
+        mainAxisExtent: 120,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
       ),
