@@ -40,6 +40,20 @@ void main() {
       }
     });
 
+    test('pictogramas: sin bloques <style> (flutter_svg ignora el CSS)', () async {
+      final rows = await store.list('pictogramas');
+      for (final row in rows) {
+        final picto = Pictogram.fromMap(row);
+        final svg = File(picto.asset).readAsStringSync();
+        expect(
+          svg.contains('<style'),
+          isFalse,
+          reason: '${picto.asset} usa clases CSS: flutter_svg las ignora y el '
+              'picto se renderiza en negro. Los estilos van inline.',
+        );
+      }
+    });
+
     test('pictogramas: sus categorías existen', () async {
       final catIds = (await store.list('categorias')).map((c) => c['id']).toSet();
       final rows = await store.list('pictogramas');
