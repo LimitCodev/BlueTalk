@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/features/comunicador/comunicador_prefs.dart';
 import 'package:bluetalk/features/comunicador/saved_messages.dart';
+import 'package:bluetalk/features/comunicador/tts_service.dart';
 
 import 'dobles.dart';
 import 'harness.dart';
@@ -247,5 +248,28 @@ void main() {
       findsOneWidget,
     );
     expect(container.read(savedMessagesProvider), isEmpty);
+  });
+
+  testWidgets('sin voz en español avisa una vez y aún así intenta hablar',
+      (tester) async {
+    final tts = FakeTtsSpeaker(spanishAvailable: false);
+    final container = await pumpComunicador(tester, tts: tts);
+
+    await abrirCategoria(tester, 'Comida');
+    await tester.tap(find.text('Manzana'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('no tiene voz en español'), findsOneWidget);
+    expect(tts.spoken, ['Manzana'], reason: 'aun así se intenta hablar');
+
+    // El aviso no se repite en el resto de la sesión.
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Pan'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('no tiene voz en español'), findsNothing);
+    expect(tts.spoken, ['Manzana', 'Pan']);
+    expect(container.read(spanishVoiceWarnedProvider), isTrue);
   });
 }
