@@ -46,4 +46,7 @@ Thumbs.db
 # OpenCode
 .opencode/state/
 
+# Investigación: informes duplicados fuera de docs/ (las notas sí se commitean)
+reports/
+
 # Nota: pubspec.lock y los .g.dart generados SÍ se commitean (es una app, no un paquete)
