@@ -52,9 +52,12 @@ List<Object> overridesDeJuegos(SharedPreferences prefs) => [
 ///
 /// Con [resetPrefs] en false se reutiliza la instancia de preferencias
 /// anterior (para verificar persistencia dentro del mismo test).
+/// [modoCalma] envuelve la app en `MediaQuery.disableAnimations`, igual
+/// que la raíz real en Modo calma (plan 00 §4).
 Future<ProviderContainer> pumpJuegos(
   WidgetTester tester, {
   bool resetPrefs = true,
+  bool modoCalma = false,
 }) async {
   if (resetPrefs) SharedPreferences.setMockInitialValues({});
   final prefs = await prefsDePrueba();
@@ -63,12 +66,24 @@ Future<ProviderContainer> pumpJuegos(
   );
   addTearDown(container.dispose);
 
+  // El builder corre por debajo del MediaQuery propio de MaterialApp,
+  // igual que la raíz real de la app (plan 00 §4).
+  final Widget app = MaterialApp(
+    home: const Scaffold(body: JuegosScreen()),
+    builder: modoCalma
+        ? (context, child) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(disableAnimations: true),
+              child: child!,
+            )
+        : null,
+  );
+
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
       child: DefaultAssetBundle(
         bundle: DiskAssetBundle(),
-        child: const MaterialApp(home: Scaffold(body: JuegosScreen())),
+        child: app,
       ),
     ),
   );
