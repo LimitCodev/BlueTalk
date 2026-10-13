@@ -9,13 +9,13 @@
 - [x] Modelos de dominio (los 11) + tests `fromMap`/`toMap` (`c0354cc`, `60729e8`)
 - [x] Contratos + repos mock con seeds (paso 6) y flag `USE_SUPABASE` (`9f67c02`)
 - [x] Onboarding real (paso 7) (`7b5e08e`)
-- [ ] Ajustes completo: voz TTS placeholder, tamaño de texto, créditos (paso 8)
+- [x] Ajustes completo: voz TTS placeholder, tamaño de texto, créditos (paso 8) (`f94baca`)
 - [ ] `pubspec.yaml` con TODAS las deps de Olas 2–3 y congelado
 - [ ] ⚠️ **Android SDK instalado** — bloquea `flutter run` y el APK (`flutter doctor` lo reporta)
 
-Estado de calidad: `flutter analyze` 0 issues · `flutter test` 49/49 · commits sin push (push por hito).
+Estado de calidad: `flutter analyze` 0 issues · `flutter test` 53/53 · commits sin push (push por hito).
 
-**Retomada rápida:** el paso 8 (Ajustes) se monta sobre `_AjustesTab` en `lib/app/router.dart` (hoy solo tiene `CalmModeToggle`); el perfil vive en `profileProvider` (`lib/features/onboarding/profile_controller.dart`).
+**Retomada rápida:** el paso 6–8 ya está. Siguiente: congelar `pubspec.yaml` con las deps de Olas 2–3 (lista en el último bullet de "Alcance detallado" de este plan y en plan 09 §13) e instalar Android SDK.
 
 **Depende de:** aprobación del plan 00.
 **Alimenta a:** todos los demás agentes (Ola 2 no empieza hasta que este termine).
