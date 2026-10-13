@@ -84,7 +84,7 @@ class _CategoryHeader extends ConsumerWidget {
   }
 }
 
-/// Inicio del comunicador: rejilla de categorías (lazy).
+/// Inicio del comunicador: buscador, favoritos y rejilla de categorías.
 class _HomeView extends ConsumerWidget {
   const _HomeView();
 
@@ -93,10 +93,170 @@ class _HomeView extends ConsumerWidget {
     final catalog = ref.watch(catalogProvider);
 
     return switch (catalog) {
-      AsyncData(:final value) => _CategoryGrid(catalog: value),
+      AsyncData(:final value) => _HomeContent(catalog: value),
       AsyncError() => const _CatalogError(),
       _ => const Center(child: CircularProgressIndicator()),
     };
+  }
+}
+
+class _HomeContent extends ConsumerWidget {
+  const _HomeContent({required this.catalog});
+
+  final Catalog catalog;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final view = ref.watch(comunicadorProvider);
+
+    if (view.query.isNotEmpty) {
+      return Column(
+        children: [
+          const _SearchField(),
+          Expanded(child: _SearchResults(catalog: catalog, query: view.query)),
+        ],
+      );
+    }
+
+    final favorites = ref.watch(favoritesProvider);
+    final favoritePictos = [
+      for (final picto in catalog.pictograms)
+        if (favorites.contains(picto.id)) picto,
+    ];
+
+    return Column(
+      children: [
+        const _SearchField(),
+        if (favoritePictos.isNotEmpty)
+          _FavoritesSection(pictos: favoritePictos)
+        else
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+            child: Text(
+              'Mantén presionado un pictograma para fijarlo en el inicio.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+        Expanded(child: _CategoryGrid(catalog: catalog)),
+      ],
+    );
+  }
+}
+
+/// Buscador por palabra sobre todos los pictogramas (case-insensitive).
+class _SearchField extends ConsumerStatefulWidget {
+  const _SearchField();
+
+  @override
+  ConsumerState<_SearchField> createState() => _SearchFieldState();
+}
+
+class _SearchFieldState extends ConsumerState<_SearchField> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // Al volver de otra vista, el texto del estado vuelve con el campo.
+    _controller = TextEditingController(
+      text: ref.read(comunicadorProvider).query,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasQuery = ref.watch(comunicadorProvider).query.isNotEmpty;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+      child: TextField(
+        controller: _controller,
+        textInputAction: TextInputAction.search,
+        onChanged: (value) =>
+            ref.read(comunicadorProvider.notifier).setQuery(value),
+        decoration: InputDecoration(
+          labelText: 'Busca una palabra',
+          hintText: 'Escribe una palabra',
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: hasQuery
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  tooltip: 'Borrar búsqueda',
+                  onPressed: () {
+                    _controller.clear();
+                    ref.read(comunicadorProvider.notifier).setQuery('');
+                  },
+                )
+              : null,
+          border: const OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+}
+
+/// Resultados del buscador sobre el catálogo completo.
+class _SearchResults extends ConsumerWidget {
+  const _SearchResults({required this.catalog, required this.query});
+
+  final Catalog catalog;
+  final String query;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final needle = query.toLowerCase();
+    final results = [
+      for (final picto in catalog.pictograms)
+        if (picto.label.toLowerCase().contains(needle) ||
+            picto.keywords.any((word) => word.toLowerCase().contains(needle)))
+          picto,
+    ];
+
+    if (results.isEmpty) {
+      return Center(child: Text('No hay pictogramas para "$query".'));
+    }
+
+    return _PictoGrid(
+      pictograms: results,
+      emptyText: 'No hay pictogramas para "$query".',
+    );
+  }
+}
+
+/// Pictogramas fijados en el inicio, en fila horizontal (lazy).
+class _FavoritesSection extends ConsumerWidget {
+  const _FavoritesSection({required this.pictos});
+
+  final List<Pictogram> pictos;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SizedBox(
+      height: 116,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        itemCount: pictos.length,
+        itemBuilder: (context, index) {
+          final picto = pictos[index];
+          return SizedBox(
+            width: 100,
+            child: PictoTile(
+              pictogram: picto,
+              favorited: true,
+              onTap: () => _onPictoTap(context, ref, picto),
+              onLongPress: () => _onPictoLongPress(context, ref, picto),
+            ),
+          );
+        },
+      ),
+    );
   }
 }
 
@@ -113,6 +273,7 @@ class _CategoryView extends ConsumerWidget {
     return switch (catalog) {
       AsyncData(:final value) => _PictoGrid(
           pictograms: value.pictogramsOf(categoryId),
+          emptyText: 'Esta categoría todavía no tiene pictogramas.',
         ),
       AsyncError() => const _CatalogError(),
       _ => const Center(child: CircularProgressIndicator()),
@@ -188,18 +349,18 @@ class _CategoryGrid extends ConsumerWidget {
   }
 }
 
-/// Rejilla de pictogramas; tocar agrega a la frase y habla (bajo tap).
+/// Rejilla de pictogramas; tocar agrega a la frase y habla (bajo tap),
+/// mantener presionado fija o desfija el picto en el inicio.
 class _PictoGrid extends ConsumerWidget {
-  const _PictoGrid({required this.pictograms});
+  const _PictoGrid({required this.pictograms, required this.emptyText});
 
   final List<Pictogram> pictograms;
+  final String emptyText;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (pictograms.isEmpty) {
-      return const Center(
-        child: Text('Esta categoría todavía no tiene pictogramas.'),
-      );
+      return Center(child: Text(emptyText));
     }
 
     final favorites = ref.watch(favoritesProvider);
@@ -219,6 +380,7 @@ class _PictoGrid extends ConsumerWidget {
           pictogram: picto,
           favorited: favorites.contains(picto.id),
           onTap: () => _onPictoTap(context, ref, picto),
+          onLongPress: () => _onPictoLongPress(context, ref, picto),
         );
       },
     );
@@ -270,4 +432,27 @@ Future<void> _onPictoTap(
   if (ref.read(speakOnTapProvider)) {
     await speakText(context, ref, picto.label);
   }
+}
+
+/// Mantener presionado: fija o desfija el picto en el inicio, con aviso.
+Future<void> _onPictoLongPress(
+  BuildContext context,
+  WidgetRef ref,
+  Pictogram picto,
+) async {
+  await ref.read(favoritesProvider.notifier).toggle(picto.id);
+  if (!context.mounted) return;
+
+  final favorited = ref.read(favoritesProvider).contains(picto.id);
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text(
+          favorited
+              ? 'Pictograma fijado en el inicio'
+              : 'Pictograma quitado del inicio',
+        ),
+      ),
+    );
 }

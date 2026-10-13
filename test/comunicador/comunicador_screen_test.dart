@@ -128,4 +128,57 @@ void main() {
     );
     expect(container.read(speakOnTapProvider), isFalse);
   });
+
+  testWidgets('el buscador filtra pictos por palabra sin importar mayúsculas',
+      (tester) async {
+    await pumpComunicador(tester);
+
+    await tester.enterText(find.byType(TextField), 'GATo');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Gato'), findsOneWidget);
+    expect(find.text('Perro'), findsNothing);
+    expect(find.text('Manzana'), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.clear));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Gato'), findsNothing);
+    expect(find.text('Comida'), findsOneWidget, reason: 'vuelve el inicio');
+  });
+
+  testWidgets('mantener presionado fija un favorito en el inicio y persiste',
+      (tester) async {
+    final container = await pumpComunicador(tester);
+
+    await abrirCategoria(tester, 'Comida');
+    await tester.longPress(find.text('Manzana'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Pictograma fijado en el inicio'), findsOneWidget);
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Volver'));
+    await tester.pumpAndSettle();
+
+    // Aparece en la sección de favoritos del inicio.
+    expect(find.text('Manzana'), findsOneWidget);
+    expect(container.read(favoritesProvider), contains('apple'));
+
+    // Y persiste tras recrear la pantalla con las mismas preferencias.
+    await tester.pumpWidget(const SizedBox());
+    await pumpComunicador(tester, resetPrefs: false);
+    expect(find.text('Manzana'), findsOneWidget);
+  });
+
+  testWidgets('mantener presionado de nuevo quita el favorito', (tester) async {
+    final container = await pumpComunicador(tester);
+
+    await abrirCategoria(tester, 'Comida');
+    await tester.longPress(find.text('Manzana'));
+    await tester.pumpAndSettle();
+    await tester.longPress(find.text('Manzana'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Pictograma quitado del inicio'), findsOneWidget);
+    expect(container.read(favoritesProvider), isEmpty);
+  });
 }

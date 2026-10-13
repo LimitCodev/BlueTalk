@@ -35,11 +35,15 @@ class DiskAssetBundle extends AssetBundle {
 }
 
 /// Bombea el comunicador con seeds leídos del disco y TTS falso.
+///
+/// Con [resetPrefs] en false se reutiliza la instancia de preferencias
+/// anterior (para verificar persistencia dentro del mismo test).
 Future<ProviderContainer> pumpComunicador(
   WidgetTester tester, {
   FakeTtsSpeaker? tts,
+  bool resetPrefs = true,
 }) async {
-  SharedPreferences.setMockInitialValues({});
+  if (resetPrefs) SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
   final container = ProviderContainer(
     overrides: [
