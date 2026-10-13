@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:accessibility_tools/accessibility_tools.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,11 +10,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bluetalk/app/app.dart';
 import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/core/theme/calm_mode.dart';
+import 'package:bluetalk/data/local/seed_store.dart';
 import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/ajustes/ajustes_screen.dart';
+import 'package:bluetalk/features/comunicador/tts_service.dart';
 import 'package:bluetalk/features/onboarding/onboarding_screen.dart';
 import 'package:bluetalk/features/onboarding/profile_controller.dart';
 
+import '../comunicador/dobles.dart';
 import 'accessibility_helper.dart';
 
 /// Auditoría de accesibilidad de la Ola 1 (regla dura plan 00 §5: targets
@@ -25,6 +31,22 @@ void main() {
 
   List<Object> overridesCon(SharedPreferences prefs) =>
       [sharedPreferencesProvider.overrideWithValue(prefs)];
+
+  // El shell aloja el comunicador real: seeds de disco + TTS falso para
+  // tests herméticos (el canal de assets de flutter test solo responde en
+  // el primer testWidgets del archivo).
+  List<Object> overridesDeShell(SharedPreferences prefs) => [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        initialProfileProvider.overrideWithValue(
+          const ChildProfile(id: 'local', nickname: 'Sol'),
+        ),
+        ttsSpeakerProvider.overrideWithValue(FakeTtsSpeaker()),
+        seedStoreProvider.overrideWithValue(
+          SeedStore(
+            (path) => SynchronousFuture<String>(File(path).readAsStringSync()),
+          ),
+        ),
+      ];
 
   testWidgets('onboarding: sin problemas de accesibilidad', (tester) async {
     final prefs = await givenPrefs();
@@ -56,12 +78,9 @@ void main() {
           textDirection: TextDirection.ltr,
           child: AccessibilityTools(
             child: ProviderScope(
-              overrides: [
-                sharedPreferencesProvider.overrideWithValue(prefs),
-                initialProfileProvider.overrideWithValue(
-                  const ChildProfile(id: 'local', nickname: 'Sol'),
-                ),
-              ],
+              // Riverpod 3 no exporta `Override` (solo se infiere): cast()
+              // lo deduce del parámetro de ProviderScope.
+              overrides: overridesDeShell(prefs).cast(),
               child: const BlueTalkApp(),
             ),
           ),
@@ -80,12 +99,7 @@ void main() {
     final prefs = await givenPrefs();
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-          initialProfileProvider.overrideWithValue(
-            const ChildProfile(id: 'local', nickname: 'Sol'),
-          ),
-        ],
+        overrides: overridesDeShell(prefs).cast(),
         child: const BlueTalkApp(),
       ),
     );

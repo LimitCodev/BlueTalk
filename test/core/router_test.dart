@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,8 +12,12 @@ import 'package:bluetalk/app/router.dart';
 import 'package:bluetalk/app/shell.dart';
 import 'package:bluetalk/core/theme/calm_mode.dart';
 import 'package:bluetalk/data/local/mock_repos.dart';
+import 'package:bluetalk/data/local/seed_store.dart';
 import 'package:bluetalk/data/models/models.dart';
+import 'package:bluetalk/features/comunicador/tts_service.dart';
 import 'package:bluetalk/features/onboarding/profile_controller.dart';
+
+import '../comunicador/dobles.dart';
 
 Future<SharedPreferences> _givenPrefs() async {
   SharedPreferences.setMockInitialValues({});
@@ -28,6 +35,15 @@ Future<ProviderContainer> _pumpApp(
         sharedPreferencesProvider.overrideWithValue(prefs),
         if (profile != null)
           initialProfileProvider.overrideWithValue(profile),
+        // El shell aloja el comunicador real: seeds leídas del disco y TTS
+        // falso para que el test sea hermético (el canal de assets de
+        // flutter test solo responde en el primer testWidgets del archivo).
+        ttsSpeakerProvider.overrideWithValue(FakeTtsSpeaker()),
+        seedStoreProvider.overrideWithValue(
+          SeedStore(
+            (path) => SynchronousFuture<String>(File(path).readAsStringSync()),
+          ),
+        ),
       ],
       child: const BlueTalkApp(),
     ),
