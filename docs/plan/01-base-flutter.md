@@ -66,4 +66,4 @@ FEAT: pantalla de ajustes con persistencia de preferencias
 - [ ] Activar modo calma grisa TODA la UI y persiste tras reiniciar.
 - [ ] `flutter analyze` 0 issues; `flutter test` verde.
 - [ ] Seeds cargan y pintan datos de ejemplo en placeholders.
-- [ ] `pubspec.yaml` con TODAS las deps de las Olas 2–3 declaradas (para congelarlo): `flutter_riverpod`, `go_router`, `drift`, `sqlite3_flutter_libs`, `path_provider`, `shared_preferences`, `flutter_tts`, `local_auth`, `cryptography`, `flutter_local_notifications`, `supabase_flutter`, `connectivity_plus`, `http`.
+- [ ] `pubspec.yaml` con TODAS las deps de las Olas 2–3 declaradas (para congelarlo): `flutter_riverpod`, `go_router`, `drift`, `sqlite3_flutter_libs`, `path_provider`, `shared_preferences`, `flutter_tts`, `local_auth`, `cryptography`, `flutter_local_notifications`, `timezone`, `supabase_flutter`, `connectivity_plus`, `flutter_svg`, `http`. Lista candidata completa y descartes: `docs/plan/09-stack-paquetes.md`.
