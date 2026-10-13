@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/theme/app_theme.dart';
 import '../core/theme/calm_mode.dart';
+import 'router.dart';
 
-/// Raíz de la app: tema celeste pastel + interruptor global del modo calma.
+/// Raíz de la app: tema celeste pastel + router + interruptor global de calma.
 class BlueTalkApp extends ConsumerWidget {
   const BlueTalkApp({super.key});
 
@@ -12,9 +13,10 @@ class BlueTalkApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final calm = ref.watch(calmModeProvider);
 
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'BlueTalk',
       theme: buildBlueTalkTheme(),
+      routerConfig: ref.read(routerProvider),
       // Toda la UI pasa por aquí: animaciones apagadas + grises en modo calma.
       builder: (context, child) {
         final media = MediaQuery.of(context);
@@ -28,11 +30,6 @@ class BlueTalkApp extends ConsumerWidget {
             ? ColorFiltered(colorFilter: calmColorFilter, child: tree)
             : tree;
       },
-      home: const Scaffold(
-        body: Center(
-          child: Text('BlueTalk'),
-        ),
-      ),
     );
   }
 }
