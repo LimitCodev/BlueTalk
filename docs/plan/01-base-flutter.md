@@ -11,11 +11,23 @@
 - [x] Onboarding real (paso 7) (`7b5e08e`)
 - [x] Ajustes completo: voz TTS placeholder, tamaño de texto, créditos (paso 8) (`f94baca`)
 - [x] `pubspec.yaml` con TODAS las deps de Olas 2–3 y congelado (`6c24de1`)
-- [ ] ⚠️ **Android SDK instalado** — bloquea `flutter run` y el APK (`flutter doctor` lo reporta). **Único pendiente de Ola 1.**
+- [x] **Android SDK instalado** (espacio de usuario, sin root) + `flutter doctor` ✓
 
 Estado de calidad: `flutter analyze` 0 issues · `flutter test` 53/53 · commits sin push (push por hito).
 
-**Retomada rápida:** los pasos 1–8 y el congelado del pubspec (paso 9) ya están. **Ola 1 solo queda instalar el Android SDK** (`flutter doctor` guía; tras eso `flutter run` en dispositivo/emulador y se puede abrir Ola 2). Los agentes de la Ola 2 pueden partir ya: estructura, contratos (`lib/data/contracts/repos.dart`), seeds (`assets/seed/`) y DI (`lib/app/di.dart`) están firmes.
+**Retomada rápida:** Ola 1 completa (pasos 1–9 + Android SDK). Los agentes de la Ola 2 pueden partir: estructura, contratos (`lib/data/contracts/repos.dart`), seeds (`assets/seed/`) y DI (`lib/app/di.dart`) están firmes.
+
+### Android SDK (instalado en espacio de usuario — sin sudo)
+
+- Ubicación: `~/android-sdk` (platform-tools, platforms;android-36, build-tools;36.0.0).
+- Configurado con `flutter config --android-sdk ~/android-sdk` (persiste en `~/.flutter_settings`).
+- **Para compilar hay que exportar la variable en cada sesión** (no está en `.bashrc`):
+  ```bash
+  export ANDROID_HOME=$HOME/android-sdk
+  flutter build apk --debug          # o --release --split-per-abi
+  ```
+- Java: `/usr/lib/jvm/java-17-openjdk` (JDK 17, compatible con AGP).
+- No confundir con el `dart` de `/opt/dart-sdk` que aparece en el aviso de `flutter doctor`: es cosmético.
 
 **Depende de:** aprobación del plan 00.
 **Alimenta a:** todos los demás agentes (Ola 2 no empieza hasta que este termine).
