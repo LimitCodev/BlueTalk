@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../app/app_avatar.dart';
+import '../../core/theme/app_colors.dart';
 import '../../core/theme/calm_mode.dart';
 import '../../core/widgets/section_header.dart';
 import '../../data/models/models.dart';
+import '../onboarding/profile_controller.dart';
 import 'settings_controller.dart';
 
 /// Ajustes (plan 01 §8): modo calma, tamaño de texto, voz (placeholder del
@@ -30,6 +34,7 @@ class AjustesScreen extends ConsumerWidget {
         },
         const Divider(),
         const _TtsSection(),
+        const _AvatarSection(),
         const Divider(),
         const _LegalSection(),
         const Divider(),
@@ -124,6 +129,101 @@ class _TtsSection extends ConsumerWidget {
 }
 
 /// Enlaces legales: los abre el agente padre (Ola 2).
+/// Sección "Tu avatar": el niño elige un picto que le representa (plan 00
+/// §5.2). Selección persistida en el perfil local, sin PII.
+class _AvatarSection extends ConsumerWidget {
+  const _AvatarSection();
+
+  /// Candidatos curados de los seeds: gestos, familia y objetos amigables.
+  static const _candidatos = <(String, String)>[
+    ('happy_man', 'Feliz'),
+    ('baby', 'Bebé'),
+    ('cat', 'Gato'),
+    ('dog', 'Perro'),
+    ('bird', 'Pájaro'),
+    ('fish', 'Pez'),
+    ('sun', 'Sol'),
+    ('ball', 'Pelota'),
+  ];
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final seleccion = ref.watch(profileProvider)?.avatarPicto ?? 'happy_man';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionHeader('Tu avatar'),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              for (final (id, label) in _candidatos)
+                _AvatarOption(pictoId: id, label: label, selected: id == seleccion),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+}
+
+/// Opción de avatar: círculo táctil de 56dp (≥48 del plan 00 §5) con
+/// borde fuerte cuando está seleccionada.
+class _AvatarOption extends ConsumerWidget {
+  const _AvatarOption({
+    required this.pictoId,
+    required this.label,
+    required this.selected,
+  });
+
+  final String pictoId;
+  final String label;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asset = ref.watch(avatarAssetProvider(pictoId)).value;
+
+    return Tooltip(
+      message: label,
+      child: Semantics(
+        button: true,
+        selected: selected,
+        label: 'Avatar $label',
+        child: InkWell(
+          borderRadius: BorderRadius.circular(28),
+          onTap: () => ref.read(profileProvider.notifier).updateAvatar(pictoId),
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primary,
+              border: Border.all(
+                color: selected
+                    ? AppColors.primaryStrong
+                    : Colors.transparent,
+                width: 3,
+              ),
+            ),
+            child: asset == null
+                ? const Icon(
+                    Icons.child_care,
+                    size: 30,
+                    color: AppColors.primaryStrong,
+                  )
+                : SvgPicture.asset(asset, width: 40, height: 40),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _LegalSection extends StatelessWidget {
   const _LegalSection();
 

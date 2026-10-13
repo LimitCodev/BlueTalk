@@ -21,6 +21,15 @@ class ProfileController extends Notifier<ChildProfile?> {
     await ref.read(profileRepoProvider).saveProfile(profile);
     state = profile;
   }
+
+  /// Cambia el avatar (picto) del niño y lo persiste (plan 00 §5.2).
+  Future<void> updateAvatar(String pictoId) async {
+    final current = state;
+    if (current == null || current.avatarPicto == pictoId) return;
+    final updated = current.copyWith(avatarPicto: pictoId);
+    await ref.read(profileRepoProvider).saveProfile(updated);
+    state = updated;
+  }
 }
 
 /// Perfil activo del niño (`null` → onboarding).

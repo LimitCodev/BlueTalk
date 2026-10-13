@@ -30,4 +30,11 @@ class ChildProfile {
         'avatarPicto': avatarPicto,
         'createdAt': createdAt?.millisecondsSinceEpoch,
       };
+
+  ChildProfile copyWith({String? nickname, String? avatarPicto}) => ChildProfile(
+        id: id,
+        nickname: nickname ?? this.nickname,
+        avatarPicto: avatarPicto ?? this.avatarPicto,
+        createdAt: createdAt,
+      );
 }

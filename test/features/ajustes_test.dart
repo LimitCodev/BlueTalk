@@ -5,8 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/data/local/mock_repos.dart';
+import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/ajustes/ajustes_screen.dart';
 import 'package:bluetalk/features/ajustes/settings_controller.dart';
+import 'package:bluetalk/features/onboarding/profile_controller.dart';
 
 void main() {
   group('SettingsController', () {
@@ -42,7 +44,13 @@ void main() {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
       final container = ProviderContainer(
-        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          // Ajustes solo se alcanza tras onboarding: hay perfil local.
+          initialProfileProvider.overrideWithValue(
+            const ChildProfile(id: 'local', nickname: 'Sol'),
+          ),
+        ],
       );
       addTearDown(container.dispose);
 
@@ -136,6 +144,25 @@ void main() {
       expect(sliders, hasLength(2));
       expect(sliders.every((s) => s.onChanged == null), isTrue);
       expect(find.text('No se pudieron cargar los ajustes'), findsOneWidget);
+    });
+
+    testWidgets('sección Tu avatar: elegir avatar lo persiste', (tester) async {
+      final container = await pumpAjustes(tester);
+
+      await tester.scrollUntilVisible(find.text('Tu avatar'), 300);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Gato'));
+      await tester.pumpAndSettle();
+
+      expect(container.read(profileProvider)?.avatarPicto, 'cat');
+      expect(
+        (await PrefsProfileRepo(
+          container.read(sharedPreferencesProvider),
+        ).currentProfile())?.avatarPicto,
+        'cat',
+        reason: 'la selección debe sobrevivir a un reinicio',
+      );
     });
   });
 }

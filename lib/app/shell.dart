@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/theme/calm_mode.dart';
+import 'app_avatar.dart';
 
 /// Shell fijo con navegación inferior predecible (plan 01 §4):
 /// Comunicar · Aprender · Rutinas · Ajustes.
@@ -25,7 +26,14 @@ class AppShell extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_tabs[index].label),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const AppAvatar(size: 28),
+            const SizedBox(width: 10),
+            Text(_tabs[index].label),
+          ],
+        ),
         actions: [
           // Botón de modo calma visible siempre en el shell (plan 01 §3).
           IconButton(
