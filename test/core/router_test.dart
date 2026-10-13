@@ -15,6 +15,7 @@ import 'package:bluetalk/data/local/mock_repos.dart';
 import 'package:bluetalk/data/local/seed_store.dart';
 import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/comunicador/tts_service.dart';
+import 'package:bluetalk/features/juegos/juegos_screen.dart';
 import 'package:bluetalk/features/onboarding/profile_controller.dart';
 
 import '../comunicador/dobles.dart';
@@ -151,7 +152,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final calmRoute = ModalRoute.of(
-      tester.element(find.text('Juegos y cuentos — próximamente')),
+      tester.element(find.byType(JuegosScreen)),
     );
     expect(calmRoute, isNotNull);
     expect(calmRoute!.transitionDuration, Duration.zero);

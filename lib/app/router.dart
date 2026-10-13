@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../core/theme/calm_mode.dart';
 import '../features/ajustes/ajustes_screen.dart';
 import '../features/comunicador/comunicador_screen.dart';
+import '../features/juegos/juegos_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/onboarding/profile_controller.dart';
 import 'shell.dart';
@@ -61,7 +62,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               pageBuilder: (context, state) => page(
                 context,
                 state,
-                const _TabContent('Aprender', 'Juegos y cuentos'),
+                const JuegosScreen(),
               ),
             ),
           ]),
