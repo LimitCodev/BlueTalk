@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'cabecera_juego.dart';
 import '../../core/theme/app_colors.dart';
 import 'avance_juegos.dart';
 import 'juegos_controller.dart';
+import 'memoria/memoria_screen.dart';
 
 /// Pestaña "Aprender" del shell: juegos y cuentos (plan 03).
 ///
@@ -19,7 +21,7 @@ class JuegosScreen extends ConsumerWidget {
 
     return switch (vista) {
       JuegoVista.inicio => const _HomeView(),
-      JuegoVista.memoria => const _Pendiente('Memoria'),
+      JuegoVista.memoria => const _MemoriaView(),
       JuegoVista.cuentos => const _Pendiente('Cuentos'),
       JuegoVista.artista => const _Pendiente('Artista'),
     };
@@ -118,6 +120,21 @@ class _JuegoCard extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Vista del memoria: cabecera + cuerpo del juego.
+class _MemoriaView extends StatelessWidget {
+  const _MemoriaView();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        CabeceraJuego('Memoria'),
+        Expanded(child: MemoriaScreen()),
+      ],
     );
   }
 }
