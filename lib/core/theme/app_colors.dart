@@ -19,7 +19,13 @@ abstract final class AppColors {
 
   /// Borde, icono y foco interactivos: el único celeste con ≥3:1 vs fondo
   /// (4.2:1). El relleno pastel [primary] queda para superficies grandes.
+  /// NO usar para texto: 4.2:1 no llega a AA (usa [primaryStrongText]).
   static const primaryStrong = Color(0xFF2F7FA8);
+
+  /// Texto de acento sobre [bg]/[surface] — 4.8:1 (AA texto ≥4.5:1).
+  /// Un tono más oscuro que [primaryStrong] porque los encabezados
+  /// de sección son texto y exigen 4.5:1.
+  static const primaryStrongText = Color(0xFF2A7699);
 
   /// Texto principal sobre bg — 11.4:1.
   static const text = Color(0xFF1F3A44);

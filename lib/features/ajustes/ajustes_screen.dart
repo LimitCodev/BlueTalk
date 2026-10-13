@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/calm_mode.dart';
+import '../../core/widgets/section_header.dart';
 import '../../data/models/models.dart';
 import 'settings_controller.dart';
 
@@ -49,7 +50,7 @@ class _TextScaleSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionHeader('Tamaño del texto'),
+        const SectionHeader('Tamaño del texto'),
         ListTile(
           title: const Text('Letra más grande'),
           subtitle: Slider(
@@ -80,7 +81,7 @@ class _TtsSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionHeader('Voz'),
+        const SectionHeader('Voz'),
         ListTile(
           title: const Text('Velocidad de la voz'),
           subtitle: Slider(
@@ -124,7 +125,7 @@ class _LegalSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionHeader('Legal'),
+        const SectionHeader('Legal'),
         ListTile(
           leading: const Icon(Icons.description_outlined),
           title: const Text('Términos y condiciones'),
@@ -169,32 +170,12 @@ class _CreditsSection extends StatelessWidget {
     return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader('Créditos'),
+        SectionHeader('Créditos'),
         ListTile(
           title: Text('Pictogramas: Mulberry Symbols'),
           subtitle: Text('© Mulberry Project — licencia CC BY-SA 4.0'),
         ),
       ],
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader(this.title);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.w700,
-            ),
-      ),
     );
   }
 }

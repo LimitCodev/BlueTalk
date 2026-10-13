@@ -41,6 +41,17 @@ void main() {
       expect(_contrast(AppColors.primaryStrong, AppColors.surface), greaterThanOrEqualTo(3.0));
     });
 
+    test('texto de acento (primaryStrongText) sobre bg y surface >= 4.5:1', () {
+      expect(
+        _contrast(AppColors.primaryStrongText, AppColors.bg),
+        greaterThanOrEqualTo(4.5),
+      );
+      expect(
+        _contrast(AppColors.primaryStrongText, AppColors.surface),
+        greaterThanOrEqualTo(4.5),
+      );
+    });
+
     test('ink de estados sobre su relleno >= 4.5:1', () {
       expect(_contrast(AppColors.onSuccess, AppColors.success), greaterThanOrEqualTo(4.5));
       expect(_contrast(AppColors.onWarning, AppColors.warning), greaterThanOrEqualTo(4.5));
