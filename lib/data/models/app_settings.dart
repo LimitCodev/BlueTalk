@@ -28,4 +28,17 @@ class AppSettings {
         'textScale': textScale,
         'remindersEnabled': remindersEnabled,
       };
+
+  AppSettings copyWith({
+    double? ttsRate,
+    double? ttsPitch,
+    double? textScale,
+    bool? remindersEnabled,
+  }) =>
+      AppSettings(
+        ttsRate: ttsRate ?? this.ttsRate,
+        ttsPitch: ttsPitch ?? this.ttsPitch,
+        textScale: textScale ?? this.textScale,
+        remindersEnabled: remindersEnabled ?? this.remindersEnabled,
+      );
 }

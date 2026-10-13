@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/theme/calm_mode.dart';
+import '../features/ajustes/ajustes_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/onboarding/profile_controller.dart';
 import 'shell.dart';
@@ -77,7 +78,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             GoRoute(
               path: '/home/ajustes',
               pageBuilder: (context, state) =>
-                  page(context, state, const _AjustesTab()),
+                  page(context, state, const AjustesScreen()),
             ),
           ]),
         ],
@@ -123,18 +124,6 @@ class _TabContent extends StatelessWidget {
           Text('$subtitle — próximamente'),
         ],
       ),
-    );
-  }
-}
-
-/// Ajustes (Ola 1): el interruptor del modo calma; el resto lo añade el paso 8.
-class _AjustesTab extends StatelessWidget {
-  const _AjustesTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: const [CalmModeToggle()],
     );
   }
 }
