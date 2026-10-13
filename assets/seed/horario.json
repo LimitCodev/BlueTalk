@@ -1,0 +1,8 @@
+[
+  { "id": "h_entrada", "title": "Entrada", "timeMinutes": 480, "pictoId": "house", "enabled": true },
+  { "id": "h_clases", "title": "Clases", "timeMinutes": 510, "pictoId": "read_,_to", "enabled": true },
+  { "id": "h_recreo", "title": "Recreo", "timeMinutes": 600, "pictoId": "play_,_to", "enabled": true },
+  { "id": "h_almuerzo", "title": "Almuerzo", "timeMinutes": 720, "pictoId": "eat_,_to", "enabled": true },
+  { "id": "h_tareas", "title": "Tareas", "timeMinutes": 840, "pictoId": "write_,_to", "enabled": true },
+  { "id": "h_salida", "title": "Salida", "timeMinutes": 960, "pictoId": "school_1", "enabled": true }
+]

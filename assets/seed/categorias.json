@@ -1,0 +1,9 @@
+[
+  { "id": "emociones", "name": "Emociones", "icon": "happy_man", "order": 1 },
+  { "id": "comida", "name": "Comida", "icon": "apple", "order": 2 },
+  { "id": "animales", "name": "Animales", "icon": "cat", "order": 3 },
+  { "id": "acciones", "name": "Acciones", "icon": "play_,_to", "order": 4 },
+  { "id": "familia", "name": "Familia y lugares", "icon": "mum_parent", "order": 5 },
+  { "id": "objetos", "name": "Objetos", "icon": "ball", "order": 6 },
+  { "id": "clima", "name": "Clima", "icon": "sun", "order": 7 }
+]

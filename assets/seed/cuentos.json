@@ -1,0 +1,38 @@
+[
+  {
+    "id": "cuento_gato",
+    "title": "El gato de Lola",
+    "coverPictoId": "cat",
+    "pages": [
+      "Lola tiene un gato.",
+      "El gato duerme en la cama.",
+      "El gato come pescado.",
+      "Lola juega con el gato.",
+      "El gato está feliz."
+    ]
+  },
+  {
+    "id": "cuento_escuela",
+    "title": "Un día en la escuela",
+    "coverPictoId": "school_1",
+    "pages": [
+      "Voy a la escuela.",
+      "Leo un libro con mi maestra.",
+      "Como pan y bebo leche en el recreo.",
+      "Juego a la pelota con mis amigos.",
+      "Vuelvo a casa con mi papá."
+    ]
+  },
+  {
+    "id": "cuento_lluvia",
+    "title": "El día de lluvia",
+    "coverPictoId": "rain",
+    "pages": [
+      "Hoy llueve.",
+      "Me pongo el abrigo y los zapatos.",
+      "Salto en los charcos.",
+      "Entra mi familia a la casa.",
+      "Tomo chocolate caliente."
+    ]
+  }
+]

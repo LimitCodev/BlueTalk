@@ -1,0 +1,7 @@
+[
+  { "id": "r_pocos_pictos", "label": "El niño usa muy pocos pictogramas al día.", "enabled": true },
+  { "id": "r_poco_tiempo", "label": "Las sesiones duran muy poco tiempo.", "enabled": true },
+  { "id": "r_cambio_humor", "label": "El humor cambia mucho entre sesiones.", "enabled": true },
+  { "id": "r_habito_sin_completar", "label": "Un hábito se repite sin completarse.", "enabled": true },
+  { "id": "r_mismo_picto", "label": "Se repite siempre el mismo pictograma.", "enabled": true }
+]

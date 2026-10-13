@@ -1,0 +1,254 @@
+[
+  {
+    "id": "happy_man",
+    "categoryId": "emociones",
+    "label": "Feliz",
+    "asset": "assets/pictos/muestra/happy_man.svg"
+  },
+  {
+    "id": "sad_man",
+    "categoryId": "emociones",
+    "label": "Triste",
+    "asset": "assets/pictos/muestra/sad_man.svg"
+  },
+  {
+    "id": "angry_man",
+    "categoryId": "emociones",
+    "label": "Enojado",
+    "asset": "assets/pictos/muestra/angry_man.svg"
+  },
+  {
+    "id": "afraid_man",
+    "categoryId": "emociones",
+    "label": "Asustado",
+    "asset": "assets/pictos/muestra/afraid_man.svg"
+  },
+  {
+    "id": "worried_man",
+    "categoryId": "emociones",
+    "label": "Preocupado",
+    "asset": "assets/pictos/muestra/worried_man.svg"
+  },
+  {
+    "id": "confused_man",
+    "categoryId": "emociones",
+    "label": "Confundido",
+    "asset": "assets/pictos/muestra/confused_man.svg"
+  },
+  {
+    "id": "apple",
+    "categoryId": "comida",
+    "label": "Manzana",
+    "asset": "assets/pictos/muestra/apple.svg"
+  },
+  {
+    "id": "bread",
+    "categoryId": "comida",
+    "label": "Pan",
+    "asset": "assets/pictos/muestra/bread.svg"
+  },
+  {
+    "id": "milk",
+    "categoryId": "comida",
+    "label": "Leche",
+    "asset": "assets/pictos/muestra/milk.svg"
+  },
+  {
+    "id": "water",
+    "categoryId": "comida",
+    "label": "Agua",
+    "asset": "assets/pictos/muestra/water.svg"
+  },
+  {
+    "id": "hot_chocolate",
+    "categoryId": "comida",
+    "label": "Chocolate caliente",
+    "asset": "assets/pictos/muestra/hot_chocolate.svg"
+  },
+  {
+    "id": "cat",
+    "categoryId": "animales",
+    "label": "Gato",
+    "asset": "assets/pictos/muestra/cat.svg"
+  },
+  {
+    "id": "dog",
+    "categoryId": "animales",
+    "label": "Perro",
+    "asset": "assets/pictos/muestra/dog.svg"
+  },
+  {
+    "id": "bird",
+    "categoryId": "animales",
+    "label": "Pájaro",
+    "asset": "assets/pictos/muestra/bird.svg"
+  },
+  {
+    "id": "fish",
+    "categoryId": "animales",
+    "label": "Pez",
+    "asset": "assets/pictos/muestra/fish.svg"
+  },
+  {
+    "id": "eat_,_to",
+    "categoryId": "acciones",
+    "label": "Comer",
+    "asset": "assets/pictos/muestra/eat_,_to.svg"
+  },
+  {
+    "id": "drink_,_to",
+    "categoryId": "acciones",
+    "label": "Beber",
+    "asset": "assets/pictos/muestra/drink_,_to.svg"
+  },
+  {
+    "id": "sleep_male_,_to",
+    "categoryId": "acciones",
+    "label": "Dormir",
+    "asset": "assets/pictos/muestra/sleep_male_,_to.svg"
+  },
+  {
+    "id": "play_,_to",
+    "categoryId": "acciones",
+    "label": "Jugar",
+    "asset": "assets/pictos/muestra/play_,_to.svg"
+  },
+  {
+    "id": "run_,_to",
+    "categoryId": "acciones",
+    "label": "Correr",
+    "asset": "assets/pictos/muestra/run_,_to.svg"
+  },
+  {
+    "id": "jump_,_to",
+    "categoryId": "acciones",
+    "label": "Saltar",
+    "asset": "assets/pictos/muestra/jump_,_to.svg"
+  },
+  {
+    "id": "walk_,_to",
+    "categoryId": "acciones",
+    "label": "Caminar",
+    "asset": "assets/pictos/muestra/walk_,_to.svg"
+  },
+  {
+    "id": "read_,_to",
+    "categoryId": "acciones",
+    "label": "Leer",
+    "asset": "assets/pictos/muestra/read_,_to.svg"
+  },
+  {
+    "id": "write_,_to",
+    "categoryId": "acciones",
+    "label": "Escribir",
+    "asset": "assets/pictos/muestra/write_,_to.svg"
+  },
+  {
+    "id": "help_,_to",
+    "categoryId": "acciones",
+    "label": "Ayudar",
+    "asset": "assets/pictos/muestra/help_,_to.svg"
+  },
+  {
+    "id": "dance_,_to",
+    "categoryId": "acciones",
+    "label": "Bailar",
+    "asset": "assets/pictos/muestra/dance_,_to.svg"
+  },
+  {
+    "id": "sing_,_to",
+    "categoryId": "acciones",
+    "label": "Cantar",
+    "asset": "assets/pictos/muestra/sing_,_to.svg"
+  },
+  {
+    "id": "mum_parent",
+    "categoryId": "familia",
+    "label": "Mamá",
+    "asset": "assets/pictos/muestra/mum_parent.svg"
+  },
+  {
+    "id": "dad_parent",
+    "categoryId": "familia",
+    "label": "Papá",
+    "asset": "assets/pictos/muestra/dad_parent.svg"
+  },
+  {
+    "id": "family",
+    "categoryId": "familia",
+    "label": "Familia",
+    "asset": "assets/pictos/muestra/family.svg"
+  },
+  {
+    "id": "baby",
+    "categoryId": "familia",
+    "label": "Bebé",
+    "asset": "assets/pictos/muestra/baby.svg"
+  },
+  {
+    "id": "house",
+    "categoryId": "familia",
+    "label": "Casa",
+    "asset": "assets/pictos/muestra/house.svg"
+  },
+  {
+    "id": "school_1",
+    "categoryId": "familia",
+    "label": "Escuela",
+    "asset": "assets/pictos/muestra/school_1.svg"
+  },
+  {
+    "id": "chair",
+    "categoryId": "objetos",
+    "label": "Silla",
+    "asset": "assets/pictos/muestra/chair.svg"
+  },
+  {
+    "id": "table",
+    "categoryId": "objetos",
+    "label": "Mesa",
+    "asset": "assets/pictos/muestra/table.svg"
+  },
+  {
+    "id": "toilets",
+    "categoryId": "objetos",
+    "label": "Baño",
+    "asset": "assets/pictos/muestra/toilets.svg"
+  },
+  {
+    "id": "ball",
+    "categoryId": "objetos",
+    "label": "Pelota",
+    "asset": "assets/pictos/muestra/ball.svg"
+  },
+  {
+    "id": "socks",
+    "categoryId": "objetos",
+    "label": "Calcetines",
+    "asset": "assets/pictos/muestra/socks.svg"
+  },
+  {
+    "id": "shoe_-_mans",
+    "categoryId": "objetos",
+    "label": "Zapatos",
+    "asset": "assets/pictos/muestra/shoe_-_mans.svg"
+  },
+  {
+    "id": "sun",
+    "categoryId": "clima",
+    "label": "Sol",
+    "asset": "assets/pictos/muestra/sun.svg"
+  },
+  {
+    "id": "rain",
+    "categoryId": "clima",
+    "label": "Lluvia",
+    "asset": "assets/pictos/muestra/rain.svg"
+  },
+  {
+    "id": "cloudy",
+    "categoryId": "clima",
+    "label": "Nublado",
+    "asset": "assets/pictos/muestra/cloudy.svg"
+  }
+]
