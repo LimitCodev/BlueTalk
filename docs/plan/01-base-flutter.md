@@ -1,5 +1,20 @@
 # Plan 01 — `base-flutter` (Ola 1, secuencial, esfuerzo XL)
 
+## Progreso (actualizado antes de apagar)
+
+- [x] Scaffold + lints + estructura feature-first (`206bf2d`)
+- [x] Design tokens celeste pastel + test contraste AA (`b350f9e`)
+- [x] Modo calma: grises, animaciones off, persistente (`132ff14`)
+- [x] Shell go_router con 4 pestañas, /onboarding, /home/*, /padre (`b50ad61`)
+- [ ] Modelos de dominio + tests `fromMap`/`toMap` (paso 5)
+- [ ] Contratos + repos mock con seeds (paso 6) y flag `USE_SUPABASE`
+- [ ] Onboarding real (paso 7)
+- [ ] Ajustes completo: voz TTS placeholder, tamaño de texto, créditos (paso 8)
+- [ ] `pubspec.yaml` con TODAS las deps de Olas 2–3 y congelado
+- [ ] ⚠️ **Android SDK instalado** — bloquea `flutter run` y el APK (`flutter doctor` lo reporta)
+
+Estado de calidad: `flutter analyze` 0 issues · `flutter test` 12/12 · commits sin push (push por hito).
+
 **Depende de:** aprobación del plan 00.
 **Alimenta a:** todos los demás agentes (Ola 2 no empieza hasta que este termine).
 **Lee:** `docs/plan/00-PLAN-MAESTRO.md` antes de tocar nada.
