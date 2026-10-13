@@ -187,6 +187,24 @@ void main() {
       expect(progress.stars, 2);
       expect(await repo.progress('otro'), isNull);
     });
+
+    test('prefs corruptas: perfil y ajustes no rompen el arranque', () async {
+      SharedPreferences.setMockInitialValues({
+        'bluetalk_profile': '{"id": "p1", "nick', // cortado a mitad
+        'bluetalk_settings': 'no es json',
+      });
+      final prefs = await SharedPreferences.getInstance();
+
+      final profile = await PrefsProfileRepo(prefs).currentProfile();
+      expect(profile, isNull, reason: 'perfil corrupto se descarta, no lanza');
+
+      final settings = await PrefsSettingsRepo(prefs).load();
+      expect(settings.textScale, 1.0, reason: 'ajustes corruptos vuelven a defaults');
+
+      // Las claves corruptas quedaron limpias para la próxima escritura.
+      expect(prefs.getString('bluetalk_profile'), isNull);
+      expect(prefs.getString('bluetalk_settings'), isNull);
+    });
   });
 
   group('di', () {

@@ -15,6 +15,17 @@ extension _FirstOrNullX<T> on Iterable<T> {
   }
 }
 
+/// Decodifica JSON guardado; si está corrupto (batería agotada a mitad de
+/// escritura, limpieza del sistema) devuelve null en vez de romper el arranque.
+Map<String, dynamic>? _tryDecodeObject(String raw) {
+  try {
+    final decoded = jsonDecode(raw);
+    return decoded is Map<String, dynamic> ? decoded : null;
+  } on FormatException {
+    return null;
+  }
+}
+
 const _profileKey = 'bluetalk_profile';
 const _settingsKey = 'bluetalk_settings';
 
@@ -28,7 +39,13 @@ class PrefsProfileRepo implements ProfileRepo {
   Future<ChildProfile?> currentProfile() async {
     final raw = _prefs.getString(_profileKey);
     if (raw == null) return null;
-    return ChildProfile.fromMap(jsonDecode(raw) as Map<String, dynamic>);
+    final map = _tryDecodeObject(raw);
+    if (map == null) {
+      // Preferencias corruptas: se descarta el perfil y se empieza limpio.
+      await _prefs.remove(_profileKey);
+      return null;
+    }
+    return ChildProfile.fromMap(map);
   }
 
   @override
@@ -163,7 +180,13 @@ class PrefsSettingsRepo implements SettingsRepo {
   Future<AppSettings> load() async {
     final raw = _prefs.getString(_settingsKey);
     if (raw == null) return const AppSettings();
-    return AppSettings.fromMap(jsonDecode(raw) as Map<String, dynamic>);
+    final map = _tryDecodeObject(raw);
+    if (map == null) {
+      // Ajustes corruptos: se vuelven a los defaults y se limpia la clave.
+      await _prefs.remove(_settingsKey);
+      return const AppSettings();
+    }
+    return AppSettings.fromMap(map);
   }
 
   @override
