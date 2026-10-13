@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/di.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/section_header.dart';
+import 'artista/artista_dibujos.dart';
 import 'juegos_catalog.dart';
 
 /// Niveles del memoria: nivel 1 = 4 parejas y sube de 2 en 2
@@ -36,6 +37,7 @@ final avanceJuegosProvider = FutureProvider<AvanceJuegos>((ref) async {
   final repo = ref.watch(gameProgressRepoProvider);
   final memoria = await repo.progress('memoria');
   final cuentos = await ref.watch(cuentosSeedProvider.future);
+  final dibujos = ref.watch(galeriaDibujosProvider).length;
 
   var completados = 0;
   for (final cuento in cuentos) {
@@ -48,7 +50,7 @@ final avanceJuegosProvider = FutureProvider<AvanceJuegos>((ref) async {
     memoriaNivel: memoria?.level ?? 1,
     cuentosCompletados: completados,
     cuentosTotal: cuentos.length,
-    dibujosGuardados: 0,
+    dibujosGuardados: dibujos,
   );
 });
 
@@ -99,7 +101,8 @@ class _AvanceList extends StatelessWidget {
               : avance.cuentosCompletados / avance.cuentosTotal,
         ),
         _AvanceFila(
-          titulo: 'Artista: ${avance.dibujosGuardados} dibujos guardados',
+          titulo: 'Artista: ${avance.dibujosGuardados} '
+              '${avance.dibujosGuardados == 1 ? 'dibujo guardado' : 'dibujos guardados'}',
           valor: (avance.dibujosGuardados / 5).clamp(0.0, 1.0),
         ),
       ],

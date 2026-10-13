@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'cabecera_juego.dart';
 import '../../core/theme/app_colors.dart';
+import 'artista/artista_screen.dart';
 import 'avance_juegos.dart';
 import 'cuentos/cuentos_screen.dart';
 import 'juegos_controller.dart';
@@ -24,7 +25,7 @@ class JuegosScreen extends ConsumerWidget {
       JuegoVista.inicio => const _HomeView(),
       JuegoVista.memoria => const _MemoriaView(),
       JuegoVista.cuentos => const CuentosScreen(),
-      JuegoVista.artista => const _Pendiente('Artista'),
+      JuegoVista.artista => const ArtistaScreen(),
     };
   }
 }
@@ -136,34 +137,6 @@ class _MemoriaView extends StatelessWidget {
         CabeceraJuego('Memoria'),
         Expanded(child: MemoriaScreen()),
       ],
-    );
-  }
-}
-
-/// Vista de un juego aún no entregado (se reemplaza en su commit).
-class _Pendiente extends ConsumerWidget {
-  const _Pendiente(this.titulo);
-
-  final String titulo;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(titulo, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          const Text('Este juego llega en el siguiente paso.'),
-          const SizedBox(height: 12),
-          OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(minimumSize: const Size(64, 48)),
-            onPressed: () => ref.read(juegosProvider.notifier).irAlInicio(),
-            icon: const Icon(Icons.chevron_left),
-            label: const Text('Volver'),
-          ),
-        ],
-      ),
     );
   }
 }
