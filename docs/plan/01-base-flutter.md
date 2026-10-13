@@ -6,14 +6,14 @@
 - [x] Design tokens celeste pastel + test contraste AA (`b350f9e`)
 - [x] Modo calma: grises, animaciones off, persistente (`132ff14`)
 - [x] Shell go_router con 4 pestañas, /onboarding, /home/*, /padre (`b50ad61`)
-- [ ] Modelos de dominio + tests `fromMap`/`toMap` (paso 5)
+- [x] Modelos de dominio (los 11) + tests `fromMap`/`toMap` (`c0354cc`, `60729e8`)
 - [ ] Contratos + repos mock con seeds (paso 6) y flag `USE_SUPABASE`
 - [ ] Onboarding real (paso 7)
 - [ ] Ajustes completo: voz TTS placeholder, tamaño de texto, créditos (paso 8)
 - [ ] `pubspec.yaml` con TODAS las deps de Olas 2–3 y congelado
 - [ ] ⚠️ **Android SDK instalado** — bloquea `flutter run` y el APK (`flutter doctor` lo reporta)
 
-Estado de calidad: `flutter analyze` 0 issues · `flutter test` 12/12 · commits sin push (push por hito).
+Estado de calidad: `flutter analyze` 0 issues · `flutter test` 32/32 · commits sin push (push por hito).
 
 **Depende de:** aprobación del plan 00.
 **Alimenta a:** todos los demás agentes (Ola 2 no empieza hasta que este termine).
