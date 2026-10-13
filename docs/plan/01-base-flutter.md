@@ -7,13 +7,15 @@
 - [x] Modo calma: grises, animaciones off, persistente (`132ff14`)
 - [x] Shell go_router con 4 pestañas, /onboarding, /home/*, /padre (`b50ad61`)
 - [x] Modelos de dominio (los 11) + tests `fromMap`/`toMap` (`c0354cc`, `60729e8`)
-- [ ] Contratos + repos mock con seeds (paso 6) y flag `USE_SUPABASE`
+- [x] Contratos + repos mock con seeds (paso 6) y flag `USE_SUPABASE` (`9f67c02`)
 - [ ] Onboarding real (paso 7)
 - [ ] Ajustes completo: voz TTS placeholder, tamaño de texto, créditos (paso 8)
 - [ ] `pubspec.yaml` con TODAS las deps de Olas 2–3 y congelado
 - [ ] ⚠️ **Android SDK instalado** — bloquea `flutter run` y el APK (`flutter doctor` lo reporta)
 
-Estado de calidad: `flutter analyze` 0 issues · `flutter test` 32/32 · commits sin push (push por hito).
+Estado de calidad: `flutter analyze` 0 issues · `flutter test` 48/48 · commits sin push (push por hito).
+
+**Retomada rápida:** el paso 7 (onboarding) consume `profileRepoProvider` de `lib/app/di.dart`; los seeds ya pintan datos en `assets/seed/`.
 
 **Depende de:** aprobación del plan 00.
 **Alimenta a:** todos los demás agentes (Ola 2 no empieza hasta que este termine).
