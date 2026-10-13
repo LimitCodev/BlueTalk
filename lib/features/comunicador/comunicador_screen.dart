@@ -13,6 +13,7 @@ import 'comunicador_prefs.dart';
 import 'phrase_bar.dart';
 import 'phrase_controller.dart';
 import 'picto_tile.dart';
+import 'saved_messages.dart';
 import 'speak_action.dart';
 
 /// Comunicador AAC (plan 02): categorías, pictogramas offline, barra de
@@ -25,15 +26,21 @@ class ComunicadorScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final categoryId = ref.watch(comunicadorProvider).categoryId;
+    final view = ref.watch(comunicadorProvider);
+    final categoryId = view.categoryId;
 
     return Column(
       children: [
-        if (categoryId != null) _CategoryHeader(categoryId: categoryId),
+        if (categoryId != null)
+          _CategoryHeader(categoryId: categoryId)
+        else if (view.showMessages)
+          const _MessagesHeader(),
         Expanded(
           child: categoryId != null
               ? _CategoryView(categoryId: categoryId)
-              : const _HomeView(),
+              : view.showMessages
+                  ? const _MessagesView()
+                  : const _HomeView(),
         ),
         const PhraseBar(),
       ],
@@ -80,6 +87,81 @@ class _CategoryHeader extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Cabecera de "Mis mensajes" con botón "Volver" al inicio.
+class _MessagesHeader extends ConsumerWidget {
+  const _MessagesHeader();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 12, 4),
+      child: Row(
+        children: [
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(64, 48),
+            ),
+            onPressed: () => ref.read(comunicadorProvider.notifier).goHome(),
+            icon: const Icon(Icons.chevron_left),
+            label: const Text('Volver'),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Mis mensajes',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Lista de mensajes guardados: tocarlos los carga en la barra de frase.
+class _MessagesView extends ConsumerWidget {
+  const _MessagesView();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final messages = ref.watch(savedMessagesProvider);
+
+    if (messages.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            'Aún no has guardado mensajes. Crea una frase y pulsa "Guardar".',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: messages.length,
+      itemBuilder: (context, index) {
+        final message = messages[index];
+        return ListTile(
+          leading: const Icon(Icons.bookmark),
+          title: Text(message.text),
+          subtitle: Text('${message.pictoIds.length} pictogramas'),
+          trailing: IconButton(
+            icon: const Icon(Icons.delete_outline),
+            tooltip: 'Borrar mensaje',
+            onPressed: () =>
+                ref.read(savedMessagesProvider.notifier).remove(message.id),
+          ),
+          onTap: () => _cargarMensaje(context, ref, message),
+        );
+      },
     );
   }
 }
@@ -175,27 +257,40 @@ class _SearchFieldState extends ConsumerState<_SearchField> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-      child: TextField(
-        controller: _controller,
-        textInputAction: TextInputAction.search,
-        onChanged: (value) =>
-            ref.read(comunicadorProvider.notifier).setQuery(value),
-        decoration: InputDecoration(
-          labelText: 'Busca una palabra',
-          hintText: 'Escribe una palabra',
-          prefixIcon: const Icon(Icons.search),
-          suffixIcon: hasQuery
-              ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  tooltip: 'Borrar búsqueda',
-                  onPressed: () {
-                    _controller.clear();
-                    ref.read(comunicadorProvider.notifier).setQuery('');
-                  },
-                )
-              : null,
-          border: const OutlineInputBorder(),
-        ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              textInputAction: TextInputAction.search,
+              onChanged: (value) =>
+                  ref.read(comunicadorProvider.notifier).setQuery(value),
+              decoration: InputDecoration(
+                labelText: 'Busca una palabra',
+                hintText: 'Escribe una palabra',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: hasQuery
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        tooltip: 'Borrar búsqueda',
+                        onPressed: () {
+                          _controller.clear();
+                          ref.read(comunicadorProvider.notifier).setQuery('');
+                        },
+                      )
+                    : null,
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          IconButton(
+            icon: const Icon(Icons.bookmark_border),
+            tooltip: 'Mis mensajes',
+            onPressed: () =>
+                ref.read(comunicadorProvider.notifier).showMessages(),
+          ),
+        ],
       ),
     );
   }
@@ -455,4 +550,18 @@ Future<void> _onPictoLongPress(
         ),
       ),
     );
+}
+
+/// Tocar un mensaje guardado: recarga sus pictos en la barra de frase.
+Future<void> _cargarMensaje(
+  BuildContext context,
+  WidgetRef ref,
+  SavedMessage message,
+) async {
+  final catalog = await ref.read(catalogProvider.future);
+  final pictos = [
+    for (final id in message.pictoIds) catalog.pictogramById(id),
+  ].whereType<Pictogram>().toList();
+  ref.read(phraseProvider.notifier).load(pictos);
+  ref.read(comunicadorProvider.notifier).goHome();
 }

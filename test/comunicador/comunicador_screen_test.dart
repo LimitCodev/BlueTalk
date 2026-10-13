@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/features/comunicador/comunicador_prefs.dart';
+import 'package:bluetalk/features/comunicador/saved_messages.dart';
 
 import 'dobles.dart';
 import 'harness.dart';
@@ -180,5 +181,71 @@ void main() {
 
     expect(find.text('Pictograma quitado del inicio'), findsOneWidget);
     expect(container.read(favoritesProvider), isEmpty);
+  });
+
+  testWidgets('guardar la frase en mis mensajes y volver a usarla',
+      (tester) async {
+    final tts = FakeTtsSpeaker();
+    await pumpComunicador(tester, tts: tts);
+
+    await abrirCategoria(tester, 'Comida');
+    await tester.tap(find.text('Manzana'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Pan'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Guardar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Guardar en mis mensajes'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Guardar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Mensaje guardado'), findsOneWidget);
+
+    // Se guarda con el texto de la frase y sus pictos.
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Volver'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.bookmark_border));
+    await tester.pumpAndSettle();
+    expect(find.text('Mis mensajes'), findsOneWidget);
+    expect(find.text('Manzana Pan'), findsOneWidget);
+    expect(find.text('2 pictogramas'), findsOneWidget);
+
+    // Pasados unos segundos se va el aviso y el botón Leer queda libre.
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+
+    // Tocar el mensaje lo recarga en la barra y se puede leer.
+    await tester.tap(find.text('Manzana Pan'));
+    await tester.pumpAndSettle();
+    expect(find.text('Manzana'), findsOneWidget, reason: 'en la barra');
+    await tester.tap(find.widgetWithText(FilledButton, 'Leer'));
+    await tester.pumpAndSettle();
+    expect(tts.spoken.last, 'Manzana Pan');
+  });
+
+  testWidgets('mis mensajes vacío muestra el literal y se puede borrar',
+      (tester) async {
+    final container = await pumpComunicador(tester);
+    await container.read(savedMessagesProvider.notifier).save(
+          text: 'Quiero agua',
+          pictoIds: const ['water'],
+        );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.bookmark_border));
+    await tester.pumpAndSettle();
+    expect(find.text('Quiero agua'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Borrar mensaje'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'Aún no has guardado mensajes. Crea una frase y pulsa "Guardar".',
+      ),
+      findsOneWidget,
+    );
+    expect(container.read(savedMessagesProvider), isEmpty);
   });
 }

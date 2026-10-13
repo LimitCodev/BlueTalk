@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../data/models/models.dart';
 import 'comunicador_prefs.dart';
 import 'phrase_controller.dart';
+import 'saved_messages.dart';
 import 'speak_action.dart';
 
 /// Barra de frase fija abajo (plan 02 §4): pictos tocados con X para
@@ -73,6 +74,16 @@ class PhraseBar extends ConsumerWidget {
                       : () => ref.read(phraseProvider.notifier).clear(),
                   child: const Text('Borrar todo'),
                 ),
+                const SizedBox(width: 8),
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(64, 48),
+                  ),
+                  onPressed: phrase.isEmpty
+                      ? null
+                      : () => _guardarMensaje(context, ref, phrase),
+                  child: const Text('Guardar'),
+                ),
                 const Spacer(),
                 FilledButton(
                   style: FilledButton.styleFrom(
@@ -89,6 +100,50 @@ class PhraseBar extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  /// Diálogo "Guardar en mis mensajes": texto editable + pictos que lo forman.
+  Future<void> _guardarMensaje(
+    BuildContext context,
+    WidgetRef ref,
+    List<Pictogram> phrase,
+  ) async {
+    final controller = TextEditingController(text: phraseText(phrase));
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Guardar en mis mensajes'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(labelText: 'Mensaje'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+
+    final text = controller.text.trim();
+    controller.dispose();
+
+    if (confirmed != true || text.isEmpty) return;
+
+    await ref.read(savedMessagesProvider.notifier).save(
+          text: text,
+          pictoIds: [for (final picto in phrase) picto.id],
+        );
+    if (context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text('Mensaje guardado')));
+    }
   }
 }
 

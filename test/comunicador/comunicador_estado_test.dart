@@ -7,6 +7,7 @@ import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/comunicador/comunicador_controller.dart';
 import 'package:bluetalk/features/comunicador/comunicador_prefs.dart';
 import 'package:bluetalk/features/comunicador/phrase_controller.dart';
+import 'package:bluetalk/features/comunicador/saved_messages.dart';
 
 const _manzana = Pictogram(
   id: 'apple',
@@ -111,6 +112,37 @@ void main() {
 
       controller.showMessages();
       expect(container.read(comunicadorProvider).showMessages, isTrue);
+    });
+  });
+
+  group('SavedMessagesController', () {
+    test('guarda, recupera y borra mensajes', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
+      addTearDown(container.dispose);
+      final controller = container.read(savedMessagesProvider.notifier);
+
+      await controller.save(text: 'Quiero agua', pictoIds: const ['water']);
+      await controller.save(text: 'A jugar', pictoIds: const ['play_,_to']);
+
+      final messages = container.read(savedMessagesProvider);
+      expect(messages.map((m) => m.text), ['A jugar', 'Quiero agua']);
+
+      // Un provider nuevo con las mismas preferencias ve los mensajes.
+      final other = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
+      addTearDown(other.dispose);
+      expect(other.read(savedMessagesProvider), hasLength(2));
+
+      await controller.remove(messages.last.id);
+      expect(
+        container.read(savedMessagesProvider).map((m) => m.text),
+        ['A jugar'],
+      );
     });
   });
 }
