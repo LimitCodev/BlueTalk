@@ -160,6 +160,8 @@ class MemoriaController extends AsyncNotifier<MemoriaViewState> {
     await ref.read(gameProgressRepoProvider).saveProgress(
           GameProgress(gameId: 'memoria', level: nuevoDesbloqueado),
         );
+    // Refresca la sección de avance del home sin reiniciar la app.
+    ref.invalidate(avanceJuegosProvider);
     // Alimenta el dashboard del modo padre (plan 03 §6).
     await ref.read(usageRepoProvider).record(
           UsageEvent(

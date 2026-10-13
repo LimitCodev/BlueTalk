@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'cabecera_juego.dart';
 import '../../core/theme/app_colors.dart';
 import 'avance_juegos.dart';
+import 'cuentos/cuentos_screen.dart';
 import 'juegos_controller.dart';
 import 'memoria/memoria_screen.dart';
 
@@ -22,7 +23,7 @@ class JuegosScreen extends ConsumerWidget {
     return switch (vista) {
       JuegoVista.inicio => const _HomeView(),
       JuegoVista.memoria => const _MemoriaView(),
-      JuegoVista.cuentos => const _Pendiente('Cuentos'),
+      JuegoVista.cuentos => const CuentosScreen(),
       JuegoVista.artista => const _Pendiente('Artista'),
     };
   }
