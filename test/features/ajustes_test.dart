@@ -105,5 +105,37 @@ void main() {
 
       expect(find.text('Cerrar'), findsOneWidget);
     });
+
+    testWidgets('si los ajustes fallan, los sliders de voz quedan inactivos',
+        (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final container = ProviderContainer(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          // Forzamos el estado de error (p.ej. storage roto).
+          settingsProvider.overrideWith(
+            () => throw StateError('storage roto'),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(home: Scaffold(body: AjustesScreen())),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final sliders = tester
+          .widgetList<Slider>(find.byType(Slider))
+          .toList();
+      // Los dos sliders de voz siguen pintados pero no se pueden mover.
+      expect(sliders, hasLength(2));
+      expect(sliders.every((s) => s.onChanged == null), isTrue);
+      expect(find.text('No se pudieron cargar los ajustes'), findsOneWidget);
+    });
   });
 }

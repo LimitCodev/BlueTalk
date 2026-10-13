@@ -25,11 +25,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   bool get _canStart => _nicknameController.text.trim().isNotEmpty && !_saving;
 
+  /// Crea el perfil (con o sin apodo) y entra. Si el guardado falla, se
+  /// revierte el bloqueo del botón y se avisa en lugar de dejar la pantalla
+  /// muerta.
   Future<void> _start() async {
     setState(() => _saving = true);
-    await ref.read(profileProvider.notifier).create(_nicknameController.text);
-    if (!mounted) return;
-    context.go('/home/comunicar');
+    try {
+      await ref
+          .read(profileProvider.notifier)
+          .create(_nicknameController.text);
+      if (!mounted) return;
+      context.go('/home/comunicar');
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No se pudo guardar. Inténtalo otra vez.'),
+        ),
+      );
+    }
   }
 
   @override
@@ -92,6 +107,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ),
                     onPressed: _canStart ? _start : null,
                     child: const Text('Comenzar'),
+                  ),
+                  const SizedBox(height: 8),
+                  // El apodo es opcional (plan 00 §5.2): se puede entrar sin él.
+                  TextButton(
+                    onPressed: _saving ? null : _start,
+                    child: const Text('Entrar sin apodo'),
                   ),
                 ],
               ),

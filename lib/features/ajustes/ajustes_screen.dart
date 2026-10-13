@@ -75,8 +75,11 @@ class _TtsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settings = ref.watch(settingsProvider).value ??
-        const AppSettings();
+    final asyncSettings = ref.watch(settingsProvider);
+    final settings = asyncSettings.value ?? const AppSettings();
+    // Si la carga falló, los sliders quedan inactivos: moverlos intentaría
+    // escribir sobre un estado de error (StateError en requireValue).
+    final enabled = asyncSettings.hasValue;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,8 +92,10 @@ class _TtsSection extends ConsumerWidget {
             min: 0.2,
             max: 0.9,
             divisions: 7,
-            onChanged: (value) =>
-                ref.read(settingsProvider.notifier).setTtsRate(value),
+            onChanged: enabled
+                ? (value) =>
+                    ref.read(settingsProvider.notifier).setTtsRate(value)
+                : null,
           ),
         ),
         ListTile(
@@ -100,8 +105,10 @@ class _TtsSection extends ConsumerWidget {
             min: 0.6,
             max: 1.4,
             divisions: 8,
-            onChanged: (value) =>
-                ref.read(settingsProvider.notifier).setTtsPitch(value),
+            onChanged: enabled
+                ? (value) =>
+                    ref.read(settingsProvider.notifier).setTtsPitch(value)
+                : null,
           ),
         ),
         Padding(

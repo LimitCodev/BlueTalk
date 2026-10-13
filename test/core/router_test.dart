@@ -83,6 +83,18 @@ void main() {
     expect(find.text('¿Cómo te llamas?'), findsNothing);
   });
 
+  testWidgets('el apodo es opcional: se puede entrar sin él', (tester) async {
+    final prefs = await _givenPrefs();
+    await _pumpApp(tester, prefs);
+
+    await tester.tap(find.text('Entrar sin apodo'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AppShell), findsOneWidget);
+    final saved = await PrefsProfileRepo(prefs).currentProfile();
+    expect(saved, isNotNull, reason: 'aunque sin apodo sí se crea el perfil');
+  });
+
   testWidgets('las pestañas navegan y el botón del shell activa el modo calma',
       (tester) async {
     final prefs = await _givenPrefs();
