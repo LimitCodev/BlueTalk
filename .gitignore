@@ -1,0 +1,44 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock
+*.g.dart
+*.freezed.dart
+
+# Android
+android/.gradle/
+android/local.properties
+android/key.properties
+*.keystore
+*.jks
+android/app/debug/
+android/app/profile/
+android/app/release/
+.gradle/
+captures/
+*.apk
+*.aab
+*.aab.idsig
+
+# IntelliJ / VS Code
+.idea/
+*.iml
+.vscode/
+
+# Símbolos de build (obfuscado) — guardarlos fuera del repo
+split-debug-info/
+
+# Supabase / secretos
+.env
+.env.*
+supabase/.temp/
+
+# SO
+.DS_Store
+Thumbs.db
+
+# OpenCode
+.opencode/state/
