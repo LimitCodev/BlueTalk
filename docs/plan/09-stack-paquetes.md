@@ -80,14 +80,19 @@ Investigación: `flutter_svg` 2.x delega en `vector_graphics`. Con muchas imáge
 | **`accessibility_tools`** | Solo en dev: verifica targets ≥48dp y semantic labels automáticos — oro puro para una app AAC |
 | `patrol` / `integration_test` | Fase 2: flujos nativos (permisos, PIN, notificaciones) |
 
-## 9. Observabilidad (fase 2)
+## 9. Observabilidad (fase 2) — explicado sin jerga
 
-| Opción | Veredicto |
-|---|---|
-| **Sentry free** (5.000 eventos/mes) | **Recomendado**: open source, sin google-services.json, scrubbing de PII sencillo |
-| Firebase Crashlytics (gratis, sin límite) | Requiere meter Firebase entero → duplica backend con Supabase |
+**¿Qué problema tiene?** Cuando la app se cierra sola en el celular de un usuario, nosotros no vemos nada. Para enterarnos y arreglarlo se usan dos caminos:
 
-Privacidad: **cero analytics de comportamiento de niños** sin consentimiento explícito del padre. Crash reports solo con datos anonimizados.
+| Camino | Qué es | Ventaja | Desventaja |
+|---|---|---|---|
+| **Sentry** | Servicio externo gratuito (5.000 reportes/mes) donde la app envía automáticamente el reporte del cierre inesperado con la línea de código que falló. Se ve en un panel web | Nos enteramos aunque el usuario esté lejos; alertas y trazas | Servicio de terceros (gratis, open source) |
+| **Crashlytics** | Igual que Sentry, pero de Google (gratis sin límite) | Gratis y muy integrado con Android | Exige meter **Firebase entero** → tendríamos dos backends (Firebase + Supabase) |
+| **Logs locales** | La app escribe sus propios errores en un archivo del propio celular. Nadie nos avisa; hay que pedirle el teléfono al usuario para leerlo | Cero dependencias, cero privacidad en juego | Solo sirve si el usuario nos presta el equipo y nos dice "pasó esto" |
+
+**Postura actual:** el MVP empieza con **logs locales** (el más simple, sin cuentas ni permisos). Al llegar la fase 2 **probamos las dos rutas** (Sentry y Crashlytics) midiendo cuál nos sirve mejor antes de decidir — el usuario quiere testear cada camino, así queda ambas documentadas aquí.
+
+Privacidad: **cero analytics de comportamiento de niños** sin consentimiento explícito del padre. Cualquier reporte de error solo con datos anonimizados.
 
 ## 10. CI/CD
 
@@ -148,8 +153,11 @@ dev_dependencies:
 
 > Versiones exactas se resuelven con `flutter pub add` al crear el proyecto (§1 es lo verificado hoy); la lista de paquetes es lo que importa.
 
-## 14. Decisiones abiertas
+## 14. Candidatos de fase 2 — se prueban todos antes de decidir
 
-1. **Sentry (fase 2)** — ¿lo activamos o nos quedamos con logs locales?
-2. **`sherpa_onnx` STT** (~+40 MB) — ¿lo exploramos en fase 2 o la app queda solo TTS?
-3. **`home_widget`** — ¿entra en el alcance del MVP o es fase 2?
+Postura del usuario: **probar cada camino en la práctica** y decidir midiendo. Quedan documentados aquí como candidatos, no como decisiones tomadas:
+
+1. Observabilidad: logs locales (MVP) vs Sentry vs Crashlytics (§9).
+2. STT on-device `sherpa_onnx` (~+40 MB) vs quedarnos solo con TTS.
+3. `home_widget` (picto en pantalla de inicio): ¿lo metemos en el MVP o es fase 2?
+4. Mascota Rive vs animaciones nativas en las rutinas.

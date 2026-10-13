@@ -168,6 +168,7 @@ scripts/                 # db-dump, keep-alive, build
 | 3 | `apk-release` | `android/**`, `docs/play/**`, `scripts/build*` | M |
 | todo | `revisor` | `docs/informes/**` (solo lectura del resto) | continuo |
 
+- **Filosofía: base fundamental antes que gadgets.** Primero se construye y estabiliza el esqueleto (Ola 1: tema, router, datos, onboarding, ajustes) con lo mínimo imprescindible. Cada gadget/feature extra (candidatos en plan 09 §11) entra después, de uno en uno, solo si demuestra su valor sobre la base ya probada. Nada se pega al aire.
 - **`pubspec.yaml` congelado en Ola 2** (deps declaradas en Ola 1).
 - Orden de revisión de planes: 00 → 01 → 02 → 03 → 04 → 05 → 06 → 07 → 08.
 
