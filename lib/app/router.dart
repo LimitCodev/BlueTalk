@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/theme/calm_mode.dart';
+import '../features/onboarding/onboarding_screen.dart';
+import '../features/onboarding/profile_controller.dart';
 import 'shell.dart';
 
 /// Router raíz: una sola instancia (recargarlo perdería la ruta actual).
@@ -24,28 +26,18 @@ final routerProvider = Provider<GoRouter>((ref) {
     return MaterialPage<Object?>(child: child);
   }
 
+  // Si ya hay perfil guardado, arranca directo en el home (sin onboarding).
+  final hasProfile = ref.read(profileProvider) != null;
+
   return GoRouter(
-    initialLocation: '/onboarding',
+    initialLocation: hasProfile ? '/home/comunicar' : '/onboarding',
     routes: [
       GoRoute(
         path: '/onboarding',
         pageBuilder: (context, state) => page(
           context,
           state,
-          const Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('BlueTalk', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700)),
-                  SizedBox(height: 8),
-                  Text('Tu voz, siempre contigo 💙'),
-                  SizedBox(height: 24),
-                  _StartButton(),
-                ],
-              ),
-            ),
-          ),
+          const OnboardingScreen(),
         ),
       ),
       StatefulShellRoute.indexedStack(
@@ -112,20 +104,6 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
-
-/// Botón de entrada del onboarding.
-class _StartButton extends StatelessWidget {
-  const _StartButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return FilledButton(
-      style: FilledButton.styleFrom(minimumSize: const Size(0, 48)),
-      onPressed: () => context.go('/home/comunicar'),
-      child: const Text('Comenzar'),
-    );
-  }
-}
 
 /// Contenido de una pestaña placeholder (el Scaffold lo pone el shell).
 class _TabContent extends StatelessWidget {

@@ -8,6 +8,9 @@ import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/app/router.dart';
 import 'package:bluetalk/app/shell.dart';
 import 'package:bluetalk/core/theme/calm_mode.dart';
+import 'package:bluetalk/data/local/mock_repos.dart';
+import 'package:bluetalk/data/models/models.dart';
+import 'package:bluetalk/features/onboarding/profile_controller.dart';
 
 Future<SharedPreferences> _givenPrefs() async {
   SharedPreferences.setMockInitialValues({});
@@ -16,31 +19,68 @@ Future<SharedPreferences> _givenPrefs() async {
 
 Future<ProviderContainer> _pumpApp(
   WidgetTester tester,
-  SharedPreferences prefs,
-) async {
+  SharedPreferences prefs, {
+  ChildProfile? profile,
+}) async {
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        if (profile != null)
+          initialProfileProvider.overrideWithValue(profile),
+      ],
       child: const BlueTalkApp(),
     ),
   );
   return ProviderScope.containerOf(tester.element(find.byType(BlueTalkApp)));
 }
 
+/// Completa el onboarding escribiendo un apodo (sin PII).
+Future<void> _completarOnboarding(WidgetTester tester) async {
+  await tester.enterText(find.byType(TextField), 'Sol');
+  // El botón se habilita en el rebuild posterior a onChanged.
+  await tester.pump();
+  await tester.tap(find.widgetWithText(FilledButton, 'Comenzar'));
+  await tester.pumpAndSettle();
+}
+
 void main() {
-  testWidgets('arranca en onboarding y entra al shell', (tester) async {
+  testWidgets('onboarding: pide apodo y entra al shell', (tester) async {
     final prefs = await _givenPrefs();
     await _pumpApp(tester, prefs);
 
-    expect(find.text('Comenzar'), findsOneWidget);
+    expect(find.text('¿Cómo te llamas?'), findsOneWidget);
+    // Sin apodo el botón está deshabilitado (no avanza vacío).
+    expect(
+      tester
+          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Comenzar'))
+          .onPressed,
+      isNull,
+    );
 
-    await tester.tap(find.text('Comenzar'));
-    await tester.pumpAndSettle();
+    await _completarOnboarding(tester);
 
     expect(find.byType(AppShell), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.text('Comunicar'), findsWidgets); // AppBar + pestaña
-    expect(find.text('Comenzar'), findsNothing);
+    expect(find.text('¿Cómo te llamas?'), findsNothing);
+
+    // El perfil quedó guardado localmente.
+    final saved = await PrefsProfileRepo(prefs).currentProfile();
+    expect(saved, isNotNull);
+    expect(saved!.nickname, 'Sol');
+  });
+
+  testWidgets('con perfil guardado arranca directo en el home', (tester) async {
+    final prefs = await _givenPrefs();
+    await _pumpApp(
+      tester,
+      prefs,
+      profile: const ChildProfile(id: 'local', nickname: 'Sol'),
+    );
+
+    expect(find.byType(AppShell), findsOneWidget);
+    expect(find.text('¿Cómo te llamas?'), findsNothing);
   });
 
   testWidgets('las pestañas navegan y el botón del shell activa el modo calma',
@@ -48,8 +88,7 @@ void main() {
     final prefs = await _givenPrefs();
     await _pumpApp(tester, prefs);
 
-    await tester.tap(find.text('Comenzar'));
-    await tester.pumpAndSettle();
+    await _completarOnboarding(tester);
 
     await tester.tap(find.text('Ajustes'));
     await tester.pumpAndSettle();
