@@ -12,10 +12,14 @@
 - [x] Ajustes completo: voz TTS placeholder, tamaño de texto, créditos (paso 8) (`f94baca`)
 - [x] `pubspec.yaml` con TODAS las deps de Olas 2–3 y congelado (`6c24de1`)
 - [x] **Android SDK instalado** (espacio de usuario, sin root) + `flutter doctor` ✓
+- [x] **APK debug compilado** (`app-debug.apk`): desugaring para flutter_local_notifications (`5b61ccb`)
+- [x] Revisión Ola 1 por `revisor` → informe + los 4 MAJOR y 3 MENOR corregidos (`46c839f`, `c619fc1`, `b03673b`, `5eb2733`)
+- [x] Auditoría de accesibilidad como gate de tests (falla si hay targets <48dp) (`e64a075`)
+- [x] `http` como dependencia directa (`801e9d3`)
 
-Estado de calidad: `flutter analyze` 0 issues · `flutter test` 53/53 · commits sin push (push por hito).
+Estado de calidad: `flutter analyze` 0 issues · `flutter test` 80/80 · commits sin push (push por hito).
 
-**Retomada rápida:** Ola 1 completa (pasos 1–9 + Android SDK). Los agentes de la Ola 2 pueden partir: estructura, contratos (`lib/data/contracts/repos.dart`), seeds (`assets/seed/`) y DI (`lib/app/di.dart`) están firmes.
+**Retomada rápida:** Ola 1 cerrada y revisada. **Comunicador AAC entregado y cableado** en `/home/comunicar` (`cd16308`): rejillas, barra de frase, TTS, favoritos, buscador, mensajes guardados en prefs (pendiente migrar a Drift). Siguiente: agentes `juegos`, `rutinas-salud`, `modo-padre` (usan los mismos contratos DI + harness hermético de `test/comunicador/harness.dart` como referencia). Pista clave de los tests: el canal de assets de `flutter test` solo responde en el primer `testWidgets` del archivo → leer seeds del disco (`SeedStore` con loader a `File`).
 
 ### Android SDK (instalado en espacio de usuario — sin sudo)
 
