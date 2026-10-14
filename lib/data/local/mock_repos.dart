@@ -148,11 +148,14 @@ class PrefsGameProgressRepo implements GameProgressRepo {
   }
 }
 
-/// Horario desde seed con mutaciones en memoria.
+/// Horario: base en seed + cambios del usuario persistidos en prefs.
 class SeedScheduleRepo implements ScheduleRepo {
-  SeedScheduleRepo(this._store);
+  SeedScheduleRepo(this._store, this._prefs);
+
+  static const _key = 'bluetalk_schedule';
 
   final SeedStore _store;
+  final SharedPreferences _prefs;
   final _entries = <String, ScheduleEntry>{};
   var _loaded = false;
 
@@ -161,6 +164,14 @@ class SeedScheduleRepo implements ScheduleRepo {
     for (final row in await _store.list('horario')) {
       final entry = ScheduleEntry.fromMap(row);
       _entries[entry.id] = entry;
+    }
+    // Los cambios guardados por el usuario tienen prioridad sobre el seed.
+    final raw = _prefs.getString(_key);
+    if (raw != null) {
+      for (final row in _tryDecodeList(raw)) {
+        final entry = ScheduleEntry.fromMap(row);
+        _entries[entry.id] = entry;
+      }
     }
     _loaded = true;
   }
@@ -176,6 +187,10 @@ class SeedScheduleRepo implements ScheduleRepo {
   Future<void> saveEntry(ScheduleEntry entry) async {
     await _ensureLoaded();
     _entries[entry.id] = entry;
+    await _prefs.setString(
+      _key,
+      jsonEncode([for (final e in _entries.values) e.toMap()]),
+    );
   }
 }
 

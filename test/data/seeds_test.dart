@@ -142,7 +142,8 @@ void main() {
     });
 
     test('horario: carga seeds y acepta cambios', () async {
-      final repo = SeedScheduleRepo(store);
+      SharedPreferences.setMockInitialValues({});
+      final repo = SeedScheduleRepo(store, await SharedPreferences.getInstance());
       final entries = await repo.schedule();
       expect(entries, hasLength(6));
 

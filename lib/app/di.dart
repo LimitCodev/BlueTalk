@@ -42,7 +42,10 @@ final gameProgressRepoProvider = Provider<GameProgressRepo>(
 );
 
 final scheduleRepoProvider = Provider<ScheduleRepo>(
-  (ref) => SeedScheduleRepo(ref.watch(seedStoreProvider)),
+  (ref) => SeedScheduleRepo(
+    ref.watch(seedStoreProvider),
+    ref.watch(sharedPreferencesProvider),
+  ),
 );
 
 final wellbeingRepoProvider = Provider<WellbeingRepo>(
