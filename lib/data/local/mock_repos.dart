@@ -259,13 +259,16 @@ class PrefsWellbeingRepo implements WellbeingRepo {
 
 /// Eventos de uso persistidos para el dashboard del modo padre.
 ///
-/// Se guardan los últimos [_maxEvents] para no engordar el JSON en gama baja
-/// (el dashboard solo necesita la sesión reciente).
+/// Política de retención: los `picto_tap` se limitan a [_maxTaps] (los más
+/// recientes) y cualquier otro tipo se conserva durante [_retencion], para
+/// que un niño que comunica mucho no desplace eventos como `juego_fin`
+/// (de ellos dependen el límite diario y las métricas del padre).
 class PrefsUsageRepo implements UsageRepo {
   PrefsUsageRepo(this._prefs);
 
   static const _key = 'bluetalk_usage';
-  static const _maxEvents = 200;
+  static const _maxTaps = 300;
+  static const _retencion = Duration(days: 14);
 
   final SharedPreferences _prefs;
   List<UsageEvent>? _cache;
@@ -283,8 +286,15 @@ class PrefsUsageRepo implements UsageRepo {
   Future<void> record(UsageEvent event) async {
     final list = await _load();
     list.add(event);
-    if (list.length > _maxEvents) {
-      list.removeRange(0, list.length - _maxEvents);
+    // No-tapas antiguas a [_retencion] fuera; después, exceso de toques.
+    final limite = event.createdAt.subtract(_retencion);
+    list.removeWhere(
+      (e) => e.type != 'picto_tap' && e.createdAt.isBefore(limite),
+    );
+    var sobran = list.where((e) => e.type == 'picto_tap').length - _maxTaps;
+    if (sobran > 0) {
+      // removeWhere recorre en orden: eliminamos los toques más antiguos.
+      list.removeWhere((e) => e.type == 'picto_tap' && sobran-- > 0);
     }
     await _prefs.setString(
       _key,

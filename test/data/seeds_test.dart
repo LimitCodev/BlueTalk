@@ -184,12 +184,12 @@ void main() {
       expect((await fresh.habits()).single.done, isTrue);
     });
 
-    test('uso: registra eventos y recorta a 200', () async {
+    test('uso: registra eventos y limita los toques a 300', () async {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
       final repo = PrefsUsageRepo(prefs);
 
-      for (var i = 0; i < 205; i++) {
+      for (var i = 0; i < 305; i++) {
         await repo.record(
           UsageEvent(
             id: 'u$i',
@@ -201,8 +201,8 @@ void main() {
       }
 
       final events = await repo.events();
-      expect(events, hasLength(200), reason: 'tope para no engordar en gama baja');
-      expect(events.last.id, 'u204', reason: 'se conservan los más recientes');
+      expect(events, hasLength(300), reason: 'tope de toques en gama baja');
+      expect(events.last.id, 'u304', reason: 'se conservan los más recientes');
     });
 
     test('avance de juegos: persiste entre reinicios', () async {
