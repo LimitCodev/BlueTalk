@@ -160,7 +160,11 @@ class _GuiaLlegada extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 6),
                 child: Row(
                   children: [
-                    PictoMini(pictoId, size: 48),
+                    PictoMini(
+                      pictoId,
+                      size: 48,
+                      semanticsLabel: texto,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(

@@ -101,7 +101,7 @@ class _EstadisticasContenido extends ConsumerWidget {
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),
-              const SectionHeader('Mi día'),
+              const SectionHeader('Resumen de hoy'),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(

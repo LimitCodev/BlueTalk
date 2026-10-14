@@ -11,10 +11,14 @@ import 'rutinas_providers.dart';
 /// Los ids del horario vienen del JSON semilla (`assets/seed/horario.json`):
 /// si un picto no está en la muestra, se muestra un icono en vez de romper.
 class PictoMini extends ConsumerWidget {
-  const PictoMini(this.pictoId, {super.key, this.size = 40});
+  const PictoMini(this.pictoId, {super.key, this.size = 40, this.semanticsLabel});
 
   final String? pictoId;
   final double size;
+
+  /// Etiqueta para lectores de pantalla (el picto es una imagen: sin
+  /// etiqueta, las herramientas de accesibilidad lo reportan).
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,6 +31,7 @@ class PictoMini extends ConsumerWidget {
         Icons.help_outline,
         size: size * 0.7,
         color: AppColors.primaryStrong,
+        semanticLabel: semanticsLabel,
       );
     }
 
@@ -35,6 +40,7 @@ class PictoMini extends ConsumerWidget {
       width: size,
       height: size,
       fit: BoxFit.contain,
+      semanticsLabel: semanticsLabel,
       placeholderBuilder: (context) => SizedBox(width: size, height: size),
     );
   }
@@ -123,14 +129,15 @@ class ActividadTile extends ConsumerWidget {
   }
 
   Future<void> _alternar(BuildContext context, WidgetRef ref) async {
-    await marcarActividad(ref, entry, hecha: !hecha);
+    final nuevoEstado = !hecha;
+    await marcarActividad(ref, entry, hecha: nuevoEstado);
     if (!context.mounted) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
           content: Text(
-            hecha
+            nuevoEstado
                 ? '${entry.title}: hecha'
                 : '${entry.title}: pendiente otra vez',
           ),

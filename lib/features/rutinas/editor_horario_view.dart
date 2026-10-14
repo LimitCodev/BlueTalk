@@ -330,8 +330,13 @@ class _FormularioActividadState extends ConsumerState<_FormularioActividad> {
 }
 
 /// Ids y nombres de las actividades quitadas (deshabilitadas) del horario.
+///
+/// Observa `horarioProvider` solo como señal de recálculo: `guardarActividad`
+/// lo invalida tras cada alta, edición o baja, y este provider vuelve a leer
+/// el repositorio (que sí conserva las entradas deshabilitadas).
 final quitadasProvider = FutureProvider<Map<String, String>>((ref) async {
-  final entries = await ref.watch(scheduleRepoProvider).schedule();
+  await ref.watch(horarioProvider.future);
+  final entries = await ref.read(scheduleRepoProvider).schedule();
   return {
     for (final e in entries)
       if (!e.enabled) e.id: e.title,

@@ -169,7 +169,7 @@ class DiaHoySection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SectionHeader('Mi día'),
+        const SectionHeader('Resumen de hoy'),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(

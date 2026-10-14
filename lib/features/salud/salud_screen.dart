@@ -232,9 +232,14 @@ class _HabitosDelDia extends ConsumerWidget {
           ListTile(
             leading: PictoMini(habito.pictoId),
             title: Text(habito.title),
-            trailing: Checkbox(
-              value: marcados.contains(habito.id),
-              onChanged: (_) => alternarHabito(ref, habito),
+            trailing: Semantics(
+              // El Checkbox suelto no tiene etiqueta: sin ella, un lector
+              // de pantalla anuncia solo "casilla de verificación".
+              label: habito.title,
+              child: Checkbox(
+                value: marcados.contains(habito.id),
+                onChanged: (_) => alternarHabito(ref, habito),
+              ),
             ),
             onTap: () => alternarHabito(ref, habito),
           ),

@@ -87,6 +87,8 @@ void main() {
     final container = await pumpRutinas(tester);
     await abrirSalud(tester);
 
+    // Queda bajo el pliegue del ListView: se desplaza antes de tocar.
+    await tester.scrollUntilVisible(find.text('Modo calma'), 240);
     await tester.tap(find.text('Modo calma'));
     await tester.pumpAndSettle();
     expect(container.read(calmModeProvider), isTrue);
