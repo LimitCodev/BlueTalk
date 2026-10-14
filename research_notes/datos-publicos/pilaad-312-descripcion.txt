@@ -1,0 +1,20 @@
+This dataset, PILAAD-312 (Personalized Interaction Logs for AAC Device Users), was developed to
+support research on personalized user interaction in assistive technology using reinforcement
+learning. It specifically addresses concerns about the diversity and adaptability of assistive
+technologies for users with different types of disabilities.  🧑‍🤝‍🧑 Participants The dataset
+includes interaction data from 312 individuals with the following disability types:  Movement
+limitations (e.g., cerebral palsy, muscular dystrophy)  Autism Spectrum Disorders (ASD)  Speech and
+language disabilities (e.g., aphasia, apraxia)  Each participant used Augmentative and Alternative
+Communication (AAC) devices over a 6-month period in 2024. The inclusion criteria ensured the
+dataset represents a realistic, varied population across age (8–60 years) and gender, and users were
+selected based on clinical diagnosis and consent.  📊 Data Collection & Logging Data was collected
+through:  Real-time interaction logs from AAC devices  User and caregiver feedback ratings  Recorded
+reaction times and behavioral observations  The dataset contains over 12,000 interaction sessions,
+with each record logging:  Interaction sequences  Reaction times  User preferences (interface
+settings)  Behavioral flags (e.g., hesitation, repetition)  Feedback rating (1–5)  Device mode used
+(e.g., eye tracking, touch)  🎯 Target Variable A binary target variable is included:  1 =
+Satisfactory interaction (feedback rating ≥ 4 and reaction time &lt; 4s)  0 = Non-satisfactory
+interaction  ✅ Addressing Reviewer Concerns This dataset was carefully designed to:  Specify
+participant types across disability categories to avoid overgeneralization.  Include full
+demographic, behavioral, and device interaction details.  Document the data collection process and
+ethical clearance, ensuring transparency and reproducibility.

@@ -1,0 +1,792 @@
+      Augmentative and Alternative Communication
+
+
+
+
+      ISSN: (Print) (Online) Journal homepage: https://www.tandfonline.com/loi/iaac20
+
+
+
+
+An early Spanish vocabulary for children who use
+AAC: developmental and linguistic considerations
+
+Gloria Soto & Brittney Cooper
+
+To cite this article: Gloria Soto & Brittney Cooper (2021): An early Spanish vocabulary for
+children who use AAC: developmental and linguistic considerations, Augmentative and Alternative
+Communication
+
+To link to this article: https://doi.org/10.1080/07434618.2021.1881822
+
+
+
+
+       Published online: 12 Feb 2021.
+
+
+
+       Submit your article to this journal
+
+
+
+       View related articles
+
+
+
+       View Crossmark data
+
+
+
+
+                      Full Terms & Conditions of access and use can be found at
+             https://www.tandfonline.com/action/journalInformation?journalCode=iaac20
+AUGMENTATIVE AND ALTERNATIVE COMMUNICATION
+https://doi.org/10.1080/07434618.2021.1881822
+
+
+FORUM NOTE
+
+An early Spanish vocabulary for children who use AAC: developmental and
+linguistic considerations
+Gloria Sotoa           and Brittney Cooperb
+a
+ Department of Speech, Language and Hearing Sciences and Department of Special Education, San Francisco State University, San
+Francisco, CA, USA; bJoint Doctoral Program in Special Education, Department of Special Education, San Francisco State University, San
+Francisco, CA, USA
+
+
+    ABSTRACT                                                                                                                       ARTICLE HISTORY
+    For children with complex communication needs in the early stages of language development, access                              Received 19 February 2020
+    to appropriate vocabulary provides a means for social interaction and participation, and the founda-                           Revised 20 January 2021
+    tion for the acquisition of grammar and other language related skills. While numerous resources are                            Accepted 20 January 2021
+    available to support decision making for speakers of English, there is a pressing need to rapidly
+                                                                                                                                   KEYWORDS
+    expand such resources for other languages. Spanish is the official language in 20 countries, and in                            Augmentative and
+    other countries (e.g., United States) Spanish-speaking communities represent a substantial proportion                          alternative communication
+    of the population. The aim of this study was to produce a developmentally-relevant word list for use                           (AAC); initial lexicon;
+    by Spanish-speaking children in the early stages of language development. The list was developed                               Spanish; vocabulary
+    from an analysis of overlap between published and validated lists of words produced by young                                   selection
+    Spanish speaking children with typical development. The list includes a wide range of word classes
+    and semantic categories and is proposed as a tool to assist professionals, families and software devel-
+    opers in the process of selecting an initial lexicon for children who require AAC and are learning
+    Spanish. Implications of our findings for vocabulary selection and future research directions
+    are discussed.
+
+
+
+
+As the use of augmentative and alternative communication                                 Despite differences about the specific content and organ-
+(AAC) continues to expand in Spanish-speaking countries                              ization of an initial lexicon, both Holland (1975) and Lahey
+and other countries with large Spanish speaking commun-                              and Bloom (1977) agreed that the first words to be taught to
+ities (e.g., United States), questions arise about the nature                        a child with a communication disorder should: (a) be devel-
+and content of vocabulary selection for an initial AAC system                        opmentally appropriate (i.e., selected among words that chil-
+in Spanish. The topic of vocabulary selection for an initial                         dren with typical development use first); (b) be relevant to
+lexicon (i.e., the first words to be taught) for children with                       the child’s communicative needs outside the clinic and/or
+atypical language development has been the center of con-                            classroom; and (c) include different types of word classes to
+siderable debate for several decades (e.g., Fristoe & Lloyd,                         support the development of grammar. While debate contin-
+1980; Holland, 1975; Lahey & Bloom, 1977; Judge et al., 2020;                        ues over vocabulary selection, these early perspectives set
+                                                                                     down guidance for decision making that continue to inform
+Laubscher & Light, 2020; Quick, Erickson, & Mccright, 2019).
+                                                                                     practice over 40 years later.
+For instance, Holland (1975) advocated for a selection of a
+                                                                                         For children and other individuals who are in the early
+relatively small (35 words) “core lexicon in which a significant
+                                                                                     stages of language development and not yet able to spell
+proportion of the lexical items can function in more than
+                                                                                     their messages, best practices in the field of AAC indicate
+one grammatical slot” (p. 519). Lahey and Bloom (1977) pro-
+                                                                                     that vocabulary selection should be conducted collabora-
+posed that an initial lexicon should be categorized into sub-                        tively by family members and professionals to ensure that
+stantive words and relational words. Substantive words refer                         the vocabulary is personally meaningful, relevant in the
+to nouns, while relational words refer to other parts of                             home, culturally appropriate, functional across contexts, sup-
+speech such as attributes, verbs, prepositions, etc. They sug-                       portive of social interaction, and facilitative of language and
+gested that substantive words should be child specific and                           literacy development (see Bean, Cargill, & Lyle, 2019 for an
+should be chosen to reflect the child’s interests as well as                         extensive discussion). To that end, AAC professionals are
+the frequency with which a child comes into contact with                             encouraged to draw on a combination of sources to identify
+particular objects, people, animals, etc. However, initial rela-                     potential vocabulary that can then be discussed with families
+tional words, they argued, should be generic enough, so                              and other professionals in a shared decision-making process.
+they could be used frequently and across multiple contexts.                          These include observation of the child with peers and
+
+CONTACT Gloria Soto         gsoto@sfsu.edu        San Francisco State University, 1600 Holloway Av, San Francisco 94132, CA, USA
+ß 2021 International Society for Augmentative and Alternative Communication
+2      G. SOTO AND B. COOPER
+
+
+siblings in various activities, analysis of the communication        Kast, 1994; Trembath et al., 2007), with the words included in
+demands of different situations, and use of communication            the English version of the MacArthur Bates Communicative
+diaries and published resources, such as developmental lan-          Development Inventories (MBCDIs; Fenson, Marchman, Thal,
+guage inventories, curriculum guides, and core vocabu-               Dale, & Reznick, 2007). There are two versions of the MBCDI:
+lary lists.                                                          (i) Words & Gestures (adapted mostly for toddlers
+    In our field, core vocabulary refers to high-frequency           8–18 months of age and assessing both word production
+words that make up approximately 80% of an individual’s              and comprehension), and (ii) Words & Sentences (designed
+expressive vocabulary and are common across activities, con-         for the assessment of word production in older children,
+texts, places, topics and demographic groups (Bean et al.,           16–30 months of age). The MBCDI has been normed with
+2019; Witkowski & Baker, 2012). Core vocabulary lists are typ-       over 1,000 infants and 1,400 toddlers, and found to be a
+ically created by sampling language use in speakers at differ-       valid and reliable tool for assessing the early vocabulary skills
+ent ages (e.g., toddlers, school-aged, adults), across different     of children with and without disabilities (see Laubscher &
+modalities (e.g., oral, written) and settings (e.g., school, work    Light, 2020 for extensive references).
+place) and with different learning profiles (e.g., neurotypical,         Laubscher and Light (2020) found that approximately 80%
+neurodiverse). The samples are then analyzed to generate             of the words included in the MBCDI were not captured in
+word frequency counts and to calculate the total number of           most of the core vocabulary lists for young children. They
+words, the total number of different words, and the number           attributed this finding to the fact that the MBCDI includes a
+of speakers who used each word. The resulting lists typically        large number of nouns and other content words (i.e., open
+consist of 200–300 words that include a range of open (e.g.,         class words), while the core vocabulary lists privilege func-
+nouns, verbs, adjectives, adverbs) and closed word classes           tion words (i.e., closed class words). Also, children who par-
+(e.g., pronouns, auxiliary verbs, copula, prepositions, articles).   ticipated in the studies that produced core vocabulary lists
+    Core vocabulary is relatively small and shows little vari-       had language abilities equivalent to or above those of a 24-
+ation across people and settings. It includes a range of word        month-old child with typical development. These children
+classes that allow for novel utterance generation and word           would be expected to produce multi-word utterances and
+combination, and can serve multiple syntactic, semantic, and         even grammatically advanced phrases and sentences which
+pragmatic functions. Because it is limited and consistent            would include function words such as pronouns, preposi-
+across contexts, core vocabulary can be displayed in a prom-         tions, etc. In contrast, the expressive vocabularies of early
+inent and stable location on a communication device and its          symbolic communicators tend to be dominated by content
+frequent use can lead to automaticity through development            words referring to salient and personally meaningful objects,
+of a consistent motor plan (e.g., Banajee, DiCarlo, & Stricklin,     animals, people, attributes, and actions. Laubscher and Light
+2003; Bean et al., 2019; Deckers, Van Zaalen, Van Balkom, &          call for a combination of methods to select developmentally
+Verhoeven, 2017; Trembath, Balandin, & Togher, 2007). In             appropriate vocabulary for early symbolic communicators
+addition, the use of core vocabulary can assist adult partners       learning AAC, including environmental inventories, communi-
+in the provision of consistent and frequent modeling (e.g.,          cation diaries, categorical inventories, and published and vali-
+aided input) and elicitation opportunities for use of the            dated inventories of words (i.e., word lists) produced by
+vocabulary across a variety of contexts, people, and topics. In      children of similar age such as the MBCDI.
+a recent study, Quick et al. (2019) found a considerable over-           Word lists and vocabulary inventories vary according to
+lap between the 267 words most frequently used by 16                 language. Lists from one language cannot and should not be
+mothers during interactions with their infants and toddlers          assumed to transfer to another language, as words represent
+with typical development and three lists of words most fre-          the concepts and grammar of each language (e.g., Jackson-
+quently used by 65 toddlers and preschoolers with typical            Maldonado, Thal, Marchman, Bates, & Gutierrez-Clellen, 1993;
+spoken language development. Quick et al. (2019) suggest             Mngomezulu, T€   onsing, Dada, & Bokaba, 2019). Cross-linguistic
+that the symmetry between maternal child-directed speech             analyses of vocabulary in young children reveal lexical differ-
+and the most frequent words used by young children with              ences across different languages (e.g., Bornstein et al., 2004),
+typical development can have important clinical implications         and within different variations of the same language (e.g.,
+for vocabulary selection for children with complex communi-          Dıaz, Fonseca, Boh   orquez, Guecha, & Sellabona, 2011;
+cation needs.                                                        Mariscal et al., 2007). A word that is frequently used by chil-
+    Despite the proposed benefits for the use of core vocabu-        dren in one language may not be translatable or develop-
+lary, a recent study calls to question the appropriateness of        mentally appropriate in another. Likewise, due to variations
+using a core word approach when selecting and teaching               in grammatical structure, lexical items such as copulas, auxil-
+expressive vocabulary for early symbolic communicators, that         iary verbs, pronouns, etc., which are frequently part of core
+is, children who have begun to produce their first words but         vocabulary lists in any given language, may be represented
+have not yet started to combine them into two or more                differently and be acquired in different order in different lan-
+word utterances (Laubscher & Light, 2020). Laubscher and             guage typologies (Bornstein et al., 2004; Łuniewska et al.,
+Light (2020) compared five core vocabulary lists developed           2016). Consequently, a number of core vocabulary lists has
+for English speaking young children aged 2–6 years of age            been published in a number of different languages, including
+(Banajee et al., 2003; Beukelman, Jones, & Rowan, 1989;              Afrikaans (Hattingh & T€  onsing, 2020), English as a second
+Fried-Oken & More, 1992; Marvin, Beukelman, Brockhaus, &             language (e.g., Boenisch & Soto, 2015), French (Robillard,
+                                                                                AUGMENTATIVE AND ALTERNATIVE COMMUNICATION          3
+
+
+Mayer-Crittenden, Minor-Corriveau, & Belanger, 2014),             Espan ~ol. An initial yield of 239 articles was identified follow-
+German (Boenisch, Musketa, & Sachse, 2007), Korean (e.g.,          ing the initial search of databases. All articles identified in
+Shin & Hill, 2016), Mandarin (e.g., Liu & Sloane, 2006), and       the database searches underwent a title and abstract screen-
+Zulu (Mngomezulu et al., 2019).                                    ing to identify relevance and evaluate against the inclusion-
+    Although a number of studies provide vocabulary lists          ary criteria. Following this, studies underwent a full-text
+and inventories for selecting and teaching vocabulary for          review. An ancestral search was performed on relevant
+children of different ages who use AAC and are learning            articles and authors to identify additional publications. Only
+English, limited resources exist in Spanish. There are 20 coun-    two studies met the inclusion criteria (Manzano, Pin      ~ eiro, &
+tries in the world with Spanish as an official language.                              ~
+                                                                   Pereira, 1997; Pineiro & Manzano, 2000). The studies used
+Additionally, information about vocabulary selection in            the same participants but reported on different results
+Spanish is also relevant to a country like the United States       (Manzano et al., 1997; Pin  ~eiro & Manzano, 2000).
+where Spanish speakers represent a substantial proportion of
+children in public schools. For instance, in California during
+                                                                   Participants
+the 2018–2019 school year, 55 percent of public-school stu-
+dents were identified as Hispanic or Latino (California            The studies by Manzano et al. (1997) and Pin       ~eiro and
+Department of Education, 2019). Given the importance that          Manzano (2000) reported on the vocabulary of the same set
+vocabulary selection has in the AAC field, the growing num-        of participants. The participants included 96 boys and 104
+ber of Spanish speaking AAC users, and the proliferation of        girls, ranging in age from 11;16 to 49;16 (months; days). All
+language communication apps and software in Spanish, it is         the children were typically developing and did not have
+imperative to begin to develop tools and resources to assist       auditory problems. The participants were recruited from six
+families, professionals and AAC software developers in the         day care centers located in four different municipalities of
+selection of Spanish vocabulary.                                   Havana, Cuba. The socioeconomic status of the families was
+    The purpose of this study was to generate a developmen-        reported as average based on the general Cuban population
+tally appropriate list of words that could be used in combin-      and all of the mothers had at least a high school education.
+ation with other methods to assist families and professionals
+in the selection of an initial lexicon for children who use
+                                                                   Data collection and analysis procedures
+AAC and are in the early stages of Spanish language devel-
+opment. In order to compile a list of highly frequent, devel-      Manzano et al. (1997) used audio recordings of the children
+opmentally appropriate early words in Spanish, we drew on          as they were interacting with peers, playing with toys (e.g.,
+published lists of frequently used vocabulary by young             teddy bears, plastic toys, musical instruments, cars, balls),
+Spanish-speaking children. To ensure that our list included        and talking with adults in an observation room. Each obser-
+developmentally appropriate words, we followed Laubscher           vation lasted about 30 min. A total of four observers tran-
+and Light’s (2020) procedures and compared those lists with        scribed the language samples. A word was excluded if the
+a Spanish version of the MBCDI (Jackson-Maldonado                  observers could not agree or did not understand it. About
+et al., 1993).                                                     7% of the words were omitted. Words containing phono-
+                                                                   logical errors were included as long as the word was recog-
+                                                                   nizable in the context (e.g., apato instead of zapato/shoes).
+Method                                                             Additionally, word substitutes that are conventional labels
+Inclusion criteria                                                 for objects and actions in child vocabulary were included
+                                                                   and labeled “stable substitutes” (e.g., “tic-tac” for reloj/watch;
+Published lists of words produced by children acquiring            “pun pun” for pelota/ball).
+Spanish as a native language were included in this study if           The participants were grouped in age groups by
+they met the following criteria: (a) were published in a peer-     2–4 month intervals (e.g., 11;16–14;15, 14;16–17;15, and so
+reviewed journal, (b) included vocabulary lists developed by       on). The resulting groups ranged from 16–20 children. The
+sampling native speakers of Spanish, and (c) included partici-     researchers calculated the frequency count of each word and
+pants that were 4 years of age and younger. Lists were             noted the age group where a word was first produced. The
+excluded if they were developed from written language sam-         resulting database included a total of 15,428 tokens and
+ples, included older children or adults, or non-native speak-      1,259 types.
+ers of Spanish.                                                       In 2000, Pin ~eiro and Manzano further analyzed the list
+                                                                   compiled by Manzano et al. (1997), and created a database
+                                                                   for use in cognitive/developmental psychology and psycho-
+Search methods
+                                                                   linguistics research. Their database included new variables
+Five databases (JSTOR, Educational Resources Information           such as the first time a word was uttered (FTU), defined as
+Center (ERIC), Linguistics and Language Behavior Abstracts         the age range in which a word was uttered for the first time
+(LLBA), PsychInfo, and PubMed) were searched using the fol-        by at least one child. They also defined the Age of
+lowing sets of free-text search terms, in Spanish and English:     Acquisition (AoA) as the age range in which a given word’s
+(a) initial lexicon/l                             ~os, (c) core
+                     exico inicial, (b) children/nin               frequency reached 10% of its total frequency. The authors
+vocabulary/vocabulario de uso frecuente, and (c) Spanish/          offer gato (cat) as an example. The word was first produced
+4     G. SOTO AND B. COOPER
+
+
+by a child between 14;16 and 17;15 months, making that              (dormir, to sleep). The most frequent ending for the infinitive
+range its FTU. Yet, the AoA for gato is 17;16–20;15 months          forms of verbs was -ar (produced 39 times or 67%).
+because children in this age group produced at least 10% of            Younger children (25;15 months) produced 96 out of
+the word’s total frequency.                                         327 conjugated verbs (29%); of those 86 (90%) were in pre-
+   The authors also provide the number of different words           sent tense and 10 (10%) were in simple past tense (e.g.,
+produced for the first time in each age range. The greatest         imperfect past and indefinite past). Older children
+number of different words were produced during the interval         (> 25;15 months) produced 231 different conjugated verbs,
+of 22;16–25;15 months, which the authors attribute to the           of which 179 (77%) were in present tense, and 52 (23%) in
+vocabulary spurt. Additional variables in the database              simple past tense. The majority of conjugated verbs were
+included the number of letters and syllables, grammatical           produced in first person singular. There were no verbs in
+class, stress pattern, semantic category, and orthographic          future or compound tenses (i.e., auxiliary verb þ participles).
+consonant-vowel pattern for each word.                              The children used periphrasis such as “voy a” (I’m going to)
+                                                                    or temporal words like man     ~ana (tomorrow), despues (after-
+                                                                    wards), or luego (later) to denote future tense. Younger chil-
+List organization                                                   dren produced 3 gerunds and no participles, while older
+The word list generated by Manzano et al. (1997) is organ-          children produced 18 gerunds and 5 participles.
+ized chronologically based on the age range in which a                 The frequency of use for all words ranged from 1 to 444
+word was first produced. Within a given age group, the              (mean ¼ 12; SD ¼ 32). For 386 words, the frequency was 1.
+                                                                    The frequency was greater than 100 for 31 words. Fifty two
+words are listed alphabetically. The frequency count of each
+                                                                    percent of high frequency words were open class words, such
+word is included. In the case of stable substitutes, the adult
+                                                                    as nouns (n ¼ 6), adverbs (n ¼ 6), verbs (n ¼ 3), adjectives
+form is provided in parenthesis [e.g., gua gua for perro/dog].
+                              ~eiro and Manzano (2000) is           (n ¼ 1). The rest, almost half of the words (48%) were closed
+    The list generated by Pin
+                                                                    class items, including personal pronouns (n ¼ 7), prepositions
+organized alphabetically by grammatical class. Nouns are fur-
+                                                                    (n ¼ 2), articles (n ¼ 3), conjunctions (n ¼ 2), and interjections
+ther categorized by semantic class (e.g., animals, articles of
+                                                                               ~eiro and Manzano (2000) found that AoA was nega-
+                                                                    (n ¼ 1). Pin
+clothing, places) and ordered alphabetically. Gerunds and
+                                                                    tively correlated with frequency, suggesting that the words
+past participles, both verb derivations, are listed as separate
+                                                                    that children used most frequently were learned at an early
+grammatical categories. Stable substitutes and their adult
+                                                                    age. In fact, all 31 most frequently used words were produced
+equivalent are presented in a separate appendix. Each word
+                                                                    for the first time by children younger than 30 months of age.
+is followed by the FTU, AoA, stress pattern, number of sylla-
+bles, number or letters and frequency of use.
+                                                                    Comparison between the PM database with the MBCDI
+                                                                    in Spanish
+The PM database
+                                                                    Following the procedures in Laubscher and Light (2020), we
+The resulting list from Manzano et al. (1997) and Pi~ neiro and
+                                                                    compared the words used by children between 11 and
+Manzano (2000) includes a total of 1,259 different words,
+                                                                    30 months in the PM database to the words on the
+representing all types of word classes including 449 common         MacArthur Inventarios del Desarrollo de Habilidades
+nouns (36%), 385 verbs (31%), 225 proper nouns (18%), 46            Comunicativas (IDHC). The IDHC is a parent report instru-
+stable substitutes (4%), 31 adjectives (2% %), 31 pronouns          ment developed for children aged 0;8 to 2;6 (years; months;
+(2%), 27 adverbs (2%), 21 gerunds (2%), 9 prepositions              Jackson-Maldonado et al., 1993). Like other versions of the
+(0.5%), 9 articles (0.5%), 9 interjections (0.5%), 8 numerals       MBCDI, the IDHC was developed to gather information about
+(0.5%), 5 past participles (0.5%), 2 conjunctions (0.5%), and 2     a child’s early communication and language skills. The IDHC
+contractions (0.5%). Out of 1259, 1189 (94.5%) are open-class       includes a word checklist of 375 nouns, grouped in semantic
+words (e.g., nouns, verbs, adjectives, and adverbs), and 70         categories (e.g., food and drinks, people, household items,
+(5.5%) are closed-class (e.g., articles, pronouns, and preposi-     outside things, temporal, toys, etc.), 106 verbs, 63 adjectives,
+tions). The database also reports the data by age group:            43 pronouns, 15 adverbs, 13 locatives, 12 stable substitutes,
+younger children were those less than 25;15 months of age;          9 prepositions, 9 articles, and 6 conjunctions.
+and older children were more than 25;15 months of age.                  Adults filling out the IDHC are instructed to mark the
+   Nouns and verbs are the most common word classes in              words that the child understands and produces. Common
+the Pin~eiro and Manzano (PM) database. The combination of          immature versions of a word (bobo for oso), pronunciation
+common nouns and proper nouns make up approximately                 errors (tete for leche), and forms substituted by the child’s fam-
+54% of the total word types. Approximately 31% of the word          ily (Coca for refresco) are acceptable. To observe the utilization
+types are verbs. Of the 385 verbs, 327 (85%) were conjugated        of verb conjugations, parents are presented with only the
+and 58 (15.06%) were produced in their infinitive form. Out of      infinitive form for each verb ending (-ar, acabar; -er, comer;
+the 58 infinitive verbs, 51 were produced by the older chil-        and -ir, subir), and are asked to note their recollection of the
+dren (88%). Younger children only produced 7 verbs in infini-       conjugations produced by the child following any verb.
+tive form. In Spanish, the infinitive forms of verbs have three         The IDHC is not a direct translation of the original English
+endings: -ar (e.g., jugar, to play), -er (comer, to eat), and -ir   CDI. The IDHC was developed using the following primary
+                                                                                   AUGMENTATIVE AND ALTERNATIVE COMMUNICATION         5
+
+
+sources: (a) natural language samples obtained from several           in both lists are presented in Appendix A. The words are
+published and unpublished studies of Mexican Spanish and              grouped by grammatical class. Approximately 14% of the
+Spanish spoken in the United States (e.g., Gonzalez, 1983;           overlapping words are closed-class words, whereas 86%
+Jackson, 1989) and (b) corpora from language experiments              are open-class words. Nouns account for the largest amount
+carried out at the University of the Americas in Mexico City          of overlapping words (n ¼ 103; 47%), and are further classi-
+(see Jackson-Maldonado et al., 1993). The authors supple-             fied by semantic category, including animals, people, food/
+mented these sources with vocabulary lists from language or           drinks, household objects, body parts, toys, vehicles, places,
+intelligence tests such as Test Vocabulario Imagenes                 clothing, outside objects, activities, and time. However,
+Peabody (Dunn, Padilla, Lugo, & Dunn, 1986) and Baterıa de           words from other grammatical categories are represented as
+Evaluaci on Intelectual Kaufman (Kaufman, Kaufman, Gomez             well, such as verbs (n ¼ 47; 22%), pronouns (n ¼ 20; 9%),
+Palacio, Rangel, & Padilla, 1987).                                    adverbs (n ¼ 13; 6%), adjectives (n ¼ 11; 5%), stable substi-
+     Although there is approximately an 80% overlap between           tutes (n ¼ 7; 3%), articles (n ¼ 5; 2%), numerals (n ¼ 5; 2%),
+the English MBCDI and the Spanish IDHC forms, the IDHC                prepositions (n ¼ 4; 2%), interjections (n ¼ 2; 1%), and con-
+reflects linguistic and cultural differences (Jackson-Maldonado       junctions (n ¼ 1; 1%).
+et al., 1993). Cultural modifications include replacing common            Appendix A also includes the first time the word was
+child social games, like tortillitas and ojitos, instead of patty     uttered (FTU) as well as the age of acquisition (AoA) for 117
+cake and peek-a-boo, and including additional items in the            words as reported in the PM database. The FTU represents
+“people” category such as madrina (“godmother”) and padrino           the age range in which that word was uttered for the first
+(“godfather”), as well as food items like tortilla and chili. Some    time by at least one child in the PM datatase. The AoA is the
+items from the English version were discarded for being irrele-       age range in which a given word’s frequency reached 10%
+vant. For example, the items “backyard”, “sandbox,” and               of its total frequency. The PM database did not report the
+“basement”, were not included in the Spanish version.                 AoA for any verbs, even for verbs with high frequency of use
+     There are seven different versions of the IDHC in Spanish:       such as ir/to go, dar/to give, and mirar/to look (e.g., voy/I go,
+Argentinian, Chilean, Columbian, Cuban, European, Mexican,            dame/give me, mira/look).
+and Peruvian Spanish, which reflect mostly dialectal differen-            All but 4 of the 31 most frequently used words in the PM
+ces of the same lexical concept (e.g., to drink: beber/tomar;         database were also included in the IDHC and therefore are
+Mariscal et al., 2007). The Columbian, Mexican and European           in the Appendix A. These 27 overlapping words represent a
+Spanish versions have been used in several normative stud-            wide range of grammatical functions and are essential to
+ies, cumulatively involving thousands of infants and toddlers         early grammaticalization in Spanish. All the pronouns, prepo-
+(e.g., Dıaz et al., 2011; Jackson-Maldonado et al., 1993;            sitions, articles and conjunctions used by children aged
+Mariscal et al., 2007; Thal, Jackson-Maldonado, & Acosta,             30 months or younger in the PM database were also included
+2000). Like their English counterpart, the IDHC has been              in the IDHC, and therefore are in the Appendix A.
+found to be reliable and valid to assess early language skills            Furthermore, the PM database included 247 words that
+of Spanish speaking children with and without disabilities            were not included in the IDHC. These were 121 nouns,
+and is increasingly incorporated in early language assess-            64 verbs, 36 stable substitutes, 7 interjections, 9 adjectives,
+ment batteries. For the purpose of this study, we selected            6 gerunds, 2 adverbs, and 2 contractions. Of those words,
+the Mexican version, as it is widely used for assessment and          sixty six percent had a frequency of 10% or less (n ¼ 162).
+screening in Latin American countries and the United States.          The remaining words could be considered dialectical
+     To determine the level of overlap between the PM database        variations of the same concept (e.g., guagua/bus), highly
+and the IDHC, we developed a list which included all the dif-         contextual objects (e.g., coco/coconut), diminutives (juguete-
+ferent words minus proper nouns (n ¼ 465) produced by chil-           juguetico/toy), lexical variations based on gender and num-
+dren 11 to 30 months of age from the PM database. To this             ber (jarrito-jarrita/jar), different verb conjugations, and verbs
+list, we added 732 different words and lexical variations pro-        not found on the IDHC (e.g., monto/to ride).
+vided in the IDHC (e.g., botella/mamila/tetero/biberon for bottle,       The IDHC included 514 words that were not included in
+which is presented as one single item in the IDHC and                 the PM database. These were 317 nouns, 62 verbs, 55 adjec-
+counted as four different words in our study). This resulted in       tives, 27 pronouns, 15 social routines and games, 10 adverbs,
+a list of 979 different words (without duplicates). We consid-        8 locatives, 7 prepositions and articles, 6 stable substitutes,
+ered a verb to be overlapping if any of the verb conjugations         4 conjunctions, and 3 question words. More than 80% of
+in the PM database matched an infinitive in the IDHC verb cat-        items in the following categories of the IDHC were not found
+egory. For every other category of word, we considered two            in the PM database: Food/Drink, Household Objects, Rooms/
+words to be overlapping only when the words matched in                Furniture, Clothing, Outside Objects, adjectives, and tem-
+gender, number, and aspect (e.g., cama vs camita).                    poral concepts.
+
+
+Results                                                               Discussion
+Out of 979 different words, 218 words were included in both           The aim of this study was to generate a vocabulary list to
+the PM database and the IDHC. This reveals an overlap of              support families, clinicians and AAC software developers in
+22% between both lists. The 218 words that were included              the selection of developmentally appropriate Spanish
+6     G. SOTO AND B. COOPER
+
+
+vocabulary. The list is relevant for children who are in the       diminutives). Verbs have a root with suffixes denoting per-
+early stages of Spanish language development. To extract           son, tense, number, aspect, and mood (see Mueller
+the specific words in our list, we analyzed the overlap            Gathercole, Sebastian, & Soto, 1999 for a discussion on the
+between a list of words produced by 200 Spanish speaking           acquisition of Spanish early morphology). The IDHC does not
+children between 11 and 30 months of age (Manzano et al.,          provide all possible morphological variations of a word or a
+1997; Pin  ~eiro & Manzano, 2000) with a list of words taken       verb, and does not offer any guidance on the acquisition or
+from the IDHC (Jackson-Maldonado et al., 1993). Both of            frequency of verb morphology (e.g., Harrison, 1992; Mueller
+these lists have been validated and used in several norma-         Gathercole et al., 1999). This may lead families and professio-
+tive studies (e.g., Jackson-Maldonado et al., 1993; Mariscal       nals to select a standard form of a word or a verb inflection
+et al., 2007; Pin~eiro et al., 1999; Thal et al., 2000).           that may be developmentally inappropriate or even ungram-
+    The resulting list includes a total of 218 overlapping         matical. For instance, the IDHC includes yo/I as one of the
+words. As in other languages, common nouns dominate the            pronouns and gustar/to like as one of its verbs leading to
+list (e.g., Jackson-Maldonado et al., 1993; McDonough et al.,      the possibility of these being combined erroneously as
+2011). This is expected, as nouns dominate the vocabularies        “yo þ gusto” (as observed in some AAC software in Spanish).
+of Spanish-speaking young children (see McDonough et al.,          This combination is ungrammatical for several reasons. The
+2011; Quintero & Perez, 2007). However, the 218 words also        verb “gustar” conjugates differently from other types of verbs
+include a range of developmentally appropriate verbs, adjec-       in Spanish. In addition, “yo þ gusto” uses a combination of
+tives, pronouns, adverbs, articles, and prepositions, providing    “personal pronoun” þ verb (SV), yet Spanish speaking chil-
+evidence of early use of these grammatical structures in the       dren seldom use this combination, as the person is always
+language of Spanish speaking children. All the articles, pro-      inflected in the verb. In fact, 60% of early sentences pro-
+nouns, prepositions, and conjunctions in the PM database           duced by children as young as 18 months of age follow VSO
+were also included in the IDHC, as were 27 of its top 31           word order (Lopez-Ornat, 1990, 1992).
+most frequently used words. The high overlap suggests that
+the function words in our list are representative of function
+                                                                   Implications for practice
+words used by Spanish speaking children in the early stages
+of language development. In fact, the combination of article       The resulting list provided in Appendix A can assist care-
+plus noun, and pronoun plus verb are among the first word          givers and professionals in the selection of an early Spanish
+combinations used by Spanish young children (Ortiz-                lexicon. The list includes all the grammatical categories used
+Ciscomani & Alvarez-Lo         pez, 2019; Shum, Conde, &          by Spanish-speaking children in the early stages of language
+Dıaz, 1992).                                                      development, and reinforces the need for AAC practitioners
+    The PM database did not include 514 words from the             to rely on natural language development and typical vocabu-
+IDHC. Likewise, 247 words from the PM database were not            lary acquisition patterns when selecting an initial Spanish
+included in the IDHC. These differences may have to do with        lexicon for young children. Open class words are predomin-
+the original purpose of both lists, the procedures used to         ant in the list. Yet, the articles, conjunction, prepositions and
+develop them, and the criteria for inclusion of a word in          pronouns included in the list are frequently used by young
+each word list. The PM database was created by transcribing        children, as found in natural language samples (see Pi~    neiro &
+children’s utterances during spontaneous play and conversa-        Manzano, 2000).
+tions with peers and adults in day care centers. As such, the         As with any other languages, the approach to selecting
+database included words that are relevant to that context,         Spanish vocabulary for children who require the use of AAC
+and many of the words had a low frequency of use.                  should reflect the way Spanish-speaking children with typical
+    The IDHC is an inventory of words that was developed           development learn and use their language. That requires an
+from a combination of sources, including parental reports,         understanding of the underlying grammatical structure of
+language samples, and published and unpublished word lists         the language, as well as the typical age and developmental
+(see Jackson-Maldonado et al., 1993 for a description). The        path in which specific words and linguistic structures are
+IDHC was designed to be “a screening instrument for early          acquired and used (see Alonso, Dıez, & Fernandez, 2016;
+Spanish acquisition … and early detection of language              Altares, Nieva, & L opez-Ornat, 2010;  Alvarez & Cuetos, 2007;
+delay” (Jackson-Maldonado et al., 1993, p. 546). Because it is     Espinosa-Ochoa, 2019; Gasc      on, Soto, & Gathercole, 2004;
+used as a tool to describe a child’s early language, it includes   Harrison, 1992; Perez & Navalo    n, 2005). The age of acquisi-
+a large number and variety of content words that are applic-       tion provided in our list can assist professionals with devel-
+able in multiple contexts.                                         opmental information on the order and typical age of
+    The IDHC has numerous advantages in evaluating early           acquisition of each word.
+linguistic development in Spanish as several studies have             The list in Appendix A includes only the standard form of
+shown (e.g., Mariscal & Gallego, 2012; Serrat, Olmo, & Sanz-       a word and the infinitive form of a verb. To put this list into
+Torrent, 2009). However, its limitations as a sole vocabulary      practice, word variations based in number (plural/singular),
+selection tool for Spanish initial lexicon should also be con-     gender (feminine/masculine) and aspect (standard/diminu-
+sidered. For instance, the IDHC does not fully account for the     tive) are suggested. Likewise, the list of verbs includes only
+fact that Spanish is an inflectional language. Nouns and           the infinitive form. Since Spanish speaking children in early
+adjectives are inflected for gender, number, and aspect (e.g.,     stages of language development seldom use the infinitive,
+                                                                                    AUGMENTATIVE AND ALTERNATIVE COMMUNICATION                    7
+
+
+developmentally appropriate conjugations ought to be                promise for describing language acquisition patterns among
+selected. These would include the present and simple past           individuals who use AAC.
+tense, the periphrastic future, the gerund and the participle           Last, our study is an initial and limited step toward assist-
+(see Gonzalez, 1983; Harrison, 1992; Pin            ~eiro &        ing families and professionals with Spanish vocabulary selec-
+Manzano, 2000).                                                     tion for children who use AAC. To establish the robustness
+   Language development in Spanish, like in other lan-              of our list, future studies should examine the early vocabula-
+guages, is mediated by the interdependence between lexical          ries of children across different dialectal variations of
+and grammatical domains (see Serrat et al., 2009; Serrat,           Spanish, as well as compare the expressive vocabulary of
+Sanz-Torrent, Feij oo, Chireac, & Hilferty, 2012; Simon-           monolingual and bilingual Spanish speaking children (see
+Cereijido & Gutierrez-Clellen, 2009). Our overlap analysis indi-   Mancilla-Martinez, Pan, & Vagh, 2011), and of children with
+cates that children as young as 30 months of age use a wide         and without typical development.
+range of content and function words (words that require
+word combinations to become meaningful) in their speech.
+                                                                    Conclusion
+Function words such as articles, prepositions and pronouns
+are essential to early syntax and grammaticalization in             This paper represents the first work to generate a vocabulary
+Spanish, and they are present in the early vocabulary of            list that can be used in the selection of a Spanish initial lexi-
+Spanish speaking children with typical development. Without         con for children in need of AAC. It is proposed as a starting
+these words, children would be extremely limited in their           point from which to spark attention in the AAC field to the
+capacity to communicate. However, an initial lexicon in             study of vocabulary selection in Spanish and should not be
+Spanish should also include content and child-specific words        regarded as a finite set of words that would cover all the
+that reflect the unique interest and experiences of the child,      communicative needs of a child in need of AAC. Rather,
+including personally relevant proper and common nouns,              these words can be used to select possible targets for
+social and routine words, sound effects, stable substitutes,        vocabulary selection for users of AAC in the early stages of
+diminutives, and other early emerging concepts that allow           Spanish development. Our list should be supplemented with
+children to communicate successfully before they are able to        other tools that would yield vocabulary items that are repre-
+produce more grammatically complex utterances (Laubscher            sentative of the child’s interests, family, and culture
+& Light, 2020).                                                     (Mngomezulu et al., 2019; Soto & Yu, 2014; Tonsing & Soto,
+   Although helpful, published word lists can never provide         2020). Similarly to any child using AAC, children who are
+the complete solution to vocabulary selection in any lan-           learning Spanish also need access to individualized vocabula-
+guage, and should always be used in conjunction with other          ries that are reflective of their interests, personalities, con-
+vocabulary selection strategies (Bean et al., 2019; Trembath        texts in which they interact, and dialects preferred by their
+et al., 2007). Caregiver and informant interviews, peer obser-      parents or significant others (Trembath et al., 2007).
+vations, natural language samples, and developmental lan-
+guage guides can help ensure that the vocabulary selected
+is relevant and tailored to each child’s needs and stage of         Disclosure statement
+language development, personality, interests, and contexts in       No potential conflict of interest was reported by the author(s).
+which they interact (Trembath et al., 2007).
+
+                                                                    Funding
+Limitations and future research direction
+                                                                    This work was supported by an Internal grant by San Francisco
+The results of the present study should be interpreted with         State University.
+caution because of a number of limitations. First, the study
+relied only on three published word lists to create a pro-
+posed initial Spanish lexicon. It is possible that there are        ORCID
+more published and unpublished sources of early Spanish
+vocabulary that were not included in our review. Second, the        Gloria Soto     http://orcid.org/0000-0002-3254-3099
+lists we used to generate our final list were derived from
+studies that included only children with typical development.       References
+Future studies are needed to investigate vocabulary use in
+                                                                    Alonso, M. A., Dıez, E., & Fernandez, A. (2016). Subjective age-of-acquisition
+Spanish-speaking children with disabilities in the early stages
+                                                                       norms for 4,640 verbs in Spanish. Behavior Research Methods, 48(4),
+of language development.                                               1337–1342. doi:10.3758/s13428-015-0675-z
+    Third, our list (Appendix A) is being proposed as a pool        Altares, S. M., Nieva, S., & Lo   pez-Ornat, S. (2010). Observar y medir el
+from which to select an initial lexicon in Spanish. Further            desarrollo gramatical temprano en espan     ~ol. Psicothema, 22, 51–56.
+                                                                    
+                                                                    Alvarez, B., & Cuetos, F. (2007). Objective age of acquisition norms for a
+examination is required to determine the vocabulary that
+                                                                       set of 328 words in Spanish. Behavior Research Methods, 39(3),
+would be appropriate and useful for individuals in more
+                                                                       377–383. doi:10.3758/bf03193006
+advanced levels of language development. Future research            Banajee, M., Dicarlo, C., & Stricklin, S. B. (2003). Core vocabulary deter-
+studies should also examine whether variables such as FTU              mination for toddlers. Augmentative and Alternative Communication,
+and AoA as defined by Pin    ~eiro and Manzano (2000) hold             19(2), 67–73. doi:10.1080/0743461031000112034
+8       G. SOTO AND B. COOPER
+
+
+Bean, A., Cargill, L. P., & Lyle, S. (2019). Framework for selecting vocabu-          Jackson-Maldonado, D., Thal, D., Marchman, V., Bates, E., & Gutierrez-
+    lary for preliterate children who use augmentative and alternative                   Clellen, V. (1993). Early lexical development in Spanish-speaking
+    communication. American Journal of Speech-Language Pathology,                        infants and toddlers. Journal of Child Language, 20(3), 523–549. doi:10.
+    28(3), 1000–1009. doi:10.1044/2019_AJSLP-18-0041                                     1017/s0305000900008461
+Beukelman, D., Jones, R., & Rowan, M. (1989). Frequency of word usage                 Judge, S., Randall, N., Goldbart, J., Lynch, Y., Moulam, L., Meredith, S., &
+    by nondisabled peers in integrated preschool classrooms.                             Murray, J. (2020). The language and communication attributes of
+    Augmentative and Alternative Communication, 5(4), 243–248. doi:10.                   graphic symbol communication aids–a systematic review and narra-
+    1080/07434618912331275296                                                            tive synthesis. Disability and Rehabilitation. Assistive Technology, 15(6),
+Boenisch, J., & Soto, G. (2015). The oral core vocabulary of typically                   652–662. doi:10.1080/17483107.2019.1604828
+    developing English-speaking school-aged children: Implications for                Kaufman, A., Kaufman, N., Gomez Palacio, M., Rangel, E., & Padilla, E.
+    AAC practice. Augmentative and Alternative Communication (Baltimore,                 (1987). Baterıa de evaluaci on intelectual Kaufman para Nin  ~os. Mexico
+    Md. : 1985), 31(1), 77–84. doi:10.3109/07434618.2014.1001521                         City, Mexico: Direccion General de Educaci   on Especial.
+Boenisch, J., Musketa, B., & Sachse, S. (2007). Die Bedeutung des Vokabulars          Lahey, M., & Bloom, L. (1977). Planning a first lexicon: Which words to
+    f€
+     ur den Spracherwerb und Konsequenzen f€            ur die Gestaltung von            teach first. The Journal of Speech and Hearing Disorders, 42(3),
+    Kommunikationsoberfl€achen. In S. Sachse, C. Birngruber, & S. Arendes                340–350. doi:10.1044/jshd.4203.340
+    (Eds.). Lernen und Lehren in der Unterst€    utzte Kommunikation. Karlsruhe       Laubscher, E., & Light, J. (2020). Core vocabulary lists for young children
+    (pp. 355–371), Karlsruhe, Germany: Von Loepe.                                        and considerations for early language development: A narrative
+Bornstein, M. H., Cote, L. R., Maital, S., Painter, K., Park, S. Y., Pascual, L.,        review. Augmentative and Alternative Communication (Baltimore, Md. :
+     … Vyt, A. (2004). Cross-linguistic analysis of vocabulary in young chil-            1985), 36(1), 43–53. doi:10.1080/07434618.2020.1737964
+    dren: spanish, dutch, French, hebrew, italian, korean, and american               Liu, C., & Sloane, Z. (2006). Developing a core vocabulary for a mandarin
+    english . Child Development, 75(4), 1115–1139. doi:10.1111/j.1467-                   Chinese AAC system using word frequency data. International Journal
+    8624.2004.00729.x                                                                    of Computer Processing of Languages, 19(04), 285–300. doi:10.1142/
+California Department of Education (2019). Basic facts—California lan-                   S0219427906001530
+    guage census: Fall 2018. Facts about english language learners in                  pez-Ornat, S. (1990). La formacio
+                                                                                      Lo                                   n de la oracio n simple: Las omisiones
+    California, CalEd Facts. Retrieved from: http://www.cde.ca.gov/ds/sd/                sintactica (S-V-O) en la adquisicion del espan~ol. Estudios de Psicologıa,
+    cb/cefelfacts.asp                                                                    11(41), 41–72. doi:10.1080/02109395.1990.10821130
+Deckers, S. R., Van Zaalen, Y., Van Balkom, H., & Verhoeven, L. (2017).                pez-Ornat, S. (1992). Sobre la gramaticalizaci
+                                                                                      Lo                                                  on. Prototipos de concor-
+    Core vocabulary of young children with Down syndrome.                                dancia verbo-sujeto: Datos de lengua espan      ~ola en nin~os de 1, 6 a 3,
+    Augmentative and Alternative Communication (Baltimore, Md. : 1985),                  6. Cognitiva, 4, 49–74.
+    33(2), 77–86. doi:10.1080/07434618.2017.1293730                                   Łuniewska, M., Haman, E., Armon-Lotem, S., Etenkowski, B., Southwood,
+Dıaz, M. F. L., Fonseca, A.  M. G., Boho   rquez, D. M. G., Guecha, C. M., &         F., And-elkovic, D., … Unal-Logacev,
+                                                                                                                     €               € (2016). Ratings of age of
+                                                                                                                                     O.
+    Sellabona, E. S. (2011). Normativizacio    n del inventario del desarrollo          acquisition of 299 words across 25 languages: Is there a cross-linguistic
+    comunicativo MacArthur-Bates al Espan             ~ol, Colombia. Revista             order of words? Behavior Research Methods, 48(3), 1154–1177. doi:10.
+    Latinoamericana de Psicologıa, 43, 241–254.                                         3758/s13428-014-0492-9
+Dunn, L. M., Padilla, E. R., Lugo, D. E., & Dunn, L. M. (1986). Test de vocab-        Mancilla-Martinez, J., Pan, B. A., & Vagh, S. B. (2011). Assessing the pro-
+    ulario en Ima  genes Peabody: Adaptacio       n Hispanoamericana. Circle           ductive vocabulary of Spanish–English bilingual toddlers from low-
+    Pines, MN: American Guidance Service.                                                income families. Applied Psycholinguistics, 32(2), 333–357. doi:10.1017/
+Espinosa-Ochoa, M. R. (2019). La perıfrasis aspectual estar þ gerundio en               S0142716410000433
+    espan ~ol infantil. Entre el Conocimiento Previo y la Influencia Del Input.       Manzano, M., Pin  ~eiro, A., & Pereira, M. (1997). Frecuencia de uso y edad
+    Revista Signos, 52, 759–779. doi:10.4067/S0718-09342019000300759                     de adquisicio n de palabras producidas por nin   ~os entre 11 y 49 meses
+Fenson, L., Marchman, V. A., Thal, D., Dale, P., & Reznick, J. S. (2007).                de edad. Revista Cubana de Psicologıa, 14, 193–207.
+    MacArthur-Bates Communicative Development Inventories: User’s Guide               Mariscal, S., Lo pez-Ornat, S., Gallego, C., Gallo, P., Karousou, A., &
+    and Technical Manual (2nd ed.). Baltimore, MD: Paul H. Brookes.                      Martinez, M. (2007). La evaluaci     on del desarrollo comunicativo y
+Fried-Oken, M., & More, L. (1992). An initial vocabulary for nonspeaking                 ling€uıstico mediante la versio     n espan  ~ola de los inventarios
+    children based on developmental and environmental language sour-                     MacArthur-Bates [Evaluation of communicative and linguistic develop-
+    ces. Augmentative and Alternative Communication, 8(1), 41–56. doi:10.                ment using the Spanish version of the MacArthur-Bates inventories].
+    1080/07434619212331276033                                                            Psicothema, 19(2), 190–197.
+Fristoe, M., & Lloyd, L. L. (1980). Planning an initial expressive sign lexi-         Mariscal, S., & Gallego, C. (2012). The relationship between early lexical
+    con for persons with severe communication impairment. The Journal                    and grammatical development in Spanish: Evidence in children with
+    of Speech and Hearing Disorders, 45(2), 170–180. doi:10.1044/jshd.                   different linguistic levels. The Spanish Journal of Psychology, 15(1),
+    4502.170                                                                             112–123. doi:10.5209/rev_sjop.2012.v15.n1.37293
+Gasc on, M. E. S., Soto, P., & Gathercole, V. C. M. (2004). La morfologıa           Marvin, C. A., Beukelman, D. R., Brockhaus, J., & Kast, L. (1994). What are
+    verbal temprana en espan     ~ol. Anuario de Psicologıa/the UB Journal of           you talking about?’’: Semantic analysis of preschool children’s conver-
+    Psychology, 35, 203–220.                                                             sational topics in home and preschool settings. Augmentative and
+Gonzalez, G. (1983). Expressing time through verb tenses and temporal                   Alternative      Communication,         10(2),     75–86.      doi:10.1080/
+    expressions in Spanish: Age 2.0-4.6. Nabe Journal, 7(2), 69–82. doi:10.              07434619412331276780
+    1080/08855072.1983.10668443                                                       McDonough, C., Song, L., Hirsh, -Pasek, K., Golinkoff, R. M., & Lannon, R.
+Hattingh, D., & T€    onsing, K. M. (2020). The core vocabulary of South                 (2011). An image is worth a thousand words: Why nouns tend to
+    African Afrikaans-speaking Grade R learners without disabilities. South              dominate verbs in early word learning. Developmental Science, 14(2),
+    African Journal of Communication Disorders, 67(1), 1–8. doi:10.4102/                 181–189. doi:10.1111/j.1467-7687.2010.00968.x
+    sajcd.v67i1.701                                                                   Mngomezulu, J., To    €nsing, K. M., Dada, S., & Bokaba, N. B. (2019).
+Harrison, C. (1992). Is there a natural order of acquisition in Spanish verb             Determining a Zulu core vocabulary for children who use augmenta-
+    morphology? Estudios de Ling€    uıstica Aplicada, 15, 266–278.                     tive and alternative communication. Augmentative and Alternative
+Holland, A. L. (1975). Language therapy for children: Some thoughts on                   Communication (Baltimore, Md. : 1985), 35(4), 274–284. doi:10.1080/
+    context and content. The Journal of Speech and Hearing Disorders,                    07434618.2019.1692902
+    40(4), 514–523. doi:10.1044/jshd.4004.514                                         Mueller Gathercole, V. C., Sebastian, E., & Soto, P. (1999). The early acqui-
+Jackson, D. (1989). Una palabra: Multiplicidad de intenciones y funciones                sition of Spanish verbal morphology: Across-the-board or piecemeal
+    (Doctoral dissertation, Centro de Estudios Ling€     uısticos y Literarios, El      knowledge? International Journal of Bilingualism, 3(2-3), 133–182. doi:
+    Colegio de Mexico).                                                                 10.1177/13670069990030020401
+                                                                                                       AUGMENTATIVE AND ALTERNATIVE COMMUNICATION                   9
+
+
+Ortiz-Ciscomani, R. M., & Alvarez-Lo     pez, E. (2019). El artıculo definido en     Shin, S., & Hill, K. (2016). Korean word frequency and commonality study
+   espan~ol en edades tempranas: De la deixis a la referencia. RAEL:                      for augmentative and alternative communication. International
+   Revista Electro  nica de Ling€
+                                 uıstica Aplicada, 18, 91–106.                           Journal of Language & Communication Disorders, 51(4), 415–429. doi:
+Perez, M., & Navalo    n, C. (2005). Objective-AoA norms for 175 names in                10.1111/1460-6984.12218
+   Spanish: Relationships with other psycholinguistic variables, estimated             Shum, G., Conde, A., & Dıaz, C. (1992). Pautas de adquisicio   n y uso del
+   AoA, and data from other languages. European Journal of Cognitive                      pronombre personal en lengua espan          ~ola. Un estudio longitudinal.
+   Psychology, 17(2), 179–206. doi:10.1080/09541440340000547                              Estudios de Psicologıa, 13(48), 67–86. doi:10.1080/02109395.1992.
+  ~eiro, A., & Manzano, M. (2000). A lexical database for Spanish-speaking
+Pin                                                                                       10821180
+   children. Behavior Research Methods, Instruments, & Computers : A                   Simon-Cereijido, G., & Guti    errez-Clellen, V. F. (2009). A cross-linguistic
+   Journal of the Psychonomic Society, Inc, 32(4), 616–628. doi:10.3758/                  and bilingual evaluation of the interdependence between lexical and
+   bf03200833                                                                             grammatical domains. Applied Psycholinguistics, 30(2), 315–337. doi:10.
+  ~eiro, A., Morenza, L., Torres, R., & Sierra, C. E. (1999). Estudio norma-
+Pin                                                                                       1017/S0142716409090134
+   tivo de veinte categorıas semanticas en nin      ~os y adultos. Revista de
+                                                                                       Soto, G., & Yu, B. (2014). Considerations for the provision of services to
+   Psicologıa General y Aplicada, 52, 147–157.
+                                                                                          bilingual children who use augmentative and alternative communica-
+Quick, N., Erickson, K., & Mccright, J. (2019). The most frequently used
+                                                                                          tion. Augmentative and Alternative Communication (Baltimore, Md. :
+   words: Comparing child-directed speech and young children’s speech
+                                                                                          1985), 30(1), 83–92. doi:10.3109/07434618.2013.878751
+   to inform vocabulary selection for aided input. Augmentative and
+                                                                                       Thal, D., Jackson-Maldonado, D., & Acosta, D. (2000). Validity of a parent-
+   Alternative Communication (Baltimore, Md. : 1985), 35(2), 120–131. doi:
+                                                                                          report measure of vocabulary and grammar for Spanish-speaking tod-
+   10.1080/07434618.2019.1576225
+                                                                                          dlers. Journal of Speech, Language, and Hearing Research : Jslhr, 43(5),
+Quintero, Y. C., & Perez, C. I. (2007). Proporcio   n de sustantivos y verbos
+   en el habla de cuidador y en el l       exico temprano en Espan    ~ol. Boletın      1087–1100. doi:10.1044/jslhr.4305.1087
+   de Ling€ uıstica, 19, 42–69.                                                       T€
+                                                                                        onsing, K. M., & Soto, G. (2020). Multilingualism and augmentative and
+Robillard, M., Mayer-Crittenden, C., Minor-Corriveau, M., & B          elanger, R.       alternative communication: examining language ideology and result-
+   (2014). Monolingual and bilingual children with and without primary                    ing practices. Augmentative and Alternative Communication, 36(3),
+   language impairment: Core vocabulary comparison. Augmentative and                      190–201.
+   Alternative Communication (Baltimore, Md. : 1985), 30(3), 267–278. doi:             Trembath, D., Balandin, S., & Togher, L. (2007). Vocabulary selection for
+   10.3109/07434618.2014.921240                                                           Australian children who use augmentative and alternative communi-
+Serrat, E., Olmo, R., & Sanz-Torrent, M. (2009). La productividad de la                   cation. Journal of Intellectual & Developmental Disability, 32(4),
+   morfologıa verbal a los dos an       ~os de edad. Infancia y Aprendizaje,             291–301. doi:10.1080/13668250701689298
+   32(1), 49–63. doi:10.1174/021037009787138194                                        Witkowski, D., & Baker, B. (2012). Addressing the content vocabulary
+Serrat, E., Sanz-Torrent, M., Feij  oo, S., Chireac, S. M., & Hilferty, J. (2012).       with core: Theory and practice for nonliterate or emerging literate
+   Acquiring verbs in Spanish: An evaluation of two proposals. Review of                  students.       Perspectives     on     Augmentative     and    Alternative
+   Cognitive Linguistics, 10(1), 133–155. doi:10.1075/rcl.10.1.04ser                      Communication, 21(3), 74–81. doi:10.1044/aac21.3.74
+10      G. SOTO AND B. COOPER
+
+
+Appendix A                                                          Continued.
+                                                                   Word                 FTU           AoA
+                                        ~eiro and Manzano (PM)
+List of Overlapping Words Between the Pin
+                                                                   Body Parts
+Database and the Inventorios del Desarrollo de Habilidades            boca           20;16-22;15
+Comunicativas (IDHC)                                                  cara            26;4-29;16
+                                                                      mano           22;16-25;15   22;16-25;15
+Word                               FTU                  AoA           nariz          17;16-20;15   17;16-20;15
+NOUNS                                                                 ojo             26;4-29;16    30;4-33;22
+Animals                                                               oreja           26;4-29;16
+  ardilla                       22;16-25;15                           pelo           14;16-17;15   22;16-25;15
+  bicho                         20;16-22;15                           pie            22;16-25;15    30;4-33;22
+  caballo                       14;16-17;15          20;16-22;15      teta           20;16-22;15
+  conejo                        20;16-22;15          20;16-22;15   Toys
+  gallina                       20;16-22;15                           carriola       22;16-25;15
+  gato                          14;16-17;15          17;16-20;15      colores        22;16-25;15    38;4-41;23
+  jirafa                         26;4-29;16                           globo           26;4-29;16
+  leon                         22;16-25;15                           jugete         17;16-20;15    26;4-29;16
+  mariposa                      17;16-20;15                           lapiz         22;16-25;15
+  mono                          20;16-22;15          22;16-25;15      mu~ neca       20;16-22;15   22;16-25;15
+  osito                         20;16-22;15          22;16-25;15      pala           22;16-25;15
+  oso                           22;16-25;15           38;4-41;23      papel          17;16-20;15
+  pajaro                       22;16-25;15                           pelota        17;16-20;15   22;16-25;15
+  pato                          14;16-17;15          20;16-22;15   Vehicles
+  perro                         14;16-17;15          22;16-25;15      avion         17;16-20;15   20;16-22;15
+  pescado                       20;16-22;15           34;7-37;21      barco          22;16-25;15    30;4-33;22
+  ping€uino                     22;16-25;15                           camion       20;16-22;15   22;16-25;15
+  pollito                       20;16-22;15          20;16-22;15      carro          22;16-25;15   22;16-25;15
+  pollo                         22;16-25;15                           coche          22;16-25;15    34;7-37;21
+  rana                          20;16-22;15          22;16-25;15      moto           22;16-25;15   22;16-25;15
+  raton                        22;16-25;15                           tractor        22;16-25;15
+  vaca                          20;16-22;15          20;16-22;15      tren           20;16-22;15   20;16-22;15
+People                                                             Places
+  abuela                        22;16-25;15           34;7-37;21      calle          22;16-25;15    34;7-37;21
+  abuelo                        22;16-25;15           34;7-37;21      casa           22;16-25;15    30;4-33;22
+  amigo                          26;4-29;16                           cocina         22;16-25;15
+  hermana                        26;4-29;16                           parque         22;16-25;15   22;16-25;15
+  hermano                        26;4-29;16                           playa          22;16-25;15    26;4-29;16
+  maestra                        26;4-29;16                        Clothing
+  mama                        14;16-17;15          22;16-25;15      reloj          11;16-14;15   20;16-22;15
+  ni~na                         22;16-25;15           26;4-29;16      sombrero       20;16-22;15
+  nin~o                         17;16-20;15          22;16-25;15      zapato         17;16-20;15   20;16-22;15
+  papa                        11;16-14;15          22;16-25;15   Outside Objects
+  payaso                        22;16-25;15          22;16-25;15      estrella        26;4-29;16
+  policıa                       26;4-29;16                           flor           20;16-22;15    34;7-37;21
+  prima                          26;4-29;16           26;4-29;16      sol            20;16-22;15    26;4-29;16
+  primo                          26;4-29;16           26;4-29;16   Activities
+  tıa                          14;16-17;15          14;16-17;15      besito          26;4-29;16    26;4-29;16
+Food and Drink                                                        fiesta         22;16-25;15    38;4-41;23
+  agua                         11;16-14;15          22;16-25;15   Time
+  az ucar                       26;4-29;16                           tarde          22;16-25;15
+  calabaza                       26;4-29;16                        VERBS
+  chocolate                      26;4-29;16                           abrir          22;16-25;15
+  comida                        22;16-25;15           30;4-33;22      acabar         22;16-25;15
+  dulce                          26;4-29;16                           bailar          26;4-29;16
+  galleta                       22;16-25;15           30;4-33;22      buscar         22;16-25;15
+  helado                         26;4-29;16           26;4-29;16      caer(se)       22;16-25;15
+  hielo                         20;16-22;15                           caminar        22;16-25;15
+  jugo                          22;16-25;15           30;4-33;22      cantar         22;16-25;15
+  leche                         20;16-22;15          22;16-25;15      cerrar         22;16-25;15
+  naranja                       22;16-25;15                           cocinar         26;4-29;16
+  papa                          20;16-22;15          22;16-25;15      comer(se)      22;16-25;15
+Household Objects                                                     comprar        22;16-25;15
+  cuchara                       22;16-25;15          22;16-25;15      correr         22;16-25;15
+  cuna                           26;4-29;16                           dar           11;16-14;15
+  escalera                      22;16-25;15                           dormir(se)     22;16-25;15
+  escoba                         26;4-29;16                           ense~ nar      22;16-25;15
+  espejo                        22;16-25;15                           escuchar       14;16-17;15
+  luz                           20;16-22;15                           esperar(se)    22;16-25;15
+  mesa                          22;16-25;15                           estar          20;16-22;15
+  peine                          26;4-29;16                           gustar          26;4-29;16
+  plato                         22;16-25;15          22;16-25;15      haber          22;16-25;15
+  puerta                        20;16-22;15          22;16-25;15      hablar          26;4-29;16
+  silla                         17;16-20;15          22;16-25;15      hacer          22;16-25;15
+  telefono                     20;16-22;15          22;16-25;15      ir(se)         22;16-25;15
+  vaso                          22;16-25;15                           jugar          20;16-22;15
+                                                     (continued)                                   (continued)
+                                                                 AUGMENTATIVE AND ALTERNATIVE COMMUNICATION                  11
+
+
+ Continued.                                       Continued.
+Word                     FTU          AoA        Word                                      FTU                          AoA
+  llevar(se)          26;4-29;16                   miau (gato)                         17;16-20;15                  20;16-22;15
+  llorar             17;16-20;15                   mu (vaca)                           14;16-17;15
+  mirar             11;16-14;15                   pıo pıo (pollo)                   22;16-25;15                  22;16-25;15
+  morder              26;4-29;16                   pipi (carro)                        14;16-17;15                  17;16-20;15
+  oır               20;16-22;15                 ARTICLES
+  parar(se)          22;16-25;15                   el                                 14;16-17;15                  22;16-25;15
+  peinar(se)          26;4-29;16                   la                                 11;16-14;15                  22;16-25;15
+  perder             20;16-22;15                   lo                                  22;16-25;15                   26;4-29;16
+  poner(se)          22;16-25;15                   un                                 14;16-17;15                  22;16-25;15
+  querer             22;16-25;15                   una                                  26;4-29;16                   30;4-33;22
+  quitar             17;16-20;15                 NUMERALS
+  romper             22;16-25;15                   cinco                               20;16-22;15                   38;4-41;23
+  saber              22;16-25;15                   cuatro                              20;16-22;15                   38;4-41;23
+  salir(se)          22;16-25;15                   dos                                 20;16-22;15                   26;4-29;16
+  saltar              26;4-29;16                   tres                                20;16-22;15                   34;7-37;21
+  sentar(se)         22;16-25;15                   uno                                 20;16-22;15                  22;16-25;15
+  ser                20;16-22;15                 PREPOSITIONS
+  tener              22;16-25;15                   a                                  17;16-20;15                  22;16-25;15
+  tirar              20;16-22;15                   de                                 22;16-25;15                   34;7-37;21
+  tocar              22;16-25;15                   en                                  22;16-25;15                   30;4-33;22
+  tomar(se)          26;4-29;16                   para                               22;16-25;15                  22;16-25;15
+  venir(se)          17;16-20;15                 INTERJECTIONS
+  ver(se)            17;16-20;15                   adios                              20;16-22;15
+PRONOUNS                                           gracias                             22;16-25;15
+  aquella            22;16-25;15    42;6-45;21   CONJUNCTIONS
+  donde             20;16-22;15   22;16-25;15     y                                  20;16-22;15                   30;4-33;22
+  esa                22;16-25;15    26;4-29;16   Note. FTU ¼ First Time Uttered or age range in which a word was uttered for
+  ese                20;16-22;15   22;16-25;15   the first time by at least one child; AoA ¼ Age of Acquisition or the age range
+  eso                22;16-25;15    34;7-37;21   in which a given word’s frequency reached 10% of its total frequency. The
+  esta               22;16-25;15    26;4-29;16   PM Database did not report AoA on any verb or any word whose frequency
+  este               17;16-20;15   22;16-25;15   was lower than 10.
+  esto              17;16-20;15   22;16-25;15    Reflects a high frequency word (>100) according to the PM database.
+  le                 22;16-25;15   22;16-25;15
+  me                22;16-25;15    34;7-37;21
+  mi                11;16-14;15    34;7-37;21
+  mıa              17;16-20;15   20;16-22;15
+  mıo              14;16-17;15   22;16-25;15
+  por que           22;16-25;15    38;4-41;23
+  que                22;16-25;15    30;4-33;22
+  que               17;16-20;15   22;16-25;15
+  quien             22;16-25;15   22;16-25;15
+  se                20;16-22;15   22;16-25;15
+  tuyo               22;16-25;15    34;7-37;21
+  yo                17;16-20;15    34;7-37;21
+ADVERBS
+  abajo               26;4-29;16
+  ahı              11;16-14;15   22;16-25;15
+  alla             11;16-14;15    38;4-41;23
+  allı              22;16-25;15   22;16-25;15
+  aquı             17;16-20;15   20;16-22;15
+  arriba             22;16-25;15    30;4-33;22
+  mas               17;16-20;15   20;16-22;15
+  mucho             22;16-25;15    26;4-29;16
+  no                11;16-14;15   22;16-25;15
+  otra               22;16-25;15
+  otro               17;16-20;15   20;16-22;15
+  sı                17;16-20;15   20;16-22;15
+  ya                 11;16-14;15   14;16-17;15
+ADJECTIVES
+  amarillo           20;16-22;15    30;4-33;22
+  azul               20;16-22;15   22;16-25;15
+  blanco             22;16-25;15
+  chico              20;16-22;15
+  feo                22;16-25;15    26;4-29;16
+  fria               22;16-25;15
+  grande            22;16-25;15    30;4-33;22
+  limpio              26;4-29;16
+  lindo              20;16-22;15   22;16-25;15
+  rojo               20;16-22;15    26;4-29;16
+  verde              22;16-25;15    38;4-41;23
+STABLE SUBSTITUTES
+  cua cua (pato)     14;16-17;15
+  gua gua (perro)    14;16-17;15   17;16-20;15
+  kikiriki (gallo)   17;16-20;15
+                                   (continued)
+

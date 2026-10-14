@@ -1,0 +1,40 @@
+{
+  "format": "open-board-log-0.1",
+  "user_id": "coughdrop:ae30f860151049a16620dc8288b3c6d72873df88507c1fcf8762ba36e84d06a202b5f0a8d862847685a11cffe7ba4a2071a90b493ee3c6f9513e16092de3a8bf",
+  "source": "coughdrop",
+  "locale": "en",
+  "sessions": [
+    {
+      "id": "fd13dbc07d79060",
+      "type": "log",
+      "started": "2000-01-01T00:00:00Z",
+      "ended": "2000-01-01T00:00:05Z",
+      "device_id": "1761b",
+      "events": [
+        {
+          "id": "fd13dbc07d79060",
+          "timestamp": "2000-01-01T00:00:00Z",
+          "type": "button",
+          "button_id": "0cbe6eb8af00b7a",
+          "board_id": "f007778af43f8db",
+          "spoken": true,
+          "label": "more",
+          "core_word": true,
+          "modeling": false,
+          "parts_of_speech": [
+            "determiner"
+          ],
+          "ip_address": "adabc483fbf1c61",
+          "window_width": 1080,
+          "window_height": 790,
+          "volume": "0.10000000149011612",
+          "screen_brightness": 0.5,
+          "percent_x": 0.861,
+          "percent_y": 0.365
+        }
+      ],
+      "anonymized": true
+    }
+  ],
+  "anonymized": true
+}

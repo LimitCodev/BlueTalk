@@ -1,0 +1,48 @@
+{
+  "format": "open-board-0.1",
+  "id": "url_images",
+  "locale": "en",
+  "name": "URL Images Board",
+  "description_html": "This is an .obf file with images referenced by external URL. It also includes some simple styling.",
+  "grid": {
+    "rows": 2,
+    "columns": 2,
+    "order": [
+      ["b1", null],
+      [null, "b2"]
+    ]
+  },
+  "buttons": [
+    {
+      "id": "b1",
+      "label": "happy",
+      "image_id": "i9",
+      "background_color": "rgb(200, 200, 200)",
+      "border_color": "rgb( 255, 0,  0) "
+    },
+    {
+      "id": "b2",
+      "label": "sad",
+      "image_id": "i11",
+      "background_color": "rgb( 200, 200, 200) ",
+      "border_color": "rgb(0, 0, 255)"
+    }
+  ],
+  "images": [
+    {
+      "id": "i9",
+      "width": 300,
+      "height": 300,
+      "url": "https://openclipart.org/image/300px/svg_to_png/205568/cyberscooty-two-kids.png",
+      "content_type": "image/png"
+    },
+    {
+      "id": "i11",
+      "width": 300,
+      "height": 300,
+      "content_type": "image/png",
+      "url": "https://openclipart.org/image/300px/svg_to_png/145/PeterM_Sad_tiger_cat.png"
+    }
+  ],
+  "sounds": []
+}

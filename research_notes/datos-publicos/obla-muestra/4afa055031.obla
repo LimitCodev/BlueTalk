@@ -1,0 +1,147 @@
+{
+  "format": "open-board-log-0.1",
+  "user_id": "coughdrop:4afa055031c1b2df431eaa1e5cb6fe52394bc1682c23e57daefd26dadc2821cbc1f4d7ce893fe0ecd78d9eae91e1cce5fcd27d6c722744448b8356c6fea813c0",
+  "source": "coughdrop",
+  "locale": "en",
+  "sessions": [
+    {
+      "id": "1d95f645029dc29",
+      "type": "log",
+      "started": "2000-01-01T00:01:30Z",
+      "ended": "2000-01-01T00:01:50Z",
+      "device_id": "96771",
+      "events": [
+        {
+          "id": "1d95f645029dc29",
+          "timestamp": "2000-01-01T00:01:27Z",
+          "type": "button",
+          "button_id": "992044007381580",
+          "board_id": "ac966bc22258e57",
+          "spoken": true,
+          "label": "b804a6599eb4b3e69f43ac8b4517b12cd186bc1c6e71d5e7322b06c81a72727bd17d3f6a8dfdc82543e140257c9b9f6cf75c0bbc43c50fc702963784ad63ce7c",
+          "vocalization": "52f47e43c2182b5694d62046714522b95c5fa3d1d968dcf4ee4200dae9c9fa5bae72529778dc902b36a74fa8cfe5c5fc2c510466e7e750b1e019b7e28566c339",
+          "core_word": false,
+          "modeling": false,
+          "parts_of_speech": [
+            "other"
+          ],
+          "orientation": {
+            "alpha": 101.9,
+            "beta": 98.8,
+            "gamma": -37.3,
+            "layout": "portrait-primary"
+          },
+          "ip_address": "a554bc4036ec08c",
+          "window_width": 393,
+          "window_height": 775,
+          "volume": 0.73333335,
+          "ambient_light": 34.110462,
+          "percent_x": 0.168,
+          "percent_y": 0.155
+        },
+        {
+          "id": "1d95f645029dc29",
+          "timestamp": "2000-01-01T00:01:34Z",
+          "type": "utterance",
+          "text": "????",
+          "buttons": [
+            {
+              "redacted": true
+            }
+          ],
+          "modeling": false,
+          "orientation": {
+            "alpha": 55.5,
+            "beta": 110.8,
+            "gamma": 3.1,
+            "layout": "portrait-primary"
+          },
+          "ip_address": "a554bc4036ec08c",
+          "window_width": 393,
+          "window_height": 775,
+          "volume": 0.73333335,
+          "ambient_light": 34.110462
+        },
+        {
+          "id": "1d95f645029dc29",
+          "timestamp": "2000-01-01T00:01:38Z",
+          "type": "utterance",
+          "text": "????",
+          "buttons": [
+            {
+              "redacted": true
+            }
+          ],
+          "modeling": false,
+          "orientation": {
+            "alpha": 60.0,
+            "beta": 110.2,
+            "gamma": 0.9,
+            "layout": "portrait-primary"
+          },
+          "ip_address": "a554bc4036ec08c",
+          "window_width": 393,
+          "window_height": 775,
+          "volume": 0.73333335,
+          "ambient_light": 34.110462
+        },
+        {
+          "id": "1d95f645029dc29",
+          "timestamp": "2000-01-01T00:01:45Z",
+          "type": "action",
+          "action": ":clear",
+          "modeling": false,
+          "orientation": {
+            "alpha": 48.9,
+            "beta": 111.4,
+            "gamma": 8.3,
+            "layout": "portrait-primary"
+          },
+          "ip_address": "a554bc4036ec08c",
+          "window_width": 393,
+          "window_height": 775,
+          "volume": 0.73333335,
+          "ambient_light": 34.110462
+        },
+        {
+          "id": "1d95f645029dc29",
+          "timestamp": "2000-01-01T00:01:49Z",
+          "type": "action",
+          "action": ":clear",
+          "modeling": false,
+          "orientation": {
+            "alpha": 49.3,
+            "beta": 112.5,
+            "gamma": 8.9,
+            "layout": "portrait-primary"
+          },
+          "ip_address": "a554bc4036ec08c",
+          "window_width": 393,
+          "window_height": 775,
+          "volume": 0.73333335,
+          "ambient_light": 34.110462
+        },
+        {
+          "id": "1d95f645029dc29",
+          "timestamp": "2000-01-01T00:01:50Z",
+          "type": "action",
+          "action": ":clear",
+          "modeling": false,
+          "orientation": {
+            "alpha": 47.8,
+            "beta": 112.5,
+            "gamma": 10.4,
+            "layout": "portrait-primary"
+          },
+          "ip_address": "a554bc4036ec08c",
+          "window_width": 393,
+          "window_height": 775,
+          "volume": 0.73333335,
+          "ambient_light": 34.110462
+        }
+      ],
+      "anonymized": true
+    }
+  ],
+  "anonymized": true
+}
