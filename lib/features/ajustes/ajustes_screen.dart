@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/app_avatar.dart';
 import '../../core/theme/app_colors.dart';
@@ -35,6 +36,8 @@ class AjustesScreen extends ConsumerWidget {
         const Divider(),
         const _TtsSection(),
         const _AvatarSection(),
+        const Divider(),
+        const _ZonaAdultosSection(),
         const Divider(),
         const _LegalSection(),
         const Divider(),
@@ -220,6 +223,28 @@ class _AvatarOption extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Acceso discreto a la zona de adultos: el PIN lo pide el gate, no aquí.
+class _ZonaAdultosSection extends StatelessWidget {
+  const _ZonaAdultosSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionHeader('Zona de adultos'),
+        ListTile(
+          leading: const Icon(Icons.lock_outline),
+          title: const Text('Modo padre'),
+          subtitle: const Text('Resumen, control y legal. Pide tu código.'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => context.go('/padre'),
+        ),
+      ],
     );
   }
 }

@@ -8,6 +8,9 @@ import '../features/comunicador/comunicador_screen.dart';
 import '../features/juegos/juegos_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/onboarding/profile_controller.dart';
+import '../features/padre/control/juegos_gate.dart';
+import '../features/padre/padre_screen.dart';
+import '../features/rutinas/rutinas_screen.dart';
 import 'shell.dart';
 
 /// Router raíz: una sola instancia (recargarlo perdería la ruta actual).
@@ -62,7 +65,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               pageBuilder: (context, state) => page(
                 context,
                 state,
-                const JuegosScreen(),
+                const JuegosGate(juegos: JuegosScreen()),
               ),
             ),
           ]),
@@ -72,7 +75,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               pageBuilder: (context, state) => page(
                 context,
                 state,
-                const _TabContent('Rutinas', 'Horario del día'),
+                const RutinasScreen(),
               ),
             ),
           ]),
@@ -90,42 +93,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => page(
           context,
           state,
-          const Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Modo padre', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
-                  SizedBox(height: 8),
-                  Text('Se activará con tu PIN'),
-                ],
-              ),
-            ),
-          ),
+          const PadreScreen(),
         ),
       ),
     ],
   );
 });
-
-/// Contenido de una pestaña placeholder (el Scaffold lo pone el shell).
-class _TabContent extends StatelessWidget {
-  const _TabContent(this.title, this.subtitle);
-
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(title, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Text('$subtitle — próximamente'),
-        ],
-      ),
-    );
-  }
-}

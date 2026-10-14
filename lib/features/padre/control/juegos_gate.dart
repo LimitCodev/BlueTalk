@@ -40,7 +40,7 @@ class _AvisoLimite extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return _PanelSuave(
+    return PanelSuave(
       icono: Icons.hourglass_disabled_outlined,
       titulo: 'El tiempo de juegos de hoy terminó.',
       texto:
@@ -72,7 +72,7 @@ class _AvisoBloqueado extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _PanelSuave(
+    return PanelSuave(
       icono: Icons.lock_outline,
       titulo: 'Los juegos están bloqueados por un adulto.',
       texto: 'Pide que te los desbloqueen desde la zona de adultos.',
@@ -87,8 +87,9 @@ class _AvisoBloqueado extends StatelessWidget {
   }
 }
 
-class _PanelSuave extends StatelessWidget {
-  const _PanelSuave({
+class PanelSuave extends StatelessWidget {
+  const PanelSuave({
+    super.key,
     required this.icono,
     required this.titulo,
     required this.texto,

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -16,12 +17,15 @@ import 'package:bluetalk/data/local/seed_store.dart';
 import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/comunicador/tts_service.dart';
 import 'package:bluetalk/features/juegos/juegos_screen.dart';
+import 'package:bluetalk/features/padre/legal/legal_screen.dart';
 import 'package:bluetalk/features/onboarding/profile_controller.dart';
 
 import '../comunicador/dobles.dart';
 
-Future<SharedPreferences> _givenPrefs() async {
-  SharedPreferences.setMockInitialValues({});
+Future<SharedPreferences> _givenPrefs() => _givenPrefsCon({});
+
+Future<SharedPreferences> _givenPrefsCon(Map<String, Object> values) async {
+  SharedPreferences.setMockInitialValues(values);
   return SharedPreferences.getInstance();
 }
 
@@ -129,15 +133,16 @@ void main() {
     expect(prefs.getBool(CalmModeController.prefKey), isTrue);
   });
 
-  testWidgets('ruta /padre muestra el placeholder del gate', (tester) async {
+  testWidgets('ruta /padre muestra la legal la primera vez', (tester) async {
     final prefs = await _givenPrefs();
     final container = await _pumpApp(tester, prefs);
 
     container.read(routerProvider).go('/padre');
     await tester.pumpAndSettle();
 
+    // Sin legal aceptada: vista legal dentro del PadreScreen (AppBar + botón).
     expect(find.text('Modo padre'), findsOneWidget);
-    expect(find.text('Se activará con tu PIN'), findsOneWidget);
+    expect(find.byType(LegalScreen), findsOneWidget);
   });
 
   testWidgets('modo calma: las rutas cambian con duración cero',
@@ -164,8 +169,82 @@ void main() {
     await tester.pumpAndSettle();
 
     final normalRoute = ModalRoute.of(
-      tester.element(find.text('Horario del día — próximamente')),
+      tester.element(find.text('Mi horario')),
     );
     expect(normalRoute!.transitionDuration, isNot(Duration.zero));
+  });
+
+  testWidgets('juegos bloqueados por un adulto muestran el aviso suave',
+      (tester) async {
+    final prefs = await _givenPrefsCon({'padre_bloqueo_juegos': true});
+    final container = await _pumpApp(
+      tester,
+      prefs,
+      profile: const ChildProfile(id: 'local', nickname: 'Sol'),
+    );
+
+    container.read(routerProvider).go('/home/aprender');
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Los juegos están bloqueados por un adulto.'),
+      findsOneWidget,
+    );
+    expect(find.byType(JuegosScreen), findsNothing);
+  });
+
+  testWidgets('tiempo de juegos agotado muestra el aviso con salida',
+      (tester) async {
+    final prefs = await _givenPrefsCon({
+      'padre_limite_juegos_min': 15,
+      'bluetalk_usage': jsonEncode([
+        {
+          'id': 'j1',
+          'type': 'juego_fin',
+          'createdAt': DateTime.now().millisecondsSinceEpoch,
+          'data': {'segundos': 1000},
+        },
+      ]),
+    });
+    final container = await _pumpApp(
+      tester,
+      prefs,
+      profile: const ChildProfile(id: 'local', nickname: 'Sol'),
+    );
+
+    container.read(routerProvider).go('/home/aprender');
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('El tiempo de juegos de hoy terminó.'),
+      findsOneWidget,
+    );
+    expect(find.byType(JuegosScreen), findsNothing);
+  });
+
+  testWidgets('colegio bloqueado por un adulto muestra el aviso y vuelve',
+      (tester) async {
+    final prefs = await _givenPrefsCon({'padre_bloqueo_entorno': true});
+    await _pumpApp(
+      tester,
+      prefs,
+      profile: const ChildProfile(id: 'local', nickname: 'Sol'),
+    );
+
+    await tester.tap(find.text('Rutinas'));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Mi colegio'));
+    await tester.tap(find.text('Mi colegio'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('La sección Mi colegio está bloqueada por un adulto.'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Volver'));
+    await tester.pumpAndSettle();
+    expect(find.text('Mi horario'), findsOneWidget);
   });
 }

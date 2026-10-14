@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../padre/control/control_parental.dart';
+import '../padre/control/juegos_gate.dart';
 import 'editor_horario_view.dart';
 import 'estadisticas_view.dart';
 import 'horario_view.dart';
@@ -27,9 +29,33 @@ class RutinasScreen extends ConsumerWidget {
       RutinaVista.horario => const HorarioView(),
       RutinaVista.editor => const EditorHorarioView(),
       RutinaVista.bienestar => const SaludScreen(),
-      RutinaVista.colegio => const EntornoScreen(),
+      RutinaVista.colegio => const _VistaColegio(),
       RutinaVista.estadisticas => const EstadisticasView(),
     };
+  }
+}
+
+/// Colegio: si un adulto lo bloqueó desde Control, muestra el panel suave
+/// en vez de la pantalla (plan 05 §4).
+class _VistaColegio extends ConsumerWidget {
+  const _VistaColegio();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!ref.watch(bloqueosProvider).entorno) return const EntornoScreen();
+
+    return PanelSuave(
+      icono: Icons.lock_outline,
+      titulo: 'La sección Mi colegio está bloqueada por un adulto.',
+      texto: 'Pide que te la desbloqueen desde la zona de adultos.',
+      botones: [
+        OutlinedButton(
+          style: OutlinedButton.styleFrom(minimumSize: const Size(64, 48)),
+          onPressed: () => ref.read(rutinasProvider.notifier).irAlInicio(),
+          child: const Text('Volver'),
+        ),
+      ],
+    );
   }
 }
 
