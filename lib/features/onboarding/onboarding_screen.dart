@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/widgets/logo_bluetalk.dart';
 import 'profile_controller.dart';
 
 /// Onboarding (plan 01 §7): "Tu voz, siempre contigo 💙" → apodo local
@@ -62,6 +63,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Identidad oficial (plan 13 P3.5): logo del cartel.
+                  const LogoBluetalk(size: 84),
+                  const SizedBox(height: 12),
                   Text(
                     'BlueTalk',
                     textAlign: TextAlign.center,
@@ -71,7 +75,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Tu voz, siempre contigo 💙',
+                    'Tu voz, siempre contigo 💚',
                     textAlign: TextAlign.center,
                     style: textTheme.bodyLarge,
                   ),

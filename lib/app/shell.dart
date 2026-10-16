@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/theme/calm_mode.dart';
+import '../core/widgets/logo_bluetalk.dart';
 import '../features/juegos/juegos_controller.dart';
-import 'app_avatar.dart';
 
 /// Si el botón Atrás puede salir de la app desde Comunicar (fila 3 del
 /// plan 13 P1).
@@ -72,7 +72,7 @@ class AppShell extends ConsumerWidget {
           title: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const AppAvatar(size: 28),
+              const LogoBluetalk(size: 28),
               const SizedBox(width: 10),
               Text(_tabs[index].label),
             ],
