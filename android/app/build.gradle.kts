@@ -56,6 +56,13 @@ android {
 
     buildTypes {
         release {
+            // Plan 13 P7.2. R8 (minify) ya viene activo por defecto con
+            // AGP 9/Flutter: aquí queda explícito. shrinkResources evita
+            // empaquetar recursos no usados. El peso real del APK es el
+            // engine de Flutter, así que apenas cambia el tamaño; se
+            // comprueba el funcionamiento con humo en emulador.
+            isMinifyEnabled = true
+            isShrinkResources = true
             // Firma propia de release si existe key.properties; si no,
             // debug (para no bloquear el desarrollo en otra máquina).
             signingConfig = if (keystorePropertiesFile.exists()) {
