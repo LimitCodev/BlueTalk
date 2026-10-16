@@ -180,7 +180,7 @@ class _Ficha extends ConsumerWidget {
     final (colorBorde, colorFondo) = switch ((descubierta, fallida)) {
       (true, _) => (AppColors.onSuccess, AppColors.success),
       (_, true) => (AppColors.onError, AppColors.error),
-      _ => (AppColors.primaryStrong, AppColors.surface),
+      _ => (context.colores.primaryStrong, context.colores.surface),
     };
 
     return Semantics(
@@ -195,18 +195,18 @@ class _Ficha extends ConsumerWidget {
             color: descubierta || fallida
                 ? colorFondo
                 : levantada
-                    ? AppColors.surface
-                    : AppColors.primary.withValues(alpha: 0.35),
+                    ? context.colores.surface
+                    : context.colores.primary.withValues(alpha: 0.35),
             border: Border.all(color: colorBorde, width: 3),
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.all(6),
           child: picto == null
-              ? const Center(
+              ? Center(
                   child: Icon(
                     Icons.extension,
                     size: 40,
-                    color: AppColors.primaryStrong,
+                    color: context.colores.primaryStrong,
                   ),
                 )
               : Column(

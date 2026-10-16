@@ -161,7 +161,7 @@ class BarraAvance extends StatelessWidget {
         child: FractionallySizedBox(
           alignment: Alignment.centerLeft,
           widthFactor: valor,
-          child: const ColoredBox(color: AppColors.primaryStrong),
+          child: ColoredBox(color: context.colores.primaryStrong),
         ),
       ),
     );

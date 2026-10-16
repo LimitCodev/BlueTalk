@@ -87,7 +87,7 @@ class _Documento extends StatelessWidget {
                 child: Text(
                   linea.texto,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: AppColors.primaryStrongText,
+                        color: context.colores.primaryStrongText,
                         fontWeight: FontWeight.w700,
                       ),
                 ),

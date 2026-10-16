@@ -416,10 +416,10 @@ class _CategoryGrid extends ConsumerWidget {
                   width: 52,
                   height: 52,
                   child: iconAsset == null
-                      ? const Icon(
+                      ? Icon(
                           Icons.grid_view_rounded,
                           size: 44,
-                          color: AppColors.primaryStrong,
+                          color: context.colores.primaryStrong,
                         )
                       : SvgPicture.asset(
                           iconAsset,

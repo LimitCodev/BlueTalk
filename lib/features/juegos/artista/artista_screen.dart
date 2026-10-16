@@ -173,10 +173,10 @@ class _BarraHerramientasState extends ConsumerState<_BarraHerramientas> {
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(64, 48),
                   backgroundColor: _confirmandoBorrado
-                      ? AppColors.primary
+                      ? context.colores.primary
                       : null,
                   foregroundColor: _confirmandoBorrado
-                      ? AppColors.primaryInk
+                      ? context.colores.primaryInk
                       : null,
                 ),
                 onPressed: estado.trazos.isEmpty && estado.activo == null
@@ -237,8 +237,8 @@ class _BotonColor extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(
                 color: seleccionado
-                    ? AppColors.primaryStrong
-                    : AppColors.primary,
+                    ? context.colores.primaryStrong
+                    : context.colores.primary,
                 width: seleccionado ? 4 : 1,
               ),
             ),
@@ -270,9 +270,9 @@ class _BotonGrosor extends StatelessWidget {
       child: FilledButton.tonalIcon(
         style: FilledButton.styleFrom(
           backgroundColor: activo
-              ? AppColors.primary
+              ? context.colores.primary
               : Theme.of(context).colorScheme.surfaceContainerHighest,
-          foregroundColor: AppColors.primaryInk,
+          foregroundColor: context.colores.primaryInk,
         ),
         onPressed: onTap,
         icon: Icon(Icons.circle, size: grosor.clamp(8.0, 20.0)),
@@ -328,8 +328,8 @@ class _LienzoState extends ConsumerState<_Lienzo> {
       child: Container(
         // Sin alto fijo: el Expanded del padre da todo el alto libre.
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          border: Border.all(color: AppColors.primaryStrong, width: 2),
+          color: context.colores.surface,
+          border: Border.all(color: context.colores.primaryStrong, width: 2),
           borderRadius: BorderRadius.circular(12),
         ),
         clipBehavior: Clip.antiAlias,
@@ -354,13 +354,13 @@ class _LienzoState extends ConsumerState<_Lienzo> {
                     CustomPaint(painter: TrazosPainter(estado.trazos)),
                     // Capa del gesto: repinta solo un trazo por frame.
                     CustomPaint(painter: TrazoActivoPainter(estado.activo)),
-                    const Positioned(
+                    Positioned(
                       left: 12,
                       top: 8,
                       child: ExcludeSemantics(
                         child: Text(
                           'Dibuja aquí con el dedo.',
-                          style: TextStyle(color: AppColors.text),
+                          style: TextStyle(color: context.colores.text),
                         ),
                       ),
                     ),
@@ -424,7 +424,7 @@ class _GaleriaLocal extends ConsumerWidget {
                           height: 72,
                           clipBehavior: Clip.antiAlias,
                           decoration: BoxDecoration(
-                            border: Border.all(color: AppColors.primary),
+                            border: Border.all(color: context.colores.primary),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: IgnorePointer(

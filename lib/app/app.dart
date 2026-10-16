@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/theme/app_colors.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/calm_mode.dart';
 import '../features/ajustes/settings_controller.dart';
@@ -17,12 +18,16 @@ class BlueTalkApp extends ConsumerWidget {
     ref.listen(recordatoriosProvider, (_, _) {});
 
     final calm = ref.watch(calmModeProvider);
-    final appScale =
-        ref.watch(settingsProvider).value?.textScale ?? 1.0;
+    final ajustes = ref.watch(settingsProvider).value;
+    final appScale = ajustes?.textScale ?? 1.0;
+    // Tema de color elegido en Ajustes (plan 13 P4): cambiarlo refresca
+    // toda la app al instante (vista previa en vivo).
+    final paleta =
+        AppColors.temas[ajustes?.tema ?? 'celeste'] ?? AppColors.celeste;
 
     return MaterialApp.router(
       title: 'BlueTalk',
-      theme: buildBlueTalkTheme(),
+      theme: buildBlueTalkTheme(paleta),
       routerConfig: ref.read(routerProvider),
       // Toda la UI pasa por aquí: animaciones apagadas + grises en modo calma.
       builder: (context, child) {

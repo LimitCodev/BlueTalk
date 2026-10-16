@@ -89,10 +89,10 @@ class _RecuperarScreenState extends ConsumerState<RecuperarScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(
+                Icon(
                   Icons.delete_outline,
                   size: 56,
-                  color: AppColors.primaryStrong,
+                  color: context.colores.primaryStrong,
                 ),
                 const SizedBox(height: 16),
                 Text(

@@ -30,7 +30,7 @@ class PictoMini extends ConsumerWidget {
       return Icon(
         Icons.help_outline,
         size: size * 0.7,
-        color: AppColors.primaryStrong,
+        color: context.colores.primaryStrong,
         semanticLabel: semanticsLabel,
       );
     }
@@ -80,7 +80,7 @@ class ActividadTile extends ConsumerWidget {
                       Text(
                         formatHora(entry.timeMinutes),
                         style: t.textTheme.bodySmall?.copyWith(
-                          color: AppColors.primaryStrongText,
+                          color: context.colores.primaryStrongText,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -104,11 +104,11 @@ class ActividadTile extends ConsumerWidget {
                     height: 48,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: hecha ? AppColors.success : AppColors.bg,
+                      color: hecha ? AppColors.success : context.colores.bg,
                       border: Border.all(
                         color: hecha
                             ? AppColors.onSuccess
-                            : AppColors.primaryStrong,
+                            : context.colores.primaryStrong,
                         width: 2,
                       ),
                     ),
@@ -116,7 +116,7 @@ class ActividadTile extends ConsumerWidget {
                       hecha ? Icons.check : Icons.schedule,
                       color: hecha
                           ? AppColors.onSuccess
-                          : AppColors.primaryStrong,
+                          : context.colores.primaryStrong,
                     ),
                   ),
                 ),

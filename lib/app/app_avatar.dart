@@ -33,12 +33,12 @@ class AppAvatar extends ConsumerWidget {
 
     return CircleAvatar(
       radius: size / 2,
-      backgroundColor: AppColors.primary,
+      backgroundColor: context.colores.primary,
       child: asset == null
           ? Icon(
               Icons.child_care,
               size: size * 0.7,
-              color: AppColors.primaryStrong,
+              color: context.colores.primaryStrong,
             )
           : SvgPicture.asset(
               asset,

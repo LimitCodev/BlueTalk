@@ -61,13 +61,13 @@ class PictoTile extends StatelessWidget {
               ),
             ),
             if (favorited)
-              const Positioned(
+              Positioned(
                 top: 2,
                 right: 2,
                 child: Icon(
                   Icons.star,
                   size: 18,
-                  color: AppColors.primaryStrong,
+                  color: context.colores.primaryStrong,
                   semanticLabel: 'Fijado en Inicio',
                 ),
               ),

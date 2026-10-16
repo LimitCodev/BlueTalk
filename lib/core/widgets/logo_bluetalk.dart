@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
+import '../theme/app_colors.dart' show Marca;
 
 /// Logo oficial de BlueTalk (plan 13 P3.2 y P3.5): burbuja de chat azul
 /// de marca con cara sonriente blanca y el corazón verde del cartel
@@ -34,7 +34,7 @@ class _LogoPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final u = size.width / 100;
-    final burbuja = Paint()..color = AppColors.primaryStrong;
+    final burbuja = Paint()..color = Marca.azul;
     final cara = Paint()..color = const Color(0xFFFFFFFF);
 
     // Cola de la burbuja, abajo a la izquierda.
@@ -51,11 +51,11 @@ class _LogoPainter extends CustomPainter {
     canvas.drawCircle(centro, 25 * u, cara);
 
     // Cara: dos ojos y una sonrisa (azul de marca).
-    final ojo = Paint()..color = AppColors.primaryStrong;
+    final ojo = Paint()..color = Marca.azul;
     canvas.drawCircle(Offset(37 * u, 37 * u), 3.4 * u, ojo);
     canvas.drawCircle(Offset(57 * u, 37 * u), 3.4 * u, ojo);
     final sonrisa = Paint()
-      ..color = AppColors.primaryStrong
+      ..color = Marca.azul
       ..style = PaintingStyle.stroke
       ..strokeWidth = 4.2 * u
       ..strokeCap = StrokeCap.round;
@@ -68,7 +68,7 @@ class _LogoPainter extends CustomPainter {
 
     // Corazón verde del cartel, abajo a la derecha sobre el anillo:
     // dos círculos (lóbulos) + un triángulo (punta), mismo relleno.
-    final verde = Paint()..color = AppColors.verdeCorazon;
+    final verde = Paint()..color = Marca.verde;
     const hx = 62.0, hy = 54.0, hs = 32.0; // caja del corazón en u
     canvas.drawCircle(Offset((hx + 0.29 * hs) * u, (hy + 0.30 * hs) * u),
         0.235 * hs * u, verde);

@@ -344,17 +344,17 @@ class _AvatarOption extends ConsumerWidget {
             height: 56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primary,
+              color: context.colores.primary,
               border: Border.all(
-                color: selected ? AppColors.primaryStrong : Colors.transparent,
+                color: selected ? context.colores.primaryStrong : Colors.transparent,
                 width: 3,
               ),
             ),
             child: asset == null
-                ? const Icon(
+                ? Icon(
                     Icons.child_care,
                     size: 30,
-                    color: AppColors.primaryStrong,
+                    color: context.colores.primaryStrong,
                   )
                 : SvgPicture.asset(asset, width: 40, height: 40),
           ),

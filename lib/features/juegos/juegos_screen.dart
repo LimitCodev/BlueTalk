@@ -94,10 +94,10 @@ class _JuegoCard extends ConsumerWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.35),
+                    color: context.colores.primary.withValues(alpha: 0.35),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icono, color: AppColors.primaryStrong),
+                  child: Icon(icono, color: context.colores.primaryStrong),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

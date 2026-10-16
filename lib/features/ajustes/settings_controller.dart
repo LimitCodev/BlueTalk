@@ -25,6 +25,10 @@ class SettingsController extends AsyncNotifier<AppSettings> {
 
   Future<void> setRemindersEnabled(bool value) =>
       _update(state.requireValue.copyWith(remindersEnabled: value));
+
+  /// Tema de color (plan 13 P4): id de `AppColors.temas`.
+  Future<void> setTema(String id) =>
+      _update(state.requireValue.copyWith(tema: id));
 }
 
 /// Ajustes actuales de la app (`AsyncData` tras cargar).

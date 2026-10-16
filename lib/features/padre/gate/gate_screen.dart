@@ -161,10 +161,10 @@ class _ColumnaGate extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Icon(
+              Icon(
                 Icons.lock_outline,
                 size: 56,
-                color: AppColors.primaryStrong,
+                color: context.colores.primaryStrong,
               ),
               const SizedBox(height: 16),
               Text(

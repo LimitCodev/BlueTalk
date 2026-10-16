@@ -129,20 +129,20 @@ class _DisclaimerSalud extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border.all(color: AppColors.primaryStrong),
+        color: context.colores.surface,
+        border: Border.all(color: context.colores.primaryStrong),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
             Icons.medical_services_outlined,
-            color: AppColors.primaryStrong,
+            color: context.colores.primaryStrong,
             size: 20,
           ),
-          SizedBox(width: 8),
-          Expanded(
+          const SizedBox(width: 8),
+          const Expanded(
             child: Text(
               disclaimerSalud,
               style: TextStyle(fontSize: 13),

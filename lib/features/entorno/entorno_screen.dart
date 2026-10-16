@@ -103,12 +103,12 @@ class _DatosColegio extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Card(
-      margin: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: ListTile(
-        leading: Icon(Icons.school_outlined, color: AppColors.primaryStrong),
-        title: Text('Colegio Demostración Norte'),
-        subtitle: Text('Aula de ejemplo — grupo azul'),
+        leading: Icon(Icons.school_outlined, color: context.colores.primaryStrong),
+        title: const Text('Colegio Demostración Norte'),
+        subtitle: const Text('Aula de ejemplo — grupo azul'),
       ),
     );
   }
@@ -119,12 +119,12 @@ class _ContactoColegio extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Card(
-      margin: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: ListTile(
-        leading: Icon(Icons.mail_outline, color: AppColors.primaryStrong),
-        title: Text('Coordinadora: Sra. Ejemplo'),
-        subtitle: Text('demo@bluetalk.app'),
+        leading: Icon(Icons.mail_outline, color: context.colores.primaryStrong),
+        title: const Text('Coordinadora: Sra. Ejemplo'),
+        subtitle: const Text('demo@bluetalk.app'),
       ),
     );
   }

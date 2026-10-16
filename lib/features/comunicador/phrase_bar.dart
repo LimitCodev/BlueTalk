@@ -161,9 +161,9 @@ class _PhraseItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.only(left: 8),
         decoration: BoxDecoration(
-          color: AppColors.bg,
+          color: context.colores.bg,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.primaryStrong),
+          border: Border.all(color: context.colores.primaryStrong),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

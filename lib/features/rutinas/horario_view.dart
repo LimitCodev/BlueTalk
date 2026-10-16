@@ -133,13 +133,13 @@ class BannerSiguienteActividad extends ConsumerWidget {
       margin: const EdgeInsets.fromLTRB(12, 4, 12, 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.35),
+        color: context.colores.primary.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          const Icon(Icons.notifications_active_outlined,
-              color: AppColors.primaryStrong),
+          Icon(Icons.notifications_active_outlined,
+              color: context.colores.primaryStrong),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -215,7 +215,7 @@ class BarraDia extends StatelessWidget {
         child: FractionallySizedBox(
           alignment: Alignment.centerLeft,
           widthFactor: valor.clamp(0.0, 1.0),
-          child: const ColoredBox(color: AppColors.primaryStrong),
+          child: ColoredBox(color: context.colores.primaryStrong),
         ),
       ),
     );

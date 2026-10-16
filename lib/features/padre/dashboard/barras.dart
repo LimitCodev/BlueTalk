@@ -56,7 +56,7 @@ class BarraDato extends StatelessWidget {
               height: 12,
               alignment: Alignment.centerLeft,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.4),
+                color: context.colores.primary.withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: FractionallySizedBox(
@@ -64,7 +64,7 @@ class BarraDato extends StatelessWidget {
                 child: Container(
                   height: 12,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryStrong,
+                    color: context.colores.primaryStrong,
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),

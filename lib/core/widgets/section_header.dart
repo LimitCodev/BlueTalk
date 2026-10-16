@@ -4,8 +4,8 @@ import '../theme/app_colors.dart';
 
 /// Encabezado de sección compartido por todas las pantallas.
 ///
-/// Usa [AppColors.primaryStrongText]: los encabezados son texto y necesitan
-/// ≥4.5:1 sobre el fondo (el pastel [AppColors.primary] solo da 1.74:1).
+/// Usa [context.colores.primaryStrongText]: los encabezados son texto y necesitan
+/// ≥4.5:1 sobre el fondo (el pastel [context.colores.primary] solo da 1.74:1).
 class SectionHeader extends StatelessWidget {
   const SectionHeader(this.title, {super.key});
 
@@ -18,7 +18,7 @@ class SectionHeader extends StatelessWidget {
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.primaryStrongText,
+              color: context.colores.primaryStrongText,
               fontWeight: FontWeight.w700,
             ),
       ),

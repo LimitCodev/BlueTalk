@@ -191,11 +191,11 @@ class _EmocionTile extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: seleccionada
-                ? AppColors.primary.withValues(alpha: 0.35)
+                ? context.colores.primary.withValues(alpha: 0.35)
                 : Colors.transparent,
             border: Border.all(
               color:
-                  seleccionada ? AppColors.primaryStrong : Colors.transparent,
+                  seleccionada ? context.colores.primaryStrong : Colors.transparent,
               width: 2,
             ),
             borderRadius: BorderRadius.circular(16),

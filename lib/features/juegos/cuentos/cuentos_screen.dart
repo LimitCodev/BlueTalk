@@ -123,9 +123,9 @@ class _ListaCuentos extends ConsumerWidget {
                           ),
                         ),
                         if (completado)
-                          const Icon(
+                          Icon(
                             Icons.star,
-                            color: AppColors.primaryStrong,
+                            color: context.colores.primaryStrong,
                             semanticLabel: 'Cuento completado',
                           ),
                         const Icon(Icons.chevron_right),
@@ -277,15 +277,15 @@ class _TareaCompletar extends ConsumerWidget {
             width: 96,
             height: 96,
             decoration: BoxDecoration(
-              color: AppColors.bg,
-              border: Border.all(color: AppColors.primaryStrong, width: 3),
+              color: context.colores.bg,
+              border: Border.all(color: context.colores.primaryStrong, width: 3),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Center(
+            child: Center(
               child: Icon(
                 Icons.image_not_supported_outlined,
                 size: 44,
-                color: AppColors.primaryStrong,
+                color: context.colores.primaryStrong,
               ),
             ),
           ),
@@ -378,9 +378,9 @@ class _OpcionTarea extends StatelessWidget {
           width: 96,
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: incorrecta ? AppColors.error : AppColors.surface,
+            color: incorrecta ? AppColors.error : context.colores.surface,
             border: Border.all(
-              color: incorrecta ? AppColors.onError : AppColors.primaryStrong,
+              color: incorrecta ? AppColors.onError : context.colores.primaryStrong,
               width: 3,
             ),
             borderRadius: BorderRadius.circular(12),
@@ -426,7 +426,7 @@ class _PictoChico extends StatelessWidget {
       width: 44,
       height: 44,
       child: asset == null
-          ? const Icon(Icons.menu_book, color: AppColors.primaryStrong)
+          ? Icon(Icons.menu_book, color: context.colores.primaryStrong)
           : SvgPicture.asset(
               asset!,
               fit: BoxFit.contain,

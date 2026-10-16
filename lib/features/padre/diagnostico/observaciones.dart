@@ -249,7 +249,7 @@ class _TarjetaObservacion extends StatelessWidget {
           children: [
             Icon(
               atencion ? Icons.warning_amber_outlined : Icons.lightbulb_outline,
-              color: AppColors.primaryStrong,
+              color: context.colores.primaryStrong,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -275,7 +275,7 @@ class _TarjetaObservacion extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: atencion
                               ? AppColors.warning
-                              : AppColors.primary.withValues(alpha: 0.4),
+                              : context.colores.primary.withValues(alpha: 0.4),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -284,7 +284,7 @@ class _TarjetaObservacion extends StatelessWidget {
                             fontSize: 12,
                             color: atencion
                                 ? AppColors.onWarning
-                                : AppColors.primaryInk,
+                                : context.colores.primaryInk,
                           ),
                         ),
                       ),
@@ -315,17 +315,17 @@ class _Disclaimer extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border.all(color: AppColors.primaryStrong),
+        color: context.colores.surface,
+        border: Border.all(color: context.colores.primaryStrong),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.health_and_safety_outlined,
-              color: AppColors.primaryStrong, size: 20),
-          SizedBox(width: 8),
-          Expanded(child: Text(disclaimerObservaciones, style: TextStyle(fontSize: 13))),
+              color: context.colores.primaryStrong, size: 20),
+          const SizedBox(width: 8),
+          const Expanded(child: Text(disclaimerObservaciones, style: TextStyle(fontSize: 13))),
         ],
       ),
     );
