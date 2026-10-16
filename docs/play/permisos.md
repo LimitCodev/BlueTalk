@@ -16,5 +16,14 @@ Receptores declarados (README de `flutter_local_notifications` 22.x):
 acciones `BOOT_COMPLETED`, `MY_PACKAGE_REPLACED`, `QUICKBOOT_POWERON` y
 `com.htc.intent.action.QUICKBOOT_POWERON`.
 
+## Copias de seguridad desactivadas (plan 11 §1.2.6)
+
+`android:allowBackup="false"` y `android:fullBackupContent="false"` en el
+manifiesto, más `android:dataExtractionRules` apuntando a
+`res/xml/data_extraction_rules.xml` (un archivo sin reglas, válido desde
+Android 12): nada de la app se copia a la nube de Google ni se traspasa con
+«transferir datos». Los datos del menor permanecen solo en el dispositivo,
+como exigen los principios de producto.
+
 La verificación en dispositivo (avisos y tras reinicio) queda registrada en
 `docs/informes/fase1-evidencia.md`.

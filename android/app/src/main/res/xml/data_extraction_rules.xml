@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Sin copias a la nube ni traspaso entre dispositivos: los datos del menor
+  viven solo en este teléfono (plan 11 §1.2.6). Sin reglas = sin copias.
+-->
+<data-extraction-rules>
+</data-extraction-rules>
