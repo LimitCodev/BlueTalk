@@ -3,11 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:bluetalk/data/models/models.dart';
+import 'package:bluetalk/features/comunicador/tts_service.dart';
 import 'package:bluetalk/features/padre/control/control_parental.dart';
 import 'package:bluetalk/features/padre/control/control_screen.dart';
 import 'package:bluetalk/features/padre/control/juegos_gate.dart';
 import 'package:bluetalk/features/padre/gate/pin_store.dart';
 
+import '../comunicador/dobles.dart';
 import 'harness.dart';
 
 /// Juegos usados hoy, repartidos en dos sesiones de [minutos] cada una.
@@ -243,5 +245,52 @@ void main() {
 
     // El aviso del SnackBar se consume para no dejar timers pendientes.
     await tester.pumpAndSettle(const Duration(seconds: 5));
+  });
+
+  testWidgets(
+      'diagnóstico de voz: solo habla bajo toque y Atrás vuelve (P6.1)',
+      (tester) async {
+    final prefs = await prefsDePrueba();
+    final container = await pumpPadre(
+      tester,
+      home: const Scaffold(body: ControlScreen()),
+      overrides: [
+        ttsSpeakerProvider.overrideWithValue(FakeTtsSpeaker()),
+        ...overridesDePadre(prefs),
+      ],
+    );
+
+    // La lista del control es perezosa: hay que desplazarse hasta la
+    // entrada nueva para que exista en el árbol (plan 13 P6.1).
+    final probarVoz = find.widgetWithText(ListTile, 'Probar la voz');
+    await tester.scrollUntilVisible(
+      probarVoz,
+      240,
+      scrollable: find.byType(Scrollable),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(probarVoz);
+    await tester.pumpAndSettle();
+    expect(find.text('¿No se oye? Toca aquí'), findsOneWidget);
+
+    final tts = container.read(ttsSpeakerProvider) as FakeTtsSpeaker;
+    expect(tts.spoken, isEmpty, reason: 'la pantalla de prueba no habla sola');
+
+    await tester.tap(
+      find.widgetWithText(FilledButton, '¿No se oye? Toca aquí'),
+    );
+    await tester.pump();
+    expect(tts.spoken, ['Hola, soy BlueTalk'], reason: 'habla bajo toque');
+
+    // Atrás de subpantalla empujada: vuelve al control (plan 13 P1).
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('¿No se oye? Toca aquí'), findsNothing);
+    expect(
+      find.text('Desbloqueo'),
+      findsOneWidget,
+      reason: 'vuelve al control parental',
+    );
   });
 }
