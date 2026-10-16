@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+
+    <!-- Primer plano del ícono adaptive: logo oficial de BlueTalk
+         (plan 13 P3.4), dibujado a mano a partir del cartel. -->
+    <path android:fillColor="#2E6492" android:pathData="M39.51,63.13 Q33.21,71.95 28.8,78.25 Q38.88,75.11 45.81,66.92 Z" />
+    <path android:fillColor="#2E6492" android:pathData="M28.8,49.91 A20.16,20.16 0 1 1 69.12,49.91 A20.16,20.16 0 1 1 28.8,49.91 Z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M33.21,49.91 A15.75,15.75 0 1 1 64.71,49.91 A15.75,15.75 0 1 1 33.21,49.91 Z" />
+    <path android:fillColor="#2E6492" android:pathData="M41.15,46.12 A2.14,2.14 0 1 1 45.43,46.12 A2.14,2.14 0 1 1 41.15,46.12 Z" />
+    <path android:fillColor="#2E6492" android:pathData="M53.75,46.12 A2.14,2.14 0 1 1 58.03,46.12 A2.14,2.14 0 1 1 53.75,46.12 Z" />
+    <path android:fillColor="@android:color/transparent" android:strokeColor="#2E6492" android:strokeWidth="2.65" android:strokeLineCap="round" android:pathData="M42.66,53.69 Q49.59,59.98 56.52,53.69" />
+    <path android:fillColor="#20A078" android:pathData="M60.15,62.88 A4.74,4.74 0 1 1 69.62,62.88 A4.74,4.74 0 1 1 60.15,62.88 Z" />
+    <path android:fillColor="#20A078" android:pathData="M68.62,62.88 A4.74,4.74 0 1 1 78.09,62.88 A4.74,4.74 0 1 1 68.62,62.88 Z" />
+    <path android:fillColor="#20A078" android:pathData="M60.55,65.3 L76.43,65.3 L69.12,76.39 Z" />
+</vector>
