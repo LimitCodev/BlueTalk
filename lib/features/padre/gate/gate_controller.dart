@@ -116,7 +116,7 @@ class GateController extends Notifier<GateEstado> {
     }
     state = GateEstado(
       fase: GateFase.pedir,
-      mensaje: state.mensaje,
+      mensaje: 'No se pudo comprobar. Escribe tu PIN.',
       bloqueo: _store().bloqueoRestante(),
     );
   }
@@ -141,6 +141,10 @@ class GateController extends Notifier<GateEstado> {
     if (_cuentaAtras != null) return;
     _cuentaAtras = Timer.periodic(const Duration(seconds: 1), (_) {
       final restante = _store().bloqueoRestante();
+      // Si el reloj inyectado no avanza (tests con reloj congelado), los
+      // segundos no cambian: sin este guard cada tick notificaría un estado
+      // nuevo y un `pumpAndSettle` nunca asentaría.
+      if (restante == state.bloqueo) return;
       state = restante > Duration.zero
           ? GateEstado(
               fase: GateFase.pedir,

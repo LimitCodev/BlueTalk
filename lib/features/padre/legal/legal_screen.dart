@@ -34,13 +34,13 @@ class _LegalScreenState extends ConsumerState<LegalScreen> {
     return ListView(
       padding: const EdgeInsets.only(bottom: 32),
       children: [
+        // Estado de la aceptación arriba: se ve sin desplazar nada.
+        if (aceptado) _Aceptado(aceptacion: aceptacion),
         const SectionHeader('Términos y condiciones'),
         _Documento(texto: terminosYCondiciones),
         const SectionHeader('Política de privacidad'),
         _Documento(texto: politicaDePrivacidad),
-        if (aceptado)
-          _Aceptado(aceptacion: aceptacion)
-        else
+        if (!aceptado)
           _Pendiente(
             consentimiento: _consentimiento,
             onCambio: (value) => setState(() => _consentimiento = value),

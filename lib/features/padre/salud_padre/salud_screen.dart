@@ -192,9 +192,9 @@ class _Cuerpo extends StatelessWidget {
             valor: resumen.habitosTotal == 0
                 ? 0
                 : resumen.habitosHechos / resumen.habitosTotal,
-            detalle: resumen.habitosTotal == 0
-                ? 'sin datos'
-                : '${resumen.habitosHechos} de ${resumen.habitosTotal}',
+            // El contador ya vive en la fila de arriba: no se repite aquí
+            // (la semántica de la barra sigue siendo «… por ciento»).
+            detalle: resumen.habitosTotal == 0 ? 'sin datos' : null,
           ),
         ),
         const SectionHeader('Historial'),
