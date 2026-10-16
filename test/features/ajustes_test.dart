@@ -144,6 +144,13 @@ void main() {
       expect(sliders, hasLength(2));
       expect(sliders.every((s) => s.onChanged == null), isTrue);
       expect(find.text('No se pudieron cargar los ajustes'), findsOneWidget);
+      // La sección de recordatorios explica su estado en vez de
+      // mostrar un interruptor que no funcionaría (revisión fase 1).
+      expect(
+        find.text('No se pueden cambiar los recordatorios ahora.'),
+        findsOneWidget,
+      );
+      expect(find.text('Recordatorios de rutina'), findsNothing);
     });
 
     testWidgets('sección Tu avatar: elegir avatar lo persiste', (tester) async {

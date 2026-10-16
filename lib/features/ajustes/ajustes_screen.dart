@@ -30,9 +30,9 @@ class AjustesScreen extends ConsumerWidget {
           AsyncData(:final value) => _TextScaleSection(settings: value),
           AsyncError() => const _SettingsError(),
           _ => const Padding(
-              padding: EdgeInsets.all(24),
-              child: Center(child: CircularProgressIndicator()),
-            ),
+            padding: EdgeInsets.all(24),
+            child: Center(child: CircularProgressIndicator()),
+          ),
         },
         const Divider(),
         const _TtsSection(),
@@ -123,45 +123,55 @@ class _RecordatoriosSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SectionHeader('Recordatorios'),
-        SwitchListTile(
-          title: const Text('Recordatorios de rutina'),
-          subtitle: const Text('Avisa cada día de la próxima actividad.'),
-          value: activos,
-          onChanged: ajustes == null
-              ? null
-              : (valor) async {
-                  if (!valor) {
-                    await ref
-                        .read(settingsProvider.notifier)
-                        .setRemindersEnabled(false);
-                    return;
-                  }
-                  // Encender: primero la explicación literal y después el
-                  // permiso del sistema; nunca al arrancar (plan 1.1).
-                  final continuar =
-                      await _explicarPermisoRecordatorios(context);
-                  if (!continuar || !context.mounted) return;
-                  final concedido = await ref
-                      .read(recordatoriosProvider.notifier)
-                      .pedirPermisoNotificaciones();
-                  // El permiso puede haber cambiado fuera de la app.
-                  ref.invalidate(notificacionesPermitidasProvider);
-                  if (concedido) {
-                    if (!context.mounted) return;
-                    await ref
-                        .read(settingsProvider.notifier)
-                        .setRemindersEnabled(true);
-                  } else if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'No se dio permiso. Los recordatorios no se activaron.',
-                        ),
-                      ),
+        // Con los ajustes ilegibles el interruptor no puede funcionar:
+        // se explica en su sitio en vez de dejar un muñón silencioso
+        // (revisión fase 1, BAJA).
+        if (asyncSettings.hasError)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text('No se pueden cambiar los recordatorios ahora.'),
+          )
+        else
+          SwitchListTile(
+            title: const Text('Recordatorios de rutina'),
+            subtitle: const Text('Avisa cada día de la próxima actividad.'),
+            value: activos,
+            onChanged: ajustes == null
+                ? null
+                : (valor) async {
+                    if (!valor) {
+                      await ref
+                          .read(settingsProvider.notifier)
+                          .setRemindersEnabled(false);
+                      return;
+                    }
+                    // Encender: primero la explicación literal y después el
+                    // permiso del sistema; nunca al arrancar (plan 1.1).
+                    final continuar = await _explicarPermisoRecordatorios(
+                      context,
                     );
-                  }
-                },
-        ),
+                    if (!continuar || !context.mounted) return;
+                    final concedido = await ref
+                        .read(recordatoriosProvider.notifier)
+                        .pedirPermisoNotificaciones();
+                    // El permiso puede haber cambiado fuera de la app.
+                    ref.invalidate(notificacionesPermitidasProvider);
+                    if (concedido) {
+                      if (!context.mounted) return;
+                      await ref
+                          .read(settingsProvider.notifier)
+                          .setRemindersEnabled(true);
+                    } else if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'No se dio permiso. Los recordatorios no se activaron.',
+                          ),
+                        ),
+                      );
+                    }
+                  },
+          ),
         if (activos && permitido.value == false)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -174,8 +184,9 @@ class _RecordatoriosSection extends ConsumerWidget {
                 const SizedBox(height: 8),
                 FilledButton.tonal(
                   onPressed: () async {
-                    final continuar =
-                        await _explicarPermisoRecordatorios(context);
+                    final continuar = await _explicarPermisoRecordatorios(
+                      context,
+                    );
                     if (!continuar || !context.mounted) return;
                     final concedido = await ref
                         .read(recordatoriosProvider.notifier)
@@ -226,7 +237,7 @@ class _TtsSection extends ConsumerWidget {
             divisions: 7,
             onChanged: enabled
                 ? (value) =>
-                    ref.read(settingsProvider.notifier).setTtsRate(value)
+                      ref.read(settingsProvider.notifier).setTtsRate(value)
                 : null,
           ),
         ),
@@ -239,7 +250,7 @@ class _TtsSection extends ConsumerWidget {
             divisions: 8,
             onChanged: enabled
                 ? (value) =>
-                    ref.read(settingsProvider.notifier).setTtsPitch(value)
+                      ref.read(settingsProvider.notifier).setTtsPitch(value)
                 : null,
           ),
         ),
@@ -288,7 +299,11 @@ class _AvatarSection extends ConsumerWidget {
             runSpacing: 12,
             children: [
               for (final (id, label) in _candidatos)
-                _AvatarOption(pictoId: id, label: label, selected: id == seleccion),
+                _AvatarOption(
+                  pictoId: id,
+                  label: label,
+                  selected: id == seleccion,
+                ),
             ],
           ),
         ),
@@ -331,9 +346,7 @@ class _AvatarOption extends ConsumerWidget {
               shape: BoxShape.circle,
               color: AppColors.primary,
               border: Border.all(
-                color: selected
-                    ? AppColors.primaryStrong
-                    : Colors.transparent,
+                color: selected ? AppColors.primaryStrong : Colors.transparent,
                 width: 3,
               ),
             ),

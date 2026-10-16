@@ -18,11 +18,13 @@ class RecordatoriosController extends Notifier<bool> {
   bool build() {
     ref.listen(
       horarioProvider,
-      (_, next) => next.whenData((entradas) => _seguro(() => _syncHorario(entradas))),
+      (_, next) =>
+          next.whenData((entradas) => _seguro(() => _syncHorario(entradas))),
     );
     ref.listen(
       settingsProvider,
-      (_, next) => next.whenData((ajustes) => _seguro(() => _syncAjustes(ajustes))),
+      (_, next) =>
+          next.whenData((ajustes) => _seguro(() => _syncAjustes(ajustes))),
     );
     ref.listen(calmModeProvider, (_, _) => _seguro(_reprogramarPorCalma));
 
@@ -54,6 +56,7 @@ class RecordatoriosController extends Notifier<bool> {
     try {
       return await ref.read(recordatorioSchedulerProvider).pedirPermiso();
     } catch (_) {
+      // Plugin no disponible o permiso inaccesible: sin permiso.
       return false;
     }
   }
