@@ -487,4 +487,49 @@ void main() {
       );
     },
   );
+
+  // ── Plan 13 P6.1: fallos que la gente sufrió en otras apps ────────────
+
+  testWidgets(
+      'P6.1: con el teclado abierto, Comenzar sigue visible y avanza',
+      (tester) async {
+    addTearDown(tester.view.reset);
+    final prefs = await _givenPrefs();
+    await _pumpApp(tester, prefs);
+
+    // Teclado virtual abierto (300 dp sobre 600 dp de pantalla).
+    tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), 'Sol');
+    await tester.pump();
+
+    // La pantalla no se congela ni se desborda y el botón principal se
+    // puede tocar con el teclado abierto (reseña: no se podía avanzar).
+    await tester.tap(find.widgetWithText(FilledButton, 'Comenzar'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byType(AppShell),
+      findsOneWidget,
+      reason: 'se avanzó al shell con el teclado abierto',
+    );
+  });
+
+  testWidgets('P6.1: la voz nunca suena sola al abrir la app', (tester) async {
+    final prefs = await _givenPrefs();
+    final container = await _pumpApp(
+      tester,
+      prefs,
+      profile: const ChildProfile(id: 'local', nickname: 'Sol'),
+    );
+    await tester.pumpAndSettle();
+
+    final tts = container.read(ttsSpeakerProvider) as FakeTtsSpeaker;
+    expect(
+      tts.spoken,
+      isEmpty,
+      reason: 'ninguna voz automática al iniciar (plan 00, no negociable)',
+    );
+  });
 }
