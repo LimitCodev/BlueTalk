@@ -8,7 +8,7 @@ Multiplataforma de comunicación aumentativa y alternativa (AAC) para niños aut
 
 ## Estado
 
-Fase de planificación y arquitectura. Documentación:
+MVP en desarrollo; compila y pasa tests. Documentación:
 
 - [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md) — decisiones técnicas y diagrama
 - [`docs/plan/00-PLAN-MAESTRO.md`](docs/plan/00-PLAN-MAESTRO.md) — plan completo y convenciones
@@ -25,8 +25,8 @@ Fase de planificación y arquitectura. Documentación:
 |---|---|
 | App | Flutter 3.x (Dart) |
 | Estado | Riverpod |
-| Datos locales | Drift (SQLite) — offline-first |
-| Datos remotos | Supabase free (opcional, tras flag) |
+| Datos locales | SharedPreferences — offline-first |
+| Datos remotos | Supabase/Drift: fuera del MVP hasta nueva decisión |
 | Voz | flutter_tts (es-ES, offline) |
 | Pictogramas | Mulberry Symbols (CC BY-SA 4.0) + Twemoji |
 

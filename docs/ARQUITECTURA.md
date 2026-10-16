@@ -1,7 +1,7 @@
 # BlueTalk — Arquitectura
 
 **Multiplataforma de comunicación aumentativa y alternativa (AAC) para niños autistas.**
-APK Android (MVP) construido en Flutter, con base de datos local offline-first y Supabase free opcional.
+APK Android (MVP) construido en Flutter, con persistencia local offline-first en SharedPreferences. Supabase y Drift quedan fuera hasta nueva decisión.
 
 ## Diagrama de decisiones
 
@@ -21,8 +21,8 @@ APK Android (MVP) construido en Flutter, con base de datos local offline-first y
    ┌──────────▼──────────────────────────────────────────────┐
    │          CAPA DE DATOS (contratos / repositorios)        │
    ├─────────────────────────────┬───────────────────────────┤
-   │  LOCAL (fuente de verdad)   │  REMOTO (flag, opcional)  │
-   │  Drift/SQLite + seeds mock  │  Supabase free            │
+   │  LOCAL (fuente de verdad)   │  REMOTO (fuera del MVP)   │
+   │  SharedPreferences + seeds  │  Supabase (nueva decisión)│
    │  100% offline, $0           │  RLS por auth.uid + sync  │
    └─────────────────────────────┴───────────────────────────┘
 ```
@@ -32,8 +32,8 @@ APK Android (MVP) construido en Flutter, con base de datos local offline-first y
 | Decisión | Por qué | Descartado |
 |---|---|---|
 | **Flutter (Dart)** | AOT nativo, buen rendimiento en dispositivos de 1–2 GB RAM, un código → Android/iOS | React Native (puente JS, más lento en gama baja), Kotlin puro (solo Android, más lento de desarrollar) |
-| **Drift (SQLite) local-first** | El niño en el aula no tiene red: la app debe funcionar 100% offline. Supabase solo sincroniza | Depender de la red para el flujo principal |
-| **Supabase free** | Auth + Postgres + RLS sin costo. Decisión del usuario | Neon (sin auth integrado) |
+| **SharedPreferences (MVP)** | El niño en el aula no tiene red: la app debe funcionar 100% offline. Para el MVP basta con leer/escribir ajustes y datos simples, sin dependencias nativas ni esquema | Depender de la red para el flujo principal |
+| **Drift y Supabase, fuera del MVP** | El MVP persiste en SharedPreferences; Drift/SQLite y Supabase free se incorporarán solo si el usuario lo decide (aún no) | Incluir ORM o backend ahora sin necesidad comprobada |
 | **Sin Redis** | Poco tráfico sincronizado → PostgREST + Drift bastan. Redis = complejidad sin beneficio. Si hay Edge Functions con tráfico: Upstash free | Upstash desde el día 1 |
 | **Mulberry Symbols (CC BY-SA)** | Licencia comercial libre, SVG, hecho para AAC → cero riesgo legal en Play Store | ARASAAC (CC BY-NC-SA: no comercial) |
 | **Modo calma** | Guías de diseño para autismo: baja sobrecarga sensorial, control del usuario sobre color/movimiento | Paleta fija sin control |
