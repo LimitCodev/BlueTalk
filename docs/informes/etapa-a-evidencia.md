@@ -2,8 +2,8 @@
 
 Plan 13: P1 (Atrás), P2 (Artista), P6.1 (fallos de las reseñas) y P7
 (instalación y APK liviano). Todos los pasos ejecutados, con `flutter
-analyze` en 0 y la suite en verde (230 → **234 tests**) antes de cada
-commit. Sin `git push`.
+analyze` en 0 y la suite en verde (222 al empezar → **235 tests** al
+cerrar) antes de cada commit. Sin `git push`.
 
 ## Estado por paso
 
@@ -28,6 +28,19 @@ commit. Sin `git push`.
   `AppShell` + `PopScope` en `PadreScreen` → `_salir()`, más
   `saleConAtrasProvider` (default true) como gancho del plan 12 F3.
 - 6 tests en verde: 5 filas + fila kiosko.
+- **Por qué `PopScope` y no rutas de `go_router`** (P1 permite elegir si
+  migrar a rutas «es muy grande»): las vistas internas de Aprender y del
+  modo padre están deliberadamente sin rutas — la navegación por estado
+  desacopla el registro de sesiones (`juegosProvider` registra cada
+  partida que alimenta el panel del padre) del router raíz. Migrarlas a
+  rutas obligaría a rehacer ese registro y todos los tests de juegos; a
+  cambio perdemos deep links y estado en el back stack, que para una app
+  AAC de un solo niño con navegación fija no aporta nada. Decisión
+  registrada aquí y en `00-PLAN-MAESTRO.md` §5.
+- **Corrección tras la revisión** (`5ac4d4e`): el Atrás desde las
+  pestañas Control/Salud/Legal del modo padre ahora vuelve al panel
+  (Resumen) en vez de cerrar sesión; desde el panel o el gate sale a
+  Ajustes; con la legal sin aceptar siempre se sale. Test rojo previo.
 - **Verificado en emulador (release, APK real):** Aprender → Atrás →
   vuelve a **Comunicar** (la app no cerró); Comunicar → Atrás → sale al
   launcher (comportamiento normal de Android). Capturas en el historial
@@ -89,7 +102,7 @@ commit. Sin `git push`.
   `minifyReleaseWithR8` en el grafo de tareas se comprobó con y sin el
   cambio; `shrinkResources` es lo nuevo, y no quita nada porque la app
   casi no tiene recursos propios → **el tamaño no cambia**: el peso es
-  el engine de Flutter. Pictogramas = **43 SVG (440 KB)**: son
+  el engine de Flutter. Pictogramas = **42 SVG (344 KB)**: son
   vectoriales, mejor que WebP → no aplica (el único mapa de bits es el
   icono launcher, que se rediseña en Etapa B/P3 con el logo nuevo; en
   ese paso se decide su formato). Sin fuentes propias (solo la Roboto
@@ -120,7 +133,11 @@ commit. Sin `git push`.
   allí mismo (un fix por commit, pero mismo paso y misma causa de
   cobertura).
 - El humo se hizo con `input tap/swipe/keyevent` de adb sobre emulador
-  sin ventanas; las capturas están en `/tmp/opencode/` de la sesión.
+  sin ventanas; las capturas que lo documentan quedan en
+  `docs/informes/capturas/` (`arranque.png` = onboarding con teclado
+  abierto, `shell.png` = shell infantil, `tras_atras.png` = Comunicar
+  tras pulsar Atrás desde Aprender, `artista.png` = Artista con la
+  galería de colores y `dibujo.png` = las dos trazas dibujadas).
 
 ## NO VERIFICADO (requiere teléfono físico o dato posterior)
 
@@ -131,15 +148,34 @@ commit. Sin `git push`.
   biometría, `allowBackup` en el dispositivo.
 - Memoria y arranque en el panel del padre (solo se midió el shell y
   Artista) y en el móvil real.
+- Medidas en **Android 7 / API 24** (el perfil que pide P7.2 para
+  móviles viejos): no hay AVD de API 24 en la máquina; el emulador
+  disponible era Android 28. Las medidas y el humo de arriba son de
+  API 28.
 - APK final de la Fase 3 (con ícono nuevo y firma ya hecha falta
   recompilar tras P3/P4).
+
+## Revisión del revisor y correcciones
+
+`revisor` cerró la etapa con 0 GRAVE, 3 MEDIO y 6 LEVE (informe completo
+en `etapa-a-revisor.md`). Correcciones aplicadas:
+
+- MEDIO-1 (Atrás en pestañas del padre) → `5ac4d4e` con test rojo previo.
+- MEDIO-2 (nombres de APK script vs doc) → `4f355b2`: el script genera
+  `dist/BlueTalk.apk` (copia del arm64-v8a) y publica su SHA-256.
+- MEDIO-3 (commit `c3238d4` con dos arreglos de causa distinta): no
+  edita la historia; queda como lección escrita en `etapa-a-revisor.md`.
+- LEVE 4–9 (cifras del informe, PopScope vs rutas, API 24, capturas en
+  el repo, correo en el historial) → corregidos en este mismo cierre.
 
 ## Commits de la etapa
 
 `bb14fb3` FEAT atras · `c4d9257` TEST atras · `cbed1b4` FEAT artista ·
 `a20a985` TEST teclado/voz · `c3238d4` FEAT rutinas avisa ·
 `d4088e2` FEAT diagnostico voz · `95ee0ce` FEAT script APK SHA-256 ·
-`6c92ef2` DOCS instalar-apk · `cc7d5e6` PERF APK reduccion
+`6c92ef2` DOCS instalar-apk · `cc7d5e6` PERF APK reduccion ·
+`76d5d97` DOCS evidencia etapa · `bc35b31` DOCS informe revisor ·
+`5ac4d4e` FIX atras pestanas padre · `4f355b2` FEAT dist/BlueTalk.apk
 
 Siguiente: **Etapa B — P3 (marca y logo) y P4 (colores)**, según la
 tabla de `AGENTS.md`.

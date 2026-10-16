@@ -62,3 +62,11 @@ anotadas aquí como constancia.
 - `flutter_driver` + `integration_test` (solo `dev_dependencies`):
   perfilado §1.3.2 y benchmark PBKDF2 §1.2.2. Ambas del SDK de Flutter;
   no añaden descargas de terceros ni permisos a la app.
+
+## Configuración de git (§5.1 «solo el nick LimitCodev»)
+
+- El historial de git arrastra el correo personal del dueño en commits
+  preexistentes (lo detectó el revisor de la etapa A). Cambiar
+  `git config user.name/user.email` para los próximos commits es
+  inmediato; el pasado no se reescribe sin su permiso.
+- Pregunta: ¿quiere que ajuste git a «LimitCodev <limitcodev@users.noreply.github.com>»?
