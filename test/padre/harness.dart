@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cryptography/cryptography.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +12,7 @@ import 'package:bluetalk/data/local/mock_repos.dart';
 import 'package:bluetalk/data/local/seed_store.dart';
 import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/padre/gate/biometria.dart';
+import 'package:bluetalk/features/padre/gate/gate_controller.dart';
 import 'package:bluetalk/features/padre/gate/pin_store.dart';
 import 'package:bluetalk/features/padre/reloj.dart';
 
@@ -65,6 +67,25 @@ class BiometriaPrueba implements Biometria {
   }
 }
 
+/// PBKDF2 en la zona del test: misma huella que [DerivadorPinAislamiento],
+/// pero sin isolate. `Isolate.run` no completa dentro de `testWidgets`
+/// (FakeAsync no procesa mensajes de isolates; ver plan 12 §0.2), y la
+/// PBKDF2 cede con timers que solo avanzan con pumps — por eso los tests de
+/// widget la bombean con `pumpAndSettle` en lugar de esperarla.
+class DerivadorPinPrueba implements DerivadorPin {
+  const DerivadorPinPrueba();
+
+  @override
+  Future<List<int>> derivar(String pin, List<int> salt, int iteraciones) async {
+    final algoritmo = Pbkdf2.hmacSha256(iterations: iteraciones, bits: 256);
+    final clave = await algoritmo.deriveKeyFromPassword(
+      password: pin,
+      nonce: salt,
+    );
+    return clave.extractBytes();
+  }
+}
+
 /// Preferencias de prueba con la fecha de bloqueo ya calculada.
 Future<SharedPreferences> prefsDePrueba({
   Map<String, Object> iniciales = const {},
@@ -87,6 +108,9 @@ List<Object> overridesDePadre(
         ),
       ),
       relojProvider.overrideWithValue(reloj?.decir ?? _relojFijo),
+      // La PBKDF2 real corre en un isolate, que no completa dentro de
+      // testWidgets (ver [DerivadorPinPrueba]).
+      derivadorPinProvider.overrideWithValue(const DerivadorPinPrueba()),
       if (biometria != null)
         biometriaProvider.overrideWithValue(biometria),
     ];
@@ -141,15 +165,23 @@ UsageEvent evento(
 /// Crea un PIN directamente en prefs (para arrancar en fase de petición).
 ///
 /// Para el pin de uso común ('1234') se siembra una huella **precalculada**
-/// (PBKDF2-HMAC-SHA256, sal fija) en vez de derivarla: la PBKDF2 de
-/// `cryptography` cede con timers, y dentro de un cuerpo `testWidgets`
-/// (FakeAsync) un `await` del hashing sin pumps concurrentes es un
-/// deadlock — por eso los tests que hacían `await crearPinDePrueba(...)`
-/// colgaban para siempre. Cualquier otro pin sí pasa por el hash real
-/// (solo aplica fuera de FakeAsync o con bombeo concurrente).
+/// (PBKDF2-HMAC-SHA256, sal fija, 10.000 iteraciones = esquema actual) en
+/// vez de derivarla: la PBKDF2 de `cryptography` cede con timers, y dentro
+/// de un cuerpo `testWidgets` (FakeAsync) un `await` del hashing sin pumps
+/// concurrentes es un deadlock — por eso los tests que hacían
+/// `await crearPinDePrueba(...)` colgaban para siempre. La semilla describe
+/// un PIN de 4 dígitos del esquema antiguo (`padre_pin_len` = 4) y declara
+/// sus parámetros (`padre_pin_iter` = 10.000) para que no se re-hashee al
+/// primer acceso. Cualquier otro pin sí pasa por el hash real con
+/// [DerivadorPinPrueba] (solo aplica fuera de FakeAsync o con bombeo
+/// concurrente).
 Future<void> crearPinDePrueba(SharedPreferences prefs, {String pin = '1234'}) async {
   if (pin != '1234') {
-    await PinStore(prefs, ahora: () => ahoraFija).crear(pin);
+    await PinStore(
+      prefs,
+      ahora: () => ahoraFija,
+      derivador: const DerivadorPinPrueba(),
+    ).crear(pin);
     return;
   }
   await prefs.setString(
@@ -160,8 +192,12 @@ Future<void> crearPinDePrueba(SharedPreferences prefs, {String pin = '1234'}) as
     PinStore.claveHash,
     '6ef6f3446c5b72722a63c08103f96e5bf12b9b3263dcab9e547c734b14918fcb',
   );
+  await prefs.setInt(PinStore.claveLongitud, 4);
+  await prefs.setInt(PinStore.claveIteraciones, 10000);
   await prefs.remove(PinStore.claveIntentos);
   await prefs.remove(PinStore.claveBloqueo);
+  await prefs.remove(PinStore.claveBloqueoDesde);
+  await prefs.remove(PinStore.claveNivel);
 }
 
 /// Regla de aceptación legal ya registrada (para arrancar tras el gate).

@@ -89,7 +89,7 @@ void main() {
     );
 
     expect(container.read(padreProvider), PadreVista.gate);
-    expect(find.text('Crea tu código de 4 dígitos'), findsOneWidget);
+    expect(find.text('Crea tu código de 6 dígitos'), findsOneWidget);
     expect(find.text('Continuar'), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
   });

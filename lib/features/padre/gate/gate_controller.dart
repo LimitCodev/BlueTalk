@@ -11,12 +11,21 @@ import 'pin_store.dart';
 /// pedirlo para entrar.
 enum GateFase { crear, confirmar, pedir }
 
+/// Derivación de la huella del PIN: en producción corre en un isolate para
+/// no congelar la UI (plan 11 §1.2); los tests de widget la sustituyen
+/// porque `Isolate.run` no completa dentro de `testWidgets` (FakeAsync,
+/// plan 12 §0.2).
+final derivadorPinProvider = Provider<DerivadorPin>(
+  (ref) => const DerivadorPinAislamiento(),
+);
+
 class GateEstado {
   const GateEstado({
     required this.fase,
     this.mensaje,
     this.desbloqueado = false,
     this.bloqueo = Duration.zero,
+    this.longitud = PinStore.longitudNueva,
   });
 
   final GateFase fase;
@@ -29,6 +38,10 @@ class GateEstado {
 
   /// Espera restante tras 5 intentos fallidos.
   final Duration bloqueo;
+
+  /// Dígitos que debe tener el código en esta fase: 6 para crear o
+  /// confirmar; los PIN creados en versiones anteriores piden los suyos.
+  final int longitud;
 
   bool get bloqueado => bloqueo > Duration.zero;
 }
@@ -52,13 +65,32 @@ class GateController extends Notifier<GateEstado> {
     return GateEstado(
       fase: store.creado ? GateFase.pedir : GateFase.crear,
       bloqueo: restante,
+      longitud: store.creado ? store.longitudGuardada : PinStore.longitudNueva,
     );
   }
 
   PinStore _store() => PinStore(
         ref.read(sharedPreferencesProvider),
         ahora: ref.read(relojProvider),
+        derivador: ref.read(derivadorPinProvider),
       );
+
+  /// Estado de la fase de petición, con la longitud del PIN guardado (los
+  /// PIN de 4 dígitos de versiones anteriores siguen pidiendo los suyos).
+  GateEstado _estadoPedir({
+    String? mensaje,
+    Duration bloqueo = Duration.zero,
+    bool desbloqueado = false,
+  }) {
+    final store = _store();
+    return GateEstado(
+      fase: GateFase.pedir,
+      mensaje: mensaje,
+      bloqueo: bloqueo,
+      desbloqueado: desbloqueado,
+      longitud: store.creado ? store.longitudGuardada : PinStore.longitudNueva,
+    );
+  }
 
   /// Fase crear → confirmar (el PIN vive solo en la pantalla hasta guardar).
   void pasarAConfirmar() {
@@ -70,29 +102,28 @@ class GateController extends Notifier<GateEstado> {
     state = GateEstado(fase: GateFase.crear, mensaje: mensaje);
   }
 
-  /// Guarda la huella del PIN nuevo y deja el gate abierto.
+  /// Guarda la huella del PIN nuevo (6 dígitos) y deja el gate abierto.
   Future<void> crearPin(String pin) async {
     await _store().crear(pin);
     _cancelarCuentaAtras();
-    state = const GateEstado(fase: GateFase.pedir, desbloqueado: true);
+    state = _estadoPedir(desbloqueado: true);
   }
 
-  /// Comprueba el PIN: correcto abre, incorrecto avisa y el quinto fallo
-  /// activa la espera de 60 segundos.
+  /// Comprueba el PIN: correcto abre, incorrecto avisa y cada ciclo de 5
+  /// fallos sube la espera del bloqueo escalonado.
   Future<void> intentar(String pin) async {
     final store = _store();
     final resultado = await store.verificar(pin);
 
     if (resultado == VerificacionPin.correcto) {
       _cancelarCuentaAtras();
-      state = const GateEstado(fase: GateFase.pedir, desbloqueado: true);
+      state = _estadoPedir(desbloqueado: true);
       return;
     }
 
     final restante = store.bloqueoRestante();
     if (restante > Duration.zero) {
-      state = GateEstado(
-        fase: GateFase.pedir,
+      state = _estadoPedir(
         mensaje: 'Demasiados intentos. Espera ${restante.inSeconds} segundos.',
         bloqueo: restante,
       );
@@ -100,10 +131,7 @@ class GateController extends Notifier<GateEstado> {
       return;
     }
 
-    state = const GateEstado(
-      fase: GateFase.pedir,
-      mensaje: 'Código incorrecto, inténtalo de nuevo.',
-    );
+    state = _estadoPedir(mensaje: 'Código incorrecto, inténtalo de nuevo.');
   }
 
   /// Desbloqueo con huella o rostro (solo si el interruptor está activo).
@@ -111,11 +139,10 @@ class GateController extends Notifier<GateEstado> {
     final correcto = await ref.read(biometriaProvider).autenticar();
     if (correcto) {
       _cancelarCuentaAtras();
-      state = const GateEstado(fase: GateFase.pedir, desbloqueado: true);
+      state = _estadoPedir(desbloqueado: true);
       return;
     }
-    state = GateEstado(
-      fase: GateFase.pedir,
+    state = _estadoPedir(
       mensaje: 'No se pudo comprobar. Escribe tu PIN.',
       bloqueo: _store().bloqueoRestante(),
     );
@@ -128,6 +155,7 @@ class GateController extends Notifier<GateEstado> {
     state = GateEstado(
       fase: store.creado ? GateFase.pedir : GateFase.crear,
       bloqueo: restante,
+      longitud: store.creado ? store.longitudGuardada : PinStore.longitudNueva,
     );
     if (restante > Duration.zero) {
       _iniciarCuentaAtras();
@@ -146,13 +174,12 @@ class GateController extends Notifier<GateEstado> {
       // nuevo y un `pumpAndSettle` nunca asentaría.
       if (restante == state.bloqueo) return;
       state = restante > Duration.zero
-          ? GateEstado(
-              fase: GateFase.pedir,
+          ? _estadoPedir(
               mensaje:
                   'Demasiados intentos. Espera ${restante.inSeconds} segundos.',
               bloqueo: restante,
             )
-          : const GateEstado(fase: GateFase.pedir);
+          : _estadoPedir();
       if (restante == Duration.zero) _cancelarCuentaAtras();
     });
   }

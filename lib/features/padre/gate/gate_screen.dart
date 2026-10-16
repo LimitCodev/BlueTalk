@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../padre_controller.dart';
 import 'biometria.dart';
 import 'gate_controller.dart';
+import 'recuperar_screen.dart';
 
 /// Gate de la zona de adultos: crear el PIN, confirmarlo o pedirlo.
 ///
@@ -27,7 +28,8 @@ class _GateScreenState extends ConsumerState<GateScreen> {
   @override
   void initState() {
     super.initState();
-    // Reconstruye al teclear para habilitar el botón al llegar a 4 dígitos.
+    // Reconstruye al teclear para habilitar el botón al llegar a la
+    // longitud del código (6 dígitos, o los 4 de un PIN antiguo).
     _pin.addListener(_alCambiar);
   }
 
@@ -57,6 +59,7 @@ class _GateScreenState extends ConsumerState<GateScreen> {
     return switch (estado.fase) {
       GateFase.crear => _CrearView(
           controlador: _pin,
+          longitud: estado.longitud,
           mensaje: estado.mensaje,
           onContinuar: () {
             _primero = _pin.text;
@@ -66,6 +69,7 @@ class _GateScreenState extends ConsumerState<GateScreen> {
         ),
       GateFase.confirmar => _ConfirmarView(
           controlador: _pin,
+          longitud: estado.longitud,
           mensaje: estado.mensaje,
           onConfirmar: () async {
             final texto = _pin.text;
@@ -97,6 +101,14 @@ class _GateScreenState extends ConsumerState<GateScreen> {
           onBiometria: () async {
             await controlador.intentarBiometria();
             _entrarSiDesbloqueado();
+          },
+          onOlvide: () {
+            _limpiar();
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const RecuperarScreen(),
+              ),
+            );
           },
         ),
     };
@@ -149,17 +161,21 @@ class _ColumnaGate extends StatelessWidget {
   }
 }
 
-/// Campo de 4 dígitos (numérico y oculto).
-Widget _campoPin(TextEditingController controlador, {VoidCallback? onEnviado}) {
+/// Campo numérico y oculto con la longitud del código en curso.
+Widget _campoPin(
+  TextEditingController controlador, {
+  required int longitud,
+  VoidCallback? onEnviado,
+}) {
   return TextField(
     controller: controlador,
     autofocus: true,
     obscureText: true,
-    maxLength: 4,
+    maxLength: longitud,
     keyboardType: TextInputType.number,
     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-    decoration: const InputDecoration(
-      labelText: 'Código de 4 dígitos',
+    decoration: InputDecoration(
+      labelText: 'Código de $longitud dígitos',
       counterText: '',
     ),
     onSubmitted: (_) => onEnviado?.call(),
@@ -169,28 +185,30 @@ Widget _campoPin(TextEditingController controlador, {VoidCallback? onEnviado}) {
 class _CrearView extends StatelessWidget {
   const _CrearView({
     required this.controlador,
+    required this.longitud,
     required this.mensaje,
     required this.onContinuar,
   });
 
   final TextEditingController controlador;
+  final int longitud;
   final String? mensaje;
   final VoidCallback onContinuar;
 
   @override
   Widget build(BuildContext context) {
     return _ColumnaGate(
-      titulo: 'Crea tu código de 4 dígitos',
+      titulo: 'Crea tu código de $longitud dígitos',
       explicacion:
           'Es el código de la zona de adultos. La app no guarda el código: '
           'guarda su huella, que no sirve para leerlo.',
       hijos: [
-        _campoPin(controlador, onEnviado: onContinuar),
+        _campoPin(controlador, longitud: longitud, onEnviado: onContinuar),
         if (mensaje != null) _AvisoError(texto: mensaje!),
         const SizedBox(height: 12),
         FilledButton(
           style: FilledButton.styleFrom(minimumSize: const Size(64, 48)),
-          onPressed: controlador.text.length == 4 ? onContinuar : null,
+          onPressed: controlador.text.length == longitud ? onContinuar : null,
           child: const Text('Continuar'),
         ),
       ],
@@ -201,12 +219,14 @@ class _CrearView extends StatelessWidget {
 class _ConfirmarView extends StatelessWidget {
   const _ConfirmarView({
     required this.controlador,
+    required this.longitud,
     required this.mensaje,
     required this.onConfirmar,
     required this.onVolver,
   });
 
   final TextEditingController controlador;
+  final int longitud;
   final String? mensaje;
   final Future<void> Function() onConfirmar;
   final VoidCallback onVolver;
@@ -215,14 +235,15 @@ class _ConfirmarView extends StatelessWidget {
   Widget build(BuildContext context) {
     return _ColumnaGate(
       titulo: 'Confirma tu código',
-      explicacion: 'Escribe los mismos 4 dígitos otra vez.',
+      explicacion: 'Escribe los mismos $longitud dígitos otra vez.',
       hijos: [
-        _campoPin(controlador, onEnviado: () => onConfirmar()),
+        _campoPin(controlador, longitud: longitud, onEnviado: () => onConfirmar()),
         if (mensaje != null) _AvisoError(texto: mensaje!),
         const SizedBox(height: 12),
         FilledButton(
           style: FilledButton.styleFrom(minimumSize: const Size(64, 48)),
-          onPressed: controlador.text.length == 4 ? () => onConfirmar() : null,
+          onPressed:
+              controlador.text.length == longitud ? () => onConfirmar() : null,
           child: const Text('Confirmar'),
         ),
         TextButton(
@@ -240,12 +261,14 @@ class _PedirView extends ConsumerWidget {
     required this.controlador,
     required this.onEntrar,
     required this.onBiometria,
+    required this.onOlvide,
   });
 
   final GateEstado estado;
   final TextEditingController controlador;
   final Future<void> Function() onEntrar;
   final Future<void> Function() onBiometria;
+  final VoidCallback onOlvide;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -263,7 +286,11 @@ class _PedirView extends ConsumerWidget {
       titulo: 'Escribe tu código',
       explicacion: 'Zona de adultos: control parental, métricas y documentos.',
       hijos: [
-        _campoPin(controlador, onEnviado: () => onEntrar()),
+        _campoPin(
+          controlador,
+          longitud: estado.longitud,
+          onEnviado: () => onEntrar(),
+        ),
         if (aviso != null) ...[
           const SizedBox(height: 8),
           _AvisoError(texto: aviso),
@@ -271,7 +298,8 @@ class _PedirView extends ConsumerWidget {
         const SizedBox(height: 12),
         FilledButton(
           style: FilledButton.styleFrom(minimumSize: const Size(64, 48)),
-          onPressed: estado.bloqueado || controlador.text.length != 4
+          onPressed: estado.bloqueado ||
+                  controlador.text.length != estado.longitud
               ? null
               : () => onEntrar(),
           child: const Text('Entrar'),
@@ -284,6 +312,13 @@ class _PedirView extends ConsumerWidget {
             child: const Text('Usar huella o rostro'),
           ),
         ],
+        const SizedBox(height: 8),
+        // Plan 11 §1.2: única salida para un PIN olvidado, con la ventana
+        // de borrado de datos detrás.
+        TextButton(
+          onPressed: onOlvide,
+          child: const Text('¿Olvidaste el código?'),
+        ),
       ],
     );
   }

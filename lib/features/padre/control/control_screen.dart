@@ -8,6 +8,7 @@ import '../dashboard/barras.dart';
 import '../gate/biometria.dart';
 import '../legal/legal_controller.dart';
 import '../padre_controller.dart';
+import 'cambiar_codigo.dart';
 import 'control_parental.dart';
 
 /// Control parental (plan 05 §4): tiempo de juegos, secciones, pantalla y
@@ -111,6 +112,16 @@ class ControlScreen extends ConsumerWidget {
           value: biometria,
           onChanged: (valor) =>
               ref.read(biometriaHabilitadaProvider.notifier).set(valor),
+        ),
+        ListTile(
+          leading: const Icon(Icons.pin_outlined),
+          title: const Text('Cambiar código'),
+          subtitle: const Text('El código nuevo siempre tiene 6 dígitos.'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => showDialog<void>(
+            context: context,
+            builder: (_) => const CambiarCodigoDialogo(),
+          ),
         ),
         const SectionHeader('Documentos'),
         ListTile(
