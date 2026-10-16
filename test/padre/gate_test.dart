@@ -364,8 +364,10 @@ void main() {
     addTearDown(rutas.dispose);
 
     // Doble que comprueba que el borrado total cancela los avisos
-    // ya programados (revisión fase 1, MEDIA).
-    final schedulerPrueba = _SchedulerCuenta();
+    // ya programados; además FALLA al cancelar, para comprobar que un
+    // plugin de avisos caído no deja el borrado a medias
+    // (revisión fase 1, BAJA nueva).
+    final schedulerPrueba = _SchedulerCuenta(falla: true);
 
     final container = ProviderContainer(
       overrides: [
@@ -436,8 +438,12 @@ void main() {
   });
 }
 
-/// Doble de scheduler que solo cuenta la cancelación total.
+/// Doble de scheduler que cuenta la cancelación total; si [falla] es
+/// true, `cancelarTodos` lanza (plugin de avisos no disponible).
 class _SchedulerCuenta implements RecordatorioScheduler {
+  _SchedulerCuenta({this.falla = false});
+
+  final bool falla;
   var cancelarTodosLlamado = 0;
 
   @override
@@ -447,7 +453,10 @@ class _SchedulerCuenta implements RecordatorioScheduler {
   Future<void> cancelar(String entryId) async {}
 
   @override
-  Future<void> cancelarTodos() async => cancelarTodosLlamado++;
+  Future<void> cancelarTodos() async {
+    cancelarTodosLlamado++;
+    if (falla) throw StateError('plugin de avisos no disponible');
+  }
 
   @override
   Future<bool> pedirPermiso() async => true;

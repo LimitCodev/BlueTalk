@@ -44,9 +44,15 @@ class RecordatoriosController extends Notifier<bool> {
   /// Cancela todos los avisos programados sin tocar nada más.
   ///
   /// Lo usa el borrado total de datos (plan 11 §1.2): tras `prefs.clear()`
-  /// no debe quedar ningún aviso del horario anterior.
+  /// no debe quedar ningún aviso del horario anterior. Si el plugin falla
+  /// se continúa igualmente: el borrado de datos es lo crítico y no puede
+  /// quedar bloqueado por un plugin caído.
   Future<void> cancelarTodoProgramado() async {
-    await ref.read(recordatorioSchedulerProvider).cancelarTodos();
+    try {
+      await ref.read(recordatorioSchedulerProvider).cancelarTodos();
+    } catch (_) {
+      // Plugin no disponible: el borrado de datos no se detiene.
+    }
     _programadas.clear();
   }
 
