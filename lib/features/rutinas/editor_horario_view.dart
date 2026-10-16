@@ -219,9 +219,10 @@ class _FormularioActividadState extends ConsumerState<_FormularioActividad> {
 
   @override
   Widget build(BuildContext context) {
-    final pictos = ref.watch(pictosPorIdProvider).value?.values.toList() ??
-        const <Pictogram>[];
-    pictos.sort((a, b) => a.label.compareTo(b.label));
+    // Mientras los pictogramas cargan (o si su lectura falla) hay lista
+    // vacía: el formulario no crashea y se rellena al llegar los datos.
+    final pictos = [...?ref.watch(pictosPorIdProvider).value?.values]
+      ..sort((a, b) => a.label.compareTo(b.label));
 
     return Padding(
       padding: const.all(20),
@@ -324,7 +325,21 @@ class _FormularioActividadState extends ConsumerState<_FormularioActividad> {
       pictoId: _pictoId,
       enabled: actual?.enabled ?? true,
     );
-    await guardarActividad(ref, entry);
+    try {
+      await guardarActividad(ref, entry);
+    } catch (_) {
+      // Plan 13 P6.1: nunca en silencio. Aviso literal y el formulario
+      // queda abierto para que el adulto pueda reintentar.
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo guardar. Prueba otra vez.'),
+          ),
+        );
+      return;
+    }
     if (mounted) Navigator.of(context).pop();
   }
 }

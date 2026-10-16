@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:bluetalk/app/di.dart';
+import 'package:bluetalk/data/contracts/repos.dart';
+import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/rutinas/rutinas_providers.dart';
 
 import 'harness.dart';
@@ -10,6 +13,25 @@ Future<void> abrirEditor(WidgetTester tester) async {
   await tester.pumpAndSettle();
   await tester.tap(find.byTooltip('Editar horario (personas adultas)'));
   await tester.pumpAndSettle();
+}
+
+/// Repo de horario que falla al guardar pero deja leer (plan 13 P6.1).
+///
+/// Devuelve una actividad para que la cabecera con el botón de edición
+/// exista (con lista vacía esa cabecera no se construye).
+class _HorarioFalla implements ScheduleRepo {
+  @override
+  Future<List<ScheduleEntry>> schedule() async => const [
+        ScheduleEntry(
+          id: 'act_prueba',
+          title: 'Entrada',
+          timeMinutes: 8 * 60,
+        ),
+      ];
+
+  @override
+  Future<void> saveEntry(ScheduleEntry entry) async =>
+      throw Exception('disco lleno');
 }
 
 void main() {
@@ -101,5 +123,36 @@ void main() {
 
     expect(find.text('Recreo largo'), findsOneWidget);
     expect(find.text('Recreo'), findsNothing);
+  });
+
+  testWidgets(
+      'si guardar falla, se queda en el formulario y avisa en literal (P6.1)',
+      (tester) async {
+    await pumpRutinas(
+      tester,
+      extraOverrides: [
+        scheduleRepoProvider.overrideWithValue(_HorarioFalla()),
+      ],
+    );
+    await abrirEditor(tester);
+
+    await tester.tap(find.text('Nueva hora'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Paseo');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(FilledButton, 'Guardar'));
+    await tester.pumpAndSettle();
+
+    // Nunca silencio (plan 13 P6.1): aviso literal y reintentable.
+    expect(
+      find.text('No se pudo guardar. Prueba otra vez.'),
+      findsOneWidget,
+    );
+    expect(
+      find.widgetWithText(FilledButton, 'Guardar'),
+      findsOneWidget,
+      reason: 'el formulario sigue abierto para reintentar',
+    );
+    expect(find.text('Paseo'), findsOneWidget, reason: 'conserva lo escrito');
   });
 }

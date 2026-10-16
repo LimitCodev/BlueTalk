@@ -56,11 +56,12 @@ Future<ProviderContainer> pumpRutinas(
   WidgetTester tester, {
   bool resetPrefs = true,
   bool modoCalma = false,
+  List<Object> extraOverrides = const [],
 }) async {
   if (resetPrefs) SharedPreferences.setMockInitialValues({});
   final prefs = await prefsDePrueba();
   final container = ProviderContainer(
-    overrides: overridesDeRutinas(prefs).cast(),
+    overrides: [...overridesDeRutinas(prefs), ...extraOverrides].cast(),
   );
   addTearDown(container.dispose);
 
