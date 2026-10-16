@@ -10,6 +10,7 @@ import '../../core/widgets/section_header.dart';
 import '../../data/models/models.dart';
 import '../onboarding/profile_controller.dart';
 import 'settings_controller.dart';
+import '../rutinas/recordatorios/recordatorios_controller.dart';
 
 /// Ajustes (plan 01 §8): modo calma, tamaño de texto, voz (placeholder del
 /// agente AAC), enlaces legales (placeholder del agente padre) y créditos.
@@ -35,6 +36,8 @@ class AjustesScreen extends ConsumerWidget {
         },
         const Divider(),
         const _TtsSection(),
+        const Divider(),
+        const _RecordatoriosSection(),
         const _AvatarSection(),
         const Divider(),
         const _ZonaAdultosSection(),
@@ -72,6 +75,125 @@ class _TextScaleSection extends ConsumerWidget {
           ),
           trailing: Text('${(settings.textScale * 100).round()}%'),
         ),
+      ],
+    );
+  }
+}
+
+/// Explicación literal previa a pedir el permiso de notificaciones
+/// (plan 1.1): nunca se pide al arrancar, solo desde Ajustes.
+/// Devuelve `true` si el usuario quiere continuar al permiso del sistema.
+Future<bool> _explicarPermisoRecordatorios(BuildContext context) async {
+  final continuar = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Activar recordatorios'),
+      content: const Text(
+        'BlueTalk avisará cada día de la próxima actividad del niño. '
+        'Después Android te pedirá su permiso para mostrar los avisos.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text('Activar recordatorios'),
+        ),
+      ],
+    ),
+  );
+  return continuar ?? false;
+}
+
+/// Recordatorios de rutina (plan 1.1): interruptor de `remindersEnabled`
+/// y permiso de avisos pedido siempre con explicación literal previa.
+class _RecordatoriosSection extends ConsumerWidget {
+  const _RecordatoriosSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncSettings = ref.watch(settingsProvider);
+    final ajustes = asyncSettings.value;
+    final activos = ajustes?.remindersEnabled ?? false;
+    final permitido = ref.watch(notificacionesPermitidasProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionHeader('Recordatorios'),
+        SwitchListTile(
+          title: const Text('Recordatorios de rutina'),
+          subtitle: const Text('Avisa cada día de la próxima actividad.'),
+          value: activos,
+          onChanged: ajustes == null
+              ? null
+              : (valor) async {
+                  if (!valor) {
+                    await ref
+                        .read(settingsProvider.notifier)
+                        .setRemindersEnabled(false);
+                    return;
+                  }
+                  // Encender: primero la explicación literal y después el
+                  // permiso del sistema; nunca al arrancar (plan 1.1).
+                  final continuar =
+                      await _explicarPermisoRecordatorios(context);
+                  if (!continuar || !context.mounted) return;
+                  final concedido = await ref
+                      .read(recordatoriosProvider.notifier)
+                      .pedirPermisoNotificaciones();
+                  if (concedido) {
+                    if (!context.mounted) return;
+                    await ref
+                        .read(settingsProvider.notifier)
+                        .setRemindersEnabled(true);
+                  } else if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'No se dio permiso. Los recordatorios no se activaron.',
+                        ),
+                      ),
+                    );
+                  }
+                },
+        ),
+        if (activos && permitido.value == false)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Android necesita tu permiso para mostrar los avisos.',
+                ),
+                const SizedBox(height: 8),
+                FilledButton.tonal(
+                  onPressed: () async {
+                    final continuar =
+                        await _explicarPermisoRecordatorios(context);
+                    if (!continuar || !context.mounted) return;
+                    final concedido = await ref
+                        .read(recordatoriosProvider.notifier)
+                        .pedirPermisoNotificaciones();
+                    ref.invalidate(notificacionesPermitidasProvider);
+                    if (!concedido && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'No se concedió. Actívalo en los ajustes de Android.',
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Activar recordatorios'),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
