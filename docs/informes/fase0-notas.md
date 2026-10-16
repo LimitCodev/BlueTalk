@@ -145,3 +145,56 @@ Disposición (coordinador):
   Atrás en `/home/aprender`): escrita en
   `docs/informes/decisiones-pendientes.md`; se conserva el comportamiento
   por defecto mientras el usuario no responda.
+
+### Paso 9 — Verificación final de la Fase 0 (2026-10-15)
+
+Salida ejecutada (todos los comandos corridos por el coordinador, no
+confiados a nadie):
+
+```text
+flutter analyze                      → No issues found! (5.4 s)
+flutter test                         → 00:17 +190: All tests passed! (190 tests)
+flutter build apk --debug            → ✓ Built build/app/outputs/flutter-apk/app-debug.apk (Gradle 10,6 s)
+git status --short                   → (vacío — sin nada sucio ni sin trackear)
+git log --oneline -12                → 68b1a09 … f41e982 (12 commits de la fase)
+```
+
+Criterios de aceptación:
+
+- [x] `flutter analyze`: 0 problemas. `flutter test`: 0 fallos. **VERIFICADO**
+  (190/190).
+- [x] La pestaña **Rutinas** muestra horario, bienestar, colegio y
+  estadísticas. **VERIFICADO POR TESTS** (`test/rutinas/` 31/31, incluye las
+  cuatro vistas); en un teléfono físico: **NO VERIFICADO AQUÍ** (lo prueba el
+  usuario con el APK).
+- [x] Ajustes → **Modo padre** abre la pantalla legal la primera vez y el
+  gate (crear PIN) después. **VERIFICADO POR TESTS**
+  (`test/padre/{legal,control,gate}_test.dart`).
+- [x] Un horario editado sigue ahí tras cerrar y reabrir la app.
+  **VERIFICADO POR TESTS** (persistencia en `test/rutinas/`).
+- [x] Con límite de juegos agotado o bloqueo activado, **Aprender** muestra
+  el aviso suave. **VERIFICADO POR TESTS** (gate de límites `e6b2dd2` +
+  `test/juegos/`).
+- [x] `git status` limpio; ninguna ruta `??`. **VERIFICADO** (salida vacía).
+- [x] Este informe lista lo que no se pudo cerrar. **HECHO** — ver abajo.
+
+Lo que NO quedó cerrado en la Fase 0 (declarado con honestidad):
+
+1. **Prueba en dispositivo físico**: NO VERIFICADO. El APK debug
+   (`build/app/outputs/flutter-apk/app-debug.apk`) está construido, pero
+   nadie del equipo lo ha instalado en un teléfono real. El usuario es quien
+   lo probará.
+2. **Hallazgos MAJOR del revisor de la ola 2** que no eran bloqueantes del
+   APK y quedan a la **Fase 1** (plan 11): textScaler vs alturas fijas de la
+   rejilla (aac #1) y tope de bytes + `catch` de la galería del artista
+   (juegos #1). El MAJOR aac #2 (JSON corrupto) sí se corrigió en
+   `dee3407` y la excepción de rutas (aac #3) quedó registrada en `35a71eb`.
+3. **Firma de release / keystore / `applicationId`**: decisión del usuario
+   (`docs/informes/decisiones-pendientes.md`); fuera de alcance hasta Fase 3
+   y no necesario para probar el APK debug.
+4. Fuera de alcance por plan (Fase 1–3): recordatorios con notificaciones,
+   PIN de 6 dígitos, `allowBackup=false`, iconos, ampliar vocabulario.
+
+**Fase 0 CERRADA.** Siguiente paso: `docs/plan/11-fases-1-a-3-excelencia.md`
+(Fase 1) — leyendo su §0 antes de escribir código — y, en paralelo cuando no
+solape, `docs/plan/12-modo-nino-kiosko-y-panel.md`.
