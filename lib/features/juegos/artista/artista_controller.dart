@@ -99,6 +99,9 @@ class ArtistaController extends Notifier<ArtistaEstado> {
     final nuevo = _normalizar(punto, tamano);
     final distancia = (nuevo - anterior).distance * tamano.width;
     if (distancia < 1.5) return;
+    // Tope de puntos por dibujo (plan 11 §1.3.5): el JSON de la galería
+    // no crece sin límite aunque el dibujo no pare nunca.
+    if (_puntosDelDibujo() >= GaleriaController.maxPuntosPorDibujo) return;
 
     state = state.copyWith(
       activo: Trazo(
@@ -129,11 +132,14 @@ class ArtistaController extends Notifier<ArtistaEstado> {
     state = state.copyWith(trazos: [...state.trazos]..removeLast());
   }
 
-  /// Guarda el dibujo actual en la galería local y registra el uso para
-  /// el dashboard del modo padre (plan 03 §6).
-  Future<void> guardar() async {
-    if (state.trazos.isEmpty) return;
-    await ref.read(galeriaDibujosProvider.notifier).guardar(state.trazos);
+  /// Guarda el dibujo y registra el uso (plan 03 §6). Devuelve `false`
+  /// si la galería está llena: no se guarda ni se registra nada.
+  Future<bool> guardar() async {
+    if (state.trazos.isEmpty) return false;
+    final guardado = await ref
+        .read(galeriaDibujosProvider.notifier)
+        .guardar(state.trazos);
+    if (!guardado) return false;
     await ref.read(usageRepoProvider).record(
           UsageEvent(
             id: 'artista_dibujo_${DateTime.now().microsecondsSinceEpoch}',
@@ -142,6 +148,17 @@ class ArtistaController extends Notifier<ArtistaEstado> {
             data: {'juego': 'artista'},
           ),
         );
+    return true;
+  }
+
+  /// Puntos contados en el dibujo en curso (trazos terminados + actual).
+  int _puntosDelDibujo() {
+    var total = state.activo?.puntos.length ?? 0;
+    for (final trazo in state.trazos) {
+      total += trazo.puntos.length;
+      if (total > GaleriaController.maxPuntosPorDibujo) return total;
+    }
+    return total;
   }
 
   /// Carga un dibujo de la galería en el lienzo para seguir editando.

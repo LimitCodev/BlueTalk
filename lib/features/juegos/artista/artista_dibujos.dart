@@ -71,9 +71,16 @@ class Dibujo {
 /// migrar a Drift cuando `lib/data/local` lo soporte, plan 03 §4).
 ///
 /// La escritura es un solo string JSON con la lista entera; cabe en
-/// preferencias sin drama (tope de [_maxDibujos] dibujos).
+/// preferencias sin drama gracias a los topes (plan 11 §1.3.5).
 class GaleriaController extends Notifier<List<Dibujo>> {
-  static const _maxDibujos = 50;
+  /// Tope de dibujos: al llegar, la pantalla avisa en lenguaje literal y
+  /// pide borrar uno. **Nunca se borra nada a escondidas.**
+  static const maxDibujos = 30;
+
+  /// Tope de puntos por dibujo: aunque se dibuje muchísimo, el JSON de
+  /// la galería no crece sin límite y el arranque no se ralentiza.
+  static const maxPuntosPorDibujo = 3000;
+
   static const _clave = 'bluetalk_artista_dibujos';
 
   @override
@@ -83,29 +90,31 @@ class GaleriaController extends Notifier<List<Dibujo>> {
     try {
       final decoded = jsonDecode(raw);
       if (decoded is! List<dynamic>) return const [];
-      return [
+      final cargados = [
         for (final row in decoded)
           if (row is Map) Dibujo.fromMap(Map<String, dynamic>.from(row)),
       ];
-    } on FormatException {
-      // Preferencias corruptas: se empieza una galería limpia.
+      // Migración del tope anterior (50): se quedan los más recientes.
+      return cargados.length > maxDibujos
+          ? cargados.sublist(cargados.length - maxDibujos)
+          : cargados;
+    } catch (_) {
+      // Preferencias corruptas (JSON o fila ilegible): galería limpia.
       return const [];
     }
   }
 
-  /// Guarda el dibujo al final de la galería (los más reciente al final).
-  Future<void> guardar(List<Trazo> trazos) async {
+  /// Guarda al final de la galería (lo más reciente al final).
+  /// Devuelve `false` si está llena: no se guarda ni se borra nada.
+  Future<bool> guardar(List<Trazo> trazos) async {
+    if (state.length >= maxDibujos) return false;
     final dibujo = Dibujo(
       id: '${DateTime.now().microsecondsSinceEpoch}',
       trazos: trazos,
     );
-    final siguiente = [...state, dibujo];
-    // Tope para no engordar el JSON en gama baja.
-    final recortados = siguiente.length > _maxDibujos
-        ? siguiente.sublist(siguiente.length - _maxDibujos)
-        : siguiente;
-    state = recortados;
+    state = [...state, dibujo];
     await _persistir();
+    return true;
   }
 
   Future<void> borrar(String id) async {

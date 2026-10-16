@@ -115,13 +115,18 @@ class _BarraHerramientas extends ConsumerWidget {
                 onPressed: estado.trazos.isEmpty
                     ? null
                     : () async {
-                        await controller.guardar();
+                        final guardado = await controller.guardar();
                         if (!context.mounted) return;
                         ScaffoldMessenger.of(context)
                           ..hideCurrentSnackBar()
                           ..showSnackBar(
-                            const SnackBar(
-                              content: Text('Dibujo guardado en Mis dibujos'),
+                            SnackBar(
+                              content: Text(
+                                guardado
+                                    ? 'Dibujo guardado en Mis dibujos'
+                                    : 'Tu galería ya tiene ${GaleriaController.maxDibujos} dibujos. '
+                                        'Borra uno de Mis dibujos para guardar este.',
+                              ),
                             ),
                           );
                       },

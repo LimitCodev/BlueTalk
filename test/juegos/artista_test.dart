@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/features/juegos/artista/artista_canvas.dart';
 import 'package:bluetalk/features/juegos/artista/artista_controller.dart';
 import 'package:bluetalk/features/juegos/artista/artista_dibujos.dart';
@@ -132,6 +136,117 @@ void main() {
       ),
       isTrue,
     );
+  });
+
+  test('la galería llena no guarda ni borra nada (plan 1.3.5)', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final container = ProviderContainer(
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+    );
+    addTearDown(container.dispose);
+    final galeria = container.read(galeriaDibujosProvider.notifier);
+
+    const trazo = Trazo(
+      color: 0xFF000000,
+      grosor: 10,
+      puntos: [Offset(0.1, 0.1), Offset(0.2, 0.2)],
+    );
+
+    for (var i = 0; i < GaleriaController.maxDibujos; i++) {
+      expect(await galeria.guardar([trazo]), isTrue,
+          reason: 'el dibujo ${i + 1} debe caber');
+    }
+    expect(
+      container.read(galeriaDibujosProvider),
+      hasLength(GaleriaController.maxDibujos),
+    );
+
+    // La siguiente no cabe: se rechaza sin tocar lo ya guardado
+    // (nunca se borra un dibujo a escondidas).
+    expect(await galeria.guardar([trazo]), isFalse);
+    expect(
+      container.read(galeriaDibujosProvider),
+      hasLength(GaleriaController.maxDibujos),
+    );
+  });
+
+  testWidgets('con la galería llena, Guardar avisa en lenguaje literal',
+      (tester) async {
+    final relleno = jsonEncode([
+      for (var i = 0; i < GaleriaController.maxDibujos; i++)
+        {
+          'id': 'd$i',
+          'trazos': [
+            {
+              'color': 0,
+              'grosor': 5.0,
+              'puntos': [
+                [0.1, 0.1],
+                [0.2, 0.2],
+              ],
+            },
+          ],
+        },
+    ]);
+    SharedPreferences.setMockInitialValues({
+      'bluetalk_artista_dibujos': relleno,
+    });
+    final container = await pumpJuegos(tester, resetPrefs: false);
+
+    await tester.tap(find.text('Artista'));
+    await tester.pumpAndSettle();
+    await _dibujarTrazo(tester);
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'Tu galería ya tiene ${GaleriaController.maxDibujos} dibujos. '
+        'Borra uno de Mis dibujos para guardar este.',
+      ),
+      findsOneWidget,
+    );
+    expect(
+      container.read(galeriaDibujosProvider),
+      hasLength(GaleriaController.maxDibujos),
+    );
+    // El dibujo en curso no se pierde: se puede seguir editando.
+    expect(container.read(artistaProvider).trazos, isNotEmpty);
+    await tester.pump(const Duration(seconds: 5)); // cierra el SnackBar
+  });
+
+  test('los puntos por dibujo tienen tope (plan 1.3.5)', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    final artista = container.read(artistaProvider.notifier);
+
+    const lienzo = Size(100000, 1000);
+    artista.empezarTrazo(const Offset(0, 0), lienzo);
+    for (var i = 1; i <= GaleriaController.maxPuntosPorDibujo + 500; i++) {
+      artista.continuarTrazo(Offset(i * 2.0, 0), lienzo);
+    }
+    artista.terminarTrazo();
+
+    final total = container
+        .read(artistaProvider)
+        .trazos
+        .fold<int>(0, (suma, t) => suma + t.puntos.length);
+    expect(total, GaleriaController.maxPuntosPorDibujo);
+  });
+
+  test('una fila corrupta de la galería no rompe la carga (plan 1.3.5)',
+      () async {
+    SharedPreferences.setMockInitialValues({
+      'bluetalk_artista_dibujos': '[{"trazos": "no soy una lista"}]',
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final container = ProviderContainer(
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+    );
+    addTearDown(container.dispose);
+
+    expect(container.read(galeriaDibujosProvider), isEmpty);
   });
 
   testWidgets('el artista no tiene problemas de accesibilidad', (tester) async {
