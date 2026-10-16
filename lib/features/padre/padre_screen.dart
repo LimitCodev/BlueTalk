@@ -73,14 +73,26 @@ class _PadreScreenState extends ConsumerState<PadreScreen> {
     final enSesion = aceptado && vista != PadreVista.gate;
     final indice = _destinos.indexWhere((destino) => destino.vista == vista);
 
-    // Fila 4 del plan 13 P1: el Atrás nunca mata el modo padre. Con una
-    // subpantalla empujada (p. ej. recuperación del PIN) la cierra Navigator;
-    // desde el panel, el Atrás sale a Ajustes con la misma lógica del
-    // botón «Salir del modo padre».
+    // Fila 4 del plan 13 P1 (corregido tras la revisión de la etapa A): el
+    // Atrás nunca mata el modo padre. Con una subpantalla empujada (p. ej.
+    // recuperación del PIN) la cierra Navigator; desde una pestaña que no
+    // es el panel se vuelve al panel; y desde el panel (o el gate) el
+    // Atrás sale a Ajustes con la misma lógica del botón «Salir del modo
+    // padre». Si la legal aún no se aceptó, se sale siempre.
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) _salir();
+        if (didPop) return;
+        final vista = ref.read(padreProvider);
+        final aceptado = ref.read(legalProvider) != null;
+        if (aceptado &&
+            (vista == PadreVista.control ||
+                vista == PadreVista.salud ||
+                vista == PadreVista.legal)) {
+          ref.read(padreProvider.notifier).irA(PadreVista.resumen);
+          return;
+        }
+        _salir();
       },
       child: Scaffold(
         appBar: AppBar(

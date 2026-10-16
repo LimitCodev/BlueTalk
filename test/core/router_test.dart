@@ -78,6 +78,36 @@ Future<void> _completarOnboarding(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+/// Consentimiento legal + creación de PIN para llegar al panel del padre.
+Future<void> _entrarAlPanelPadre(
+  WidgetTester tester,
+  ProviderContainer container,
+) async {
+  container.read(routerProvider).go('/padre');
+  await tester.pumpAndSettle();
+  expect(find.byType(LegalScreen), findsOneWidget);
+
+  // Consentimiento parental y aceptación (la legal es la primera vez).
+  await tester.scrollUntilVisible(find.byType(CheckboxListTile), 300);
+  await tester.tap(find.byType(CheckboxListTile));
+  await tester.pump();
+  final aceptar = find.widgetWithText(FilledButton, 'Aceptar y continuar');
+  await tester.scrollUntilVisible(aceptar, 300);
+  await tester.tap(aceptar);
+  await tester.pumpAndSettle();
+
+  // Se crea un PIN de prueba para llegar al panel.
+  await tester.enterText(find.byType(TextField), '123456');
+  await tester.pump();
+  await tester.tap(find.widgetWithText(FilledButton, 'Continuar'));
+  await tester.pumpAndSettle();
+  await tester.enterText(find.byType(TextField), '123456');
+  await tester.pump();
+  await tester.tap(find.widgetWithText(FilledButton, 'Confirmar'));
+  await tester.pumpAndSettle();
+  expect(find.byType(NavigationBar), findsOneWidget, reason: 'panel');
+}
+
 void main() {
   testWidgets('onboarding: pide apodo y entra al shell', (tester) async {
     final prefs = await _givenPrefs();
@@ -358,33 +388,7 @@ void main() {
       profile: const ChildProfile(id: 'local', nickname: 'Sol'),
     );
 
-    container.read(routerProvider).go('/padre');
-    await tester.pumpAndSettle();
-    expect(find.byType(LegalScreen), findsOneWidget);
-
-    // Consentimiento parental y aceptación (la legal es la primera vez).
-    await tester.scrollUntilVisible(find.byType(CheckboxListTile), 300);
-    await tester.tap(find.byType(CheckboxListTile));
-    await tester.pump();
-    final aceptar = find.widgetWithText(FilledButton, 'Aceptar y continuar');
-    await tester.scrollUntilVisible(aceptar, 300);
-    await tester.tap(aceptar);
-    await tester.pumpAndSettle();
-
-    // Se crea un PIN de prueba para llegar al panel.
-    await tester.enterText(find.byType(TextField), '123456');
-    await tester.pump();
-    await tester.tap(find.widgetWithText(FilledButton, 'Continuar'));
-    await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextField), '123456');
-    await tester.pump();
-    await tester.tap(find.widgetWithText(FilledButton, 'Confirmar'));
-    await tester.pumpAndSettle();
-    expect(
-      find.byType(NavigationBar),
-      findsOneWidget,
-      reason: 'panel del padre',
-    );
+    await _entrarAlPanelPadre(tester, container);
 
     // Cerrar sesión deja el gate en «Escribe tu código».
     await tester.tap(find.byTooltip('Cerrar sesión'));
@@ -405,6 +409,43 @@ void main() {
 
     // Atrás otra vez: del panel a Ajustes. (La lista de Ajustes es perezosa:
     // hay que desplazarse para que la sección exista en el árbol.)
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Zona de adultos'), 300);
+    expect(find.text('Zona de adultos'), findsOneWidget);
+  });
+
+  testWidgets('P1 fila 4: Atrás en una pestaña del padre vuelve al panel, '
+      'no cierra sesión', (tester) async {
+    final prefs = await _givenPrefs();
+    final container = await _pumpApp(
+      tester,
+      prefs,
+      profile: const ChildProfile(id: 'local', nickname: 'Sol'),
+    );
+    await _entrarAlPanelPadre(tester, container);
+
+    // Pestaña Control (etiqueta propia de la barra de navegación).
+    await tester.tap(
+      find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text('Control'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Límite diario de juegos'), findsOneWidget);
+
+    // Atrás: vuelve al panel (Resumen); no cierra sesión ni sale a Ajustes.
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(
+      find.byType(NavigationBar),
+      findsOneWidget,
+      reason: 'sigue en el modo padre',
+    );
+    expect(find.text('Límite diario de juegos'), findsNothing);
+
+    // Atrás desde el panel: sale a Ajustes (misma lógica de «Salir»).
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Zona de adultos'), 300);
