@@ -18,29 +18,36 @@ class ArtistaScreen extends ConsumerWidget {
     return const Column(
       children: [
         CabeceraJuego('Artista'),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _BarraHerramientas(),
-                _Lienzo(),
-                _GaleriaLocal(),
-              ],
-            ),
-          ),
-        ),
+        _BarraHerramientas(),
+        // El lienzo ocupa todo el alto libre: no hay nada que desplazar,
+        // así un arrastre vertical nunca compite con un scroll (plan 13 P2).
+        Expanded(child: _Lienzo()),
       ],
     );
   }
 }
 
-/// Barra de herramientas: colores, grosor, goma y deshacer (≥48dp).
-class _BarraHerramientas extends ConsumerWidget {
+/// Barra de herramientas compacta arriba del lienzo (plan 13 P2):
+/// colores, grosor, goma, deshacer, guardar, galería y borrar todo (≥48dp).
+class _BarraHerramientas extends ConsumerStatefulWidget {
   const _BarraHerramientas();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_BarraHerramientas> createState() => _BarraHerramientasState();
+}
+
+class _BarraHerramientasState extends ConsumerState<_BarraHerramientas> {
+  /// Segundo toque pendiente en «Borrar todo»: sin diálogo largo, el
+  /// propio botón pide la confirmación (plan 13 P2).
+  bool _confirmandoBorrado = false;
+
+  /// Cualquier otra acción de la barra cancela una confirmación pendiente.
+  void _cancelarConfirmacion() {
+    if (_confirmandoBorrado) setState(() => _confirmandoBorrado = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final estado = ref.watch(artistaProvider);
     final controller = ref.read(artistaProvider.notifier);
 
@@ -59,7 +66,10 @@ class _BarraHerramientas extends ConsumerWidget {
                     nombre: nombre,
                     color: color,
                     seleccionado: !estado.goma && estado.color == color,
-                    onTap: () => controller.elegirColor(color),
+                    onTap: () {
+                      _cancelarConfirmacion();
+                      controller.elegirColor(color);
+                    },
                   ),
               ],
             ),
@@ -74,47 +84,58 @@ class _BarraHerramientas extends ConsumerWidget {
                 etiqueta: 'Fino',
                 grosor: grosorFino,
                 activo: estado.grosor == grosorFino,
-                onTap: () => controller.elegirGrosor(grosorFino),
+                onTap: () {
+                  _cancelarConfirmacion();
+                  controller.elegirGrosor(grosorFino);
+                },
               ),
               _BotonGrosor(
                 etiqueta: 'Medio',
                 grosor: grosorMedio,
                 activo: estado.grosor == grosorMedio,
-                onTap: () => controller.elegirGrosor(grosorMedio),
+                onTap: () {
+                  _cancelarConfirmacion();
+                  controller.elegirGrosor(grosorMedio);
+                },
               ),
               _BotonGrosor(
                 etiqueta: 'Grosor',
                 grosor: grosorGrueso,
                 activo: estado.grosor == grosorGrueso,
-                onTap: () => controller.elegirGrosor(grosorGrueso),
+                onTap: () {
+                  _cancelarConfirmacion();
+                  controller.elegirGrosor(grosorGrueso);
+                },
               ),
               const SizedBox(width: 8),
               FilledButton.tonalIcon(
                 style: FilledButton.styleFrom(minimumSize: const Size(64, 48)),
-                onPressed: controller.alternarGoma,
-                icon: Icon(
-                  estado.goma ? Icons.cleaning_services : Icons.brush,
-                ),
+                onPressed: () {
+                  _cancelarConfirmacion();
+                  controller.alternarGoma();
+                },
+                icon: Icon(estado.goma ? Icons.cleaning_services : Icons.brush),
                 label: Text(estado.goma ? 'Goma activa' : 'Goma'),
               ),
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(64, 48),
                 ),
-                onPressed:
-                    estado.trazos.isEmpty && estado.activo == null
-                        ? null
-                        : controller.deshacer,
+                onPressed: estado.trazos.isEmpty && estado.activo == null
+                    ? null
+                    : () {
+                        _cancelarConfirmacion();
+                        controller.deshacer();
+                      },
                 icon: const Icon(Icons.undo),
                 label: const Text('Deshacer'),
               ),
               FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size(64, 48),
-                ),
+                style: FilledButton.styleFrom(minimumSize: const Size(64, 48)),
                 onPressed: estado.trazos.isEmpty
                     ? null
                     : () async {
+                        _cancelarConfirmacion();
                         final guardado = await controller.guardar();
                         if (!context.mounted) return;
                         ScaffoldMessenger.of(context)
@@ -125,13 +146,55 @@ class _BarraHerramientas extends ConsumerWidget {
                                 guardado
                                     ? 'Dibujo guardado en Mis dibujos'
                                     : 'Tu galería ya tiene ${GaleriaController.maxDibujos} dibujos. '
-                                        'Borra uno de Mis dibujos para guardar este.',
+                                          'Borra uno de Mis dibujos para guardar este.',
                               ),
                             ),
                           );
                       },
                 icon: const Icon(Icons.save),
                 label: const Text('Guardar'),
+              ),
+              // La galería vive en una hoja inferior: en pantalla solo
+              // queda el lienzo, sin nada que desplazar (plan 13 P2).
+              FilledButton.tonalIcon(
+                style: FilledButton.styleFrom(minimumSize: const Size(64, 48)),
+                onPressed: () {
+                  _cancelarConfirmacion();
+                  showModalBottomSheet<void>(
+                    context: context,
+                    builder: (context) =>
+                        const SafeArea(child: _GaleriaLocal()),
+                  );
+                },
+                icon: const Icon(Icons.photo_library_outlined),
+                label: const Text('Mis dibujos'),
+              ),
+              FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(64, 48),
+                  backgroundColor: _confirmandoBorrado
+                      ? AppColors.primary
+                      : null,
+                  foregroundColor: _confirmandoBorrado
+                      ? AppColors.primaryInk
+                      : null,
+                ),
+                onPressed: estado.trazos.isEmpty && estado.activo == null
+                    ? null
+                    : () {
+                        if (!_confirmandoBorrado) {
+                          setState(() => _confirmandoBorrado = true);
+                          return;
+                        }
+                        setState(() => _confirmandoBorrado = false);
+                        controller.borrarTodo();
+                      },
+                icon: Icon(
+                  _confirmandoBorrado
+                      ? Icons.warning_amber_outlined
+                      : Icons.delete_outline,
+                ),
+                label: Text(_confirmandoBorrado ? '¿Seguro?' : 'Borrar todo'),
               ),
             ],
           ),
@@ -231,15 +294,39 @@ class _Lienzo extends ConsumerStatefulWidget {
 class _LienzoState extends ConsumerState<_Lienzo> {
   Size _tamano = Size.zero;
 
+  /// Puntero que está dibujando: el resto (palma, segundo dedo) se ignora.
+  int? _punteroActivo;
+
+  void _empezar(PointerDownEvent evento) {
+    if (_punteroActivo != null) return;
+    _punteroActivo = evento.pointer;
+    ref
+        .read(artistaProvider.notifier)
+        .empezarTrazo(evento.localPosition, _tamano);
+  }
+
+  void _mover(PointerMoveEvent evento) {
+    if (evento.pointer != _punteroActivo) return;
+    ref
+        .read(artistaProvider.notifier)
+        .continuarTrazo(evento.localPosition, _tamano);
+  }
+
+  void _terminar(int puntero) {
+    if (puntero != _punteroActivo) return;
+    _punteroActivo = null;
+    // Tanto al soltar como al cancelarse el puntero se guarda lo dibujado.
+    ref.read(artistaProvider.notifier).terminarTrazo();
+  }
+
   @override
   Widget build(BuildContext context) {
     final estado = ref.watch(artistaProvider);
-    final controller = ref.read(artistaProvider.notifier);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Container(
-        height: 320,
+        // Sin alto fijo: el Expanded del padre da todo el alto libre.
         decoration: BoxDecoration(
           color: AppColors.surface,
           border: Border.all(color: AppColors.primaryStrong, width: 2),
@@ -249,18 +336,16 @@ class _LienzoState extends ConsumerState<_Lienzo> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             _tamano = Size(constraints.maxWidth, constraints.maxHeight);
-            return GestureDetector(
+            // Listener en vez de GestureDetector: no hay tolerancia ni
+            // arena de gestos, el trazo empieza en el primer píxel
+            // (plan 13 P2).
+            return Listener(
               key: const ValueKey('lienzo_artista'),
               behavior: HitTestBehavior.opaque,
-              onPanStart: (details) => controller.empezarTrazo(
-                details.localPosition,
-                _tamano,
-              ),
-              onPanUpdate: (details) => controller.continuarTrazo(
-                details.localPosition,
-                _tamano,
-              ),
-              onPanEnd: (_) => controller.terminarTrazo(),
+              onPointerDown: _empezar,
+              onPointerMove: _mover,
+              onPointerUp: (evento) => _terminar(evento.pointer),
+              onPointerCancel: (evento) => _terminar(evento.pointer),
               child: RepaintBoundary(
                 child: Stack(
                   fit: StackFit.expand,
@@ -326,9 +411,14 @@ class _GaleriaLocal extends ConsumerWidget {
                       InkWell(
                         key: ValueKey('dibujo_${dibujo.id}'),
                         borderRadius: BorderRadius.circular(8),
-                        onTap: () => ref
-                            .read(artistaProvider.notifier)
-                            .cargarDibujo(dibujo),
+                        onTap: () {
+                          ref
+                              .read(artistaProvider.notifier)
+                              .cargarDibujo(dibujo);
+                          // La galería vive en una hoja inferior: al cargar
+                          // el dibujo se cierra para volver a ver el lienzo.
+                          Navigator.of(context).pop();
+                        },
                         child: Container(
                           width: 96,
                           height: 72,

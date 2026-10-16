@@ -7,15 +7,15 @@ import 'artista_dibujos.dart';
 
 /// Pinceles de la paleta pastel (plan 00 §4) con nombre literal.
 List<(String, Color)> get pincelesPastel => const [
-      ('Celeste', Color(0xFF7FC9EA)),
-      ('Verde', Color(0xFFA8DDB5)),
-      ('Amarillo', Color(0xFFF6D97A)),
-      ('Rosa', Color(0xFFF4B8C6)),
-      ('Naranja', Color(0xFFF7C59F)),
-      ('Morado', Color(0xFFC9B8E8)),
-      ('Marrón', Color(0xFFB08968)),
-      ('Negro', Color(0xFF1F3A44)),
-    ];
+  ('Celeste', Color(0xFF7FC9EA)),
+  ('Verde', Color(0xFFA8DDB5)),
+  ('Amarillo', Color(0xFFF6D97A)),
+  ('Rosa', Color(0xFFF4B8C6)),
+  ('Naranja', Color(0xFFF7C59F)),
+  ('Morado', Color(0xFFC9B8E8)),
+  ('Marrón', Color(0xFFB08968)),
+  ('Negro', Color(0xFF1F3A44)),
+];
 
 /// Grosor fino del trazo, en píxeles lógicos sobre el lienzo completo.
 const grosorFino = 4.0;
@@ -52,14 +52,13 @@ class ArtistaEstado {
     List<Trazo>? trazos,
     Trazo? activo,
     bool limpiarActivo = false,
-  }) =>
-      ArtistaEstado(
-        color: color ?? this.color,
-        grosor: grosor ?? this.grosor,
-        goma: goma ?? this.goma,
-        trazos: trazos ?? this.trazos,
-        activo: limpiarActivo ? null : activo ?? this.activo,
-      );
+  }) => ArtistaEstado(
+    color: color ?? this.color,
+    grosor: grosor ?? this.grosor,
+    goma: goma ?? this.goma,
+    trazos: trazos ?? this.trazos,
+    activo: limpiarActivo ? null : activo ?? this.activo,
+  );
 }
 
 /// Controlador del artista: pinceles, goma, deshacer y guardar.
@@ -132,6 +131,13 @@ class ArtistaController extends Notifier<ArtistaEstado> {
     state = state.copyWith(trazos: [...state.trazos]..removeLast());
   }
 
+  /// Borra todo el lienzo. La interfaz protege esta acción con un segundo
+  /// toque (plan 13 P2): aquí solo se limpia.
+  void borrarTodo() {
+    if (state.trazos.isEmpty && state.activo == null) return;
+    state = state.copyWith(trazos: const [], limpiarActivo: true);
+  }
+
   /// Guarda el dibujo y registra el uso (plan 03 §6). Devuelve `false`
   /// si la galería está llena: no se guarda ni se registra nada.
   Future<bool> guardar() async {
@@ -141,7 +147,9 @@ class ArtistaController extends Notifier<ArtistaEstado> {
         .guardar(state.trazos);
     if (!guardado) return false;
     try {
-      await ref.read(usageRepoProvider).record(
+      await ref
+          .read(usageRepoProvider)
+          .record(
             UsageEvent(
               id: 'artista_dibujo_${DateTime.now().microsecondsSinceEpoch}',
               type: 'dibujo_guardado',
@@ -172,9 +180,9 @@ class ArtistaController extends Notifier<ArtistaEstado> {
   }
 
   Offset _normalizar(Offset punto, Size tamano) => Offset(
-        (punto.dx / tamano.width).clamp(0.0, 1.0),
-        (punto.dy / tamano.height).clamp(0.0, 1.0),
-      );
+    (punto.dx / tamano.width).clamp(0.0, 1.0),
+    (punto.dy / tamano.height).clamp(0.0, 1.0),
+  );
 }
 
 /// Controlador del artista.

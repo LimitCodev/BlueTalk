@@ -51,7 +51,12 @@ void main() {
     expect(dibujos, hasLength(1));
     expect(dibujos.first.trazos, isNotEmpty);
 
-    // La miniatura se puede tocar para seguir editando el dibujo.
+    // La galería vive en una hoja inferior (plan 13 P2).
+    await tester.tap(find.text('Mis dibujos'));
+    await tester.pumpAndSettle();
+
+    // La miniatura se toca para seguir editando el dibujo y la hoja
+    // se cierra al cargarlo.
     await tester.tap(find.byKey(ValueKey('dibujo_${dibujos.first.id}')));
     await tester.pump();
     expect(container.read(artistaProvider).trazos, hasLength(1));
@@ -257,5 +262,64 @@ void main() {
       overrides: overridesDeJuegos(prefs),
       home: const Scaffold(body: ArtistaScreen()),
     );
+  });
+
+  // ── Plan 13 P2: dibujar no debe mover la pantalla ──────────────────────
+
+  testWidgets(
+      'P2: un arrastre vertical largo dibuja sin desplazar la pantalla',
+      (tester) async {
+    final container = await pumpJuegos(tester);
+
+    await tester.tap(find.text('Artista'));
+    await tester.pumpAndSettle();
+
+    // (b) La pantalla de Artista no tiene desplazamiento vertical: no
+    // existe ningún ScrollController que un arrastre pueda mover. (La
+    // fila de colores es horizontal a propósito: no compite con el dedo.)
+    final verticales = tester
+        .widgetList<Scrollable>(find.byType(Scrollable))
+        .where((scrollable) => scrollable.axisDirection == AxisDirection.down);
+    expect(verticales, isEmpty, reason: 'nada que desplazar al dibujar');
+
+    // (a) Arrastre vertical largo sobre el lienzo: el trazo empieza en el
+    // primer contacto (sin tolerancia) y queda guardado al soltar.
+    final lienzo = find.byKey(const ValueKey('lienzo_artista'));
+    final gesture = await tester.startGesture(tester.getCenter(lienzo));
+    await gesture.moveBy(const Offset(0, 40));
+    await gesture.moveBy(const Offset(0, 40));
+    await tester.pump();
+    expect(
+      container.read(artistaProvider).activo,
+      isNotNull,
+      reason: 'el trazo está activo mientras el dedo se mueve',
+    );
+
+    await gesture.up();
+    await tester.pump();
+    expect(container.read(artistaProvider).trazos, hasLength(1));
+  });
+
+  testWidgets('P2: Borrar todo exige un segundo toque', (tester) async {
+    final container = await pumpJuegos(tester);
+
+    await tester.tap(find.text('Artista'));
+    await tester.pumpAndSettle();
+    await _dibujarTrazo(tester);
+    expect(container.read(artistaProvider).trazos, hasLength(1));
+
+    // Primer toque: solo pide confirmación (sin diálogo largo).
+    await tester.tap(find.text('Borrar todo'));
+    await tester.pump();
+    expect(
+      container.read(artistaProvider).trazos,
+      hasLength(1),
+      reason: 'el primer toque no borra nada todavía',
+    );
+
+    // Segundo toque: borra.
+    await tester.tap(find.text('¿Seguro?'));
+    await tester.pump();
+    expect(container.read(artistaProvider).trazos, isEmpty);
   });
 }
