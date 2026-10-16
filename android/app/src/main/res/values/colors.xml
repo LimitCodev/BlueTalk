@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Celeste de marca (tinte de #70D0F8 = AppColors.bg) para el
+         primer fotograma del arranque (plan 13 P3.7). -->
+    <color name="launch_background">#EDF9FE</color>
+</resources>

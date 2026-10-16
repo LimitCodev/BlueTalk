@@ -1,36 +1,49 @@
 import 'package:flutter/material.dart';
 
-/// Tokens de color — paleta celeste pastel (plan 00 §4).
+/// Tokens de color — paleta de marca extraída del cartel oficial
+/// (`referencia_logo_y_colores_iniciales.jpeg`, plan 13 P3.1).
+///
+/// Los códigos hexadecimales salen del cartel con script de una sola vez
+/// (djpeg + Python sobre el PPM; método y muestras en
+/// `docs/informes/etapa-b-evidencia.md`); no están inventados.
 ///
 /// Todos los contrastes están verificados por `test/core/tokens_test.dart`
 /// contra WCAG 2.2 AA (texto ≥4.5:1, elementos de UI ≥3:1).
 abstract final class AppColors {
-  /// Fondo general. Nunca blanco puro (deslumbra en pantallas baratas).
-  static const bg = Color(0xFFF3FAFF);
+  /// Fondo general: tinte claro (12 %) del celeste de marca #70D0F8; el
+  /// celeste fuerte del cartel como fondo de pantalla entera deslumbraría
+  /// (plan 00 §4: pastel, sin deslumbrar). Nunca blanco puro.
+  static const bg = Color(0xFFEDF9FE);
 
-  /// Tarjetas y superficies.
+  /// Tarjetas y superficies (la pantalla del móvil del cartel es blanca).
   static const surface = Color(0xFFFFFFFF);
 
-  /// Relleno pastel de botones y acentos. El texto encima va en [primaryInk].
-  static const primary = Color(0xFF7FC9EA);
+  /// Relleno celeste de marca (fondo superior del cartel) para botones y
+  /// acentos. El texto encima va en [primaryInk].
+  static const primary = Color(0xFF70D0F8);
 
-  /// Texto sobre [primary] — 7.3:1.
-  static const primaryInk = Color(0xFF12333B);
+  /// Texto sobre [primary] — 8.7:1 (navy de titulares del cartel).
+  static const primaryInk = Color(0xFF002848);
 
-  /// Borde, icono y foco interactivos: el único celeste con ≥3:1 vs fondo
-  /// (4.2:1). El relleno pastel [primary] queda para superficies grandes.
-  /// NO usar para texto: 4.2:1 no llega a AA (usa [primaryStrongText]).
-  static const primaryStrong = Color(0xFF2F7FA8);
+  /// Borde, icono y foco interactivos: azul de marca del cartel (el
+  /// anillo de la burbuja y el texto «BlueTalk») — 5.8:1 vs [bg].
+  static const primaryStrong = Color(0xFF2E6492);
 
-  /// Texto de acento sobre [bg]/[surface] — 4.8:1 (AA texto ≥4.5:1).
-  /// Un tono más oscuro que [primaryStrong] porque los encabezados
-  /// de sección son texto y exigen 4.5:1.
-  static const primaryStrongText = Color(0xFF2A7699);
+  /// Texto de acento sobre [bg]/[surface] — 5.8:1 (AA texto ≥4.5:1).
+  /// Mismo azul de marca que [primaryStrong]: los dos nombres se
+  /// conservan porque expresan usos distintos (borde/icono vs texto).
+  static const primaryStrongText = Color(0xFF2E6492);
 
-  /// Texto principal sobre bg — 11.4:1.
-  static const text = Color(0xFF1F3A44);
+  /// Texto principal: navy de los titulares del cartel — 14:1 sobre [bg].
+  static const text = Color(0xFF002848);
 
-  /// Estados. Relleno pastel + su tinta oscura (≥7.8:1 entre sí).
+  /// Verde del corazón del logo. Solo relleno y decoración (iconos,
+  /// pictogramas de marca): ~3.4:1 contra blanco, NO llega a AA para
+  /// texto — para texto usar [text] o [primaryStrongText].
+  static const verdeCorazon = Color(0xFF20A078);
+
+  /// Estados. Colores semánticos, no de marca: no cambian con la paleta
+  /// ni con el tema (plan 00 §4). Relleno pastel + su tinta oscura.
   static const success = Color(0xFFDDF3E4);
   static const onSuccess = Color(0xFF14522E);
   static const warning = Color(0xFFFBEBC8);

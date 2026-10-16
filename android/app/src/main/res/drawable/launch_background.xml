@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Modify this file to customize your launch splash screen -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@android:color/white" />
+    <!-- Plan 13 P3.7: el primer fotograma es el celeste de marca (tinte
+         claro del #70D0F8 del cartel = AppColors.bg), no un blanco que
+         deslumbra antes de cargar. -->
+    <item android:drawable="@color/launch_background" />
 
     <!-- You can insert your own image assets here -->
     <!-- <item>
