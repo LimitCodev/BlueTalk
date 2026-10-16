@@ -8,7 +8,7 @@ App Flutter (Android) de comunicación aumentativa (AAC) para niñas y niños au
 2. Ejecuta `docs/plan/10-fase0-funcional.md` (9 pasos, uno por commit). **Hazlo completo antes de nada más.**
 3. Ejecuta `docs/plan/11-fases-1-a-3-excelencia.md` (Fases 1, 2 y 3). Lee su §0 (estándar de ingeniería y reglas de honestidad) **antes** de escribir código: aplica a todo.
 4. Ejecuta `docs/plan/12-modo-nino-kiosko-y-panel.md` (modo niño restringido, registro de uso, panel y recomendaciones), por fases, tras cerrar su Fase 0.
-5. Ejecuta `docs/plan/13-pulido-uso-real.md` (Atrás, dibujo, marca, colores, panel visual, instalación y gama baja). Puede ir antes de las fases 1+ del plan 12 si el usuario quiere un APK de prueba mejor.
+5. Ejecuta `docs/plan/13-pulido-uso-real.md` (Atrás, dibujo, marca, colores, panel visual, instalación y gama baja). Hazlo justo después de cerrar la Fase 0 del plan 12 y **antes** de las fases 1+ del plan 12 (decisión por defecto, para dar al usuario un APK de prueba mejor; el usuario puede cambiarla).
 6. Al terminar cada fase: escribe `docs/informes/faseN-evidencia.md`, invoca al subagente `revisor` (`.opencode/agents/revisor.md`) y corrige lo grave.
 
 Nadie te va a revisar sobre la marcha. **Tu informe de evidencia es la única prueba de que el trabajo está hecho.** Hazlo honesto: lo no verificado se declara como NO VERIFICADO.

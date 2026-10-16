@@ -41,6 +41,8 @@ Se dejan escritas y se continúa con todo lo que no depende de ellas.
 
 ## Botón «Atrás» (PopScope) en `/home/aprender`
 
+**RESUELTA (2026-10-16, por el dueño):** Atrás debe moverse dentro de la app, no cerrarla. Comportamiento exigido en `docs/plan/13-pulido-uso-real.md` P1.
+
 - Elevado por el revisor en `docs/informes/ola2-comunicador-juegos.md`
   («Para el coordinador», punto 3): `lib/app/router.dart` no define el
   comportamiento del botón Atrás en `/home/aprender` ni en las vistas internas;
