@@ -66,7 +66,9 @@ class _CambiarCodigoDialogoState extends ConsumerState<CambiarCodigoDialogo> {
     try {
       await store.crear(_nuevo.text);
     } on FormatException {
-      setState(() => _error = 'El código debe tener 6 dígitos.');
+      if (mounted) {
+        setState(() => _error = 'El código debe tener 6 dígitos.');
+      }
       return;
     }
     if (!mounted) return;

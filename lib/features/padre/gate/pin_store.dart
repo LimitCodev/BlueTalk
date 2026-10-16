@@ -215,10 +215,20 @@ class PinStore {
     final List<int> guardado;
     final List<int> salt;
     try {
-      guardado = _deHex(_prefs.getString(claveHash)!);
-      salt = _deHex(_prefs.getString(claveSalt)!);
+      final hashGuardado = _prefs.getString(claveHash);
+      final salGuardada = _prefs.getString(claveSalt);
+      // Clave ausente o con un tipo que no es texto (almacenamiento
+      // corrupto): se trata como código incorrecto, igual que el resto.
+      if (hashGuardado == null || salGuardada == null) {
+        return VerificacionPin.incorrecto;
+      }
+      guardado = _deHex(hashGuardado);
+      salt = _deHex(salGuardada);
     } on FormatException {
       // Almacenamiento corrupto: se trata como código incorrecto.
+      return VerificacionPin.incorrecto;
+    } on TypeError {
+      // Tipo inesperado bajo la clave: misma respuesta.
       return VerificacionPin.incorrecto;
     }
 

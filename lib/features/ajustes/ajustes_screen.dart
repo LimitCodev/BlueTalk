@@ -144,6 +144,8 @@ class _RecordatoriosSection extends ConsumerWidget {
                   final concedido = await ref
                       .read(recordatoriosProvider.notifier)
                       .pedirPermisoNotificaciones();
+                  // El permiso puede haber cambiado fuera de la app.
+                  ref.invalidate(notificacionesPermitidasProvider);
                   if (concedido) {
                     if (!context.mounted) return;
                     await ref

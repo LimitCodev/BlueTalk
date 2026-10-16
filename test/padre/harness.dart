@@ -99,6 +99,7 @@ List<Object> overridesDePadre(
   SharedPreferences prefs, {
   RelojPrueba? reloj,
   BiometriaPrueba? biometria,
+  DerivadorPin? derivador,
 }) =>
     [
       sharedPreferencesProvider.overrideWithValue(prefs),
@@ -110,7 +111,9 @@ List<Object> overridesDePadre(
       relojProvider.overrideWithValue(reloj?.decir ?? _relojFijo),
       // La PBKDF2 real corre en un isolate, que no completa dentro de
       // testWidgets (ver [DerivadorPinPrueba]).
-      derivadorPinProvider.overrideWithValue(const DerivadorPinPrueba()),
+      derivadorPinProvider.overrideWithValue(
+        derivador ?? const DerivadorPinPrueba(),
+      ),
       if (biometria != null)
         biometriaProvider.overrideWithValue(biometria),
     ];

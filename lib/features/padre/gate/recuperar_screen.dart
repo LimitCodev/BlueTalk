@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/di.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../rutinas/recordatorios/recordatorios_controller.dart';
+import '../../rutinas/rutinas_providers.dart';
+import '../../ajustes/settings_controller.dart';
+import '../../onboarding/profile_controller.dart';
 import '../legal/legal_controller.dart';
 import '../padre_controller.dart';
 import 'gate_controller.dart';
@@ -50,6 +54,10 @@ class _RecuperarScreenState extends ConsumerState<RecuperarScreen> {
 
   Future<void> _borrar() async {
     if (!_confirmado) return;
+    // Los avisos ya programados apuntan al horario viejo: se cancelan
+    // antes de borrar (plan 11 §1.2), que no llegue ningún aviso de
+    // datos que ya no existen.
+    await ref.read(recordatoriosProvider.notifier).cancelarTodoProgramado();
     // Se borra todo lo guardado en este dispositivo: PIN, progreso,
     // horario, ajustes y consentimientos.
     await ref.read(sharedPreferencesProvider).clear();
@@ -57,7 +65,11 @@ class _RecuperarScreenState extends ConsumerState<RecuperarScreen> {
     ref
       ..invalidate(gateProvider)
       ..invalidate(legalProvider)
-      ..invalidate(padreProvider);
+      ..invalidate(padreProvider)
+      ..invalidate(settingsProvider)
+      ..invalidate(horarioProvider)
+      ..invalidate(profileProvider)
+      ..invalidate(recordatoriosProvider);
     if (!mounted) return;
     // Sin un router por debajo (pantalla suelta en tests) no hay adónde
     // navegar: los datos ya están borrados, que es lo esencial.

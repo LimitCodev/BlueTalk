@@ -39,6 +39,15 @@ class RecordatoriosController extends Notifier<bool> {
     return ajustes?.remindersEnabled ?? false;
   }
 
+  /// Cancela todos los avisos programados sin tocar nada más.
+  ///
+  /// Lo usa el borrado total de datos (plan 11 §1.2): tras `prefs.clear()`
+  /// no debe quedar ningún aviso del horario anterior.
+  Future<void> cancelarTodoProgramado() async {
+    await ref.read(recordatorioSchedulerProvider).cancelarTodos();
+    _programadas.clear();
+  }
+
   /// Pide el permiso de notificaciones (solo desde Ajustes, plan 1.1).
   /// Sin permiso o con error se devuelve `false`: nada se rompe.
   Future<bool> pedirPermisoNotificaciones() async {

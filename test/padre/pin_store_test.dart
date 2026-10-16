@@ -322,6 +322,13 @@ void main() {
     final pinSalVacia = await corrupto({...base(), PinStore.claveSalt: ''});
     expect(await pinSalVacia.verificar('123456'), VerificacionPin.incorrecto);
 
+    // Clave con un tipo que no es texto (corrupción del almacén): no
+    // debe lanzar, se responde incorrecto (revisión fase 1, MEDIA).
+    final pinHashTipado = await corrupto({...base(), PinStore.claveHash: 7});
+    expect(await pinHashTipado.verificar('123456'), VerificacionPin.incorrecto);
+    final pinSalTipada = await corrupto({...base(), PinStore.claveSalt: 7});
+    expect(await pinSalTipada.verificar('123456'), VerificacionPin.incorrecto);
+
     // Longitud persistida fuera de rango.
     final pinLenRaro = await corrupto(base(longitud: -3));
     expect(await pinLenRaro.verificar('123456'), VerificacionPin.incorrecto);

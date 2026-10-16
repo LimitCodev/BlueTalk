@@ -140,14 +140,19 @@ class ArtistaController extends Notifier<ArtistaEstado> {
         .read(galeriaDibujosProvider.notifier)
         .guardar(state.trazos);
     if (!guardado) return false;
-    await ref.read(usageRepoProvider).record(
-          UsageEvent(
-            id: 'artista_dibujo_${DateTime.now().microsecondsSinceEpoch}',
-            type: 'dibujo_guardado',
-            createdAt: DateTime.now(),
-            data: {'juego': 'artista'},
-          ),
-        );
+    try {
+      await ref.read(usageRepoProvider).record(
+            UsageEvent(
+              id: 'artista_dibujo_${DateTime.now().microsecondsSinceEpoch}',
+              type: 'dibujo_guardado',
+              createdAt: DateTime.now(),
+              data: {'juego': 'artista'},
+            ),
+          );
+    } catch (_) {
+      // El registro de uso es solo para el panel del modo padre: si
+      // falla, el dibujo ya está guardado y nada importante se pierde.
+    }
     return true;
   }
 

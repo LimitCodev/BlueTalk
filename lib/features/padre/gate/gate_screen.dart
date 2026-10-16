@@ -46,9 +46,37 @@ class _GateScreenState extends ConsumerState<GateScreen> {
 
   /// Tras validar, pasa el control al padre de la pantalla raíz.
   void _entrarSiDesbloqueado() {
+    // Tras un await la pantalla pudo haberse ido (revisión fase 1).
+    if (!mounted) return;
     if (!ref.read(gateProvider).desbloqueado) return;
     _limpiar();
     ref.read(padreProvider.notifier).entrar();
+  }
+
+  /// true mientras dura la verificación (~PBKDF2): con los botones
+  /// apagados, un doble toque no cuenta dos fallos seguidos.
+  bool _verificando = false;
+
+  Future<void> _intentar() async {
+    if (_verificando) return;
+    setState(() => _verificando = true);
+    try {
+      await ref.read(gateProvider.notifier).intentar(_pin.text);
+      _entrarSiDesbloqueado();
+    } finally {
+      if (mounted) setState(() => _verificando = false);
+    }
+  }
+
+  Future<void> _intentarBiometria() async {
+    if (_verificando) return;
+    setState(() => _verificando = true);
+    try {
+      await ref.read(gateProvider.notifier).intentarBiometria();
+      _entrarSiDesbloqueado();
+    } finally {
+      if (mounted) setState(() => _verificando = false);
+    }
   }
 
   @override
@@ -94,14 +122,9 @@ class _GateScreenState extends ConsumerState<GateScreen> {
       GateFase.pedir => _PedirView(
           estado: estado,
           controlador: _pin,
-          onEntrar: () async {
-            await controlador.intentar(_pin.text);
-            _entrarSiDesbloqueado();
-          },
-          onBiometria: () async {
-            await controlador.intentarBiometria();
-            _entrarSiDesbloqueado();
-          },
+          verificando: _verificando,
+          onEntrar: _intentar,
+          onBiometria: _intentarBiometria,
           onOlvide: () {
             _limpiar();
             Navigator.of(context).push(
@@ -259,6 +282,7 @@ class _PedirView extends ConsumerWidget {
   const _PedirView({
     required this.estado,
     required this.controlador,
+    required this.verificando,
     required this.onEntrar,
     required this.onBiometria,
     required this.onOlvide,
@@ -266,6 +290,7 @@ class _PedirView extends ConsumerWidget {
 
   final GateEstado estado;
   final TextEditingController controlador;
+  final bool verificando;
   final Future<void> Function() onEntrar;
   final Future<void> Function() onBiometria;
   final VoidCallback onOlvide;
@@ -299,6 +324,7 @@ class _PedirView extends ConsumerWidget {
         FilledButton(
           style: FilledButton.styleFrom(minimumSize: const Size(64, 48)),
           onPressed: estado.bloqueado ||
+                  verificando ||
                   controlador.text.length != estado.longitud
               ? null
               : () => onEntrar(),
@@ -308,7 +334,9 @@ class _PedirView extends ConsumerWidget {
           const SizedBox(height: 8),
           OutlinedButton(
             style: OutlinedButton.styleFrom(minimumSize: const Size(64, 48)),
-            onPressed: estado.bloqueado ? null : () => onBiometria(),
+            onPressed: estado.bloqueado || verificando
+                ? null
+                : () => onBiometria(),
             child: const Text('Usar huella o rostro'),
           ),
         ],

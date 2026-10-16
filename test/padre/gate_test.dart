@@ -1,6 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:bluetalk/data/models/models.dart';
+import 'package:bluetalk/features/rutinas/recordatorios/recordatorio_scheduler.dart';
+import 'package:bluetalk/features/rutinas/recordatorios/recordatorio_scheduler_real.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:bluetalk/features/padre/gate/gate_controller.dart';
@@ -101,6 +107,47 @@ void main() {
     );
     expect(container.read(gateProvider).desbloqueado, isFalse);
     expect(container.read(gateProvider).bloqueo, Duration.zero);
+  });
+
+  testWidgets('un doble toque en Entrar cuenta un solo fallo',
+      (tester) async {
+    final prefs = await prefsDePrueba();
+    await crearPinDePrueba(prefs);
+    // La verificación queda en el aire hasta que el test la resuelva:
+    // así se observa el estado «en curso» sin carreras.
+    final derivador = DerivadorEnEspera();
+    await pumpPadre(
+      tester,
+      home: const Scaffold(body: GateScreen()),
+      overrides: overridesDePadre(prefs, derivador: derivador),
+    );
+
+    final entrar = find.widgetWithText(FilledButton, 'Entrar');
+    await _escribir(tester, '9999');
+    await tester.tap(entrar);
+    await tester.pump();
+
+    // Mientras verifica, los botones quedan apagados…
+    expect(tester.widget<FilledButton>(entrar).onPressed, isNull);
+    await tester.tap(entrar);
+    await tester.pump();
+    // …y un segundo toque no lanza otra derivación (revisión fase 1).
+    expect(derivador.llamadas, 1, reason: 'solo cuenta el primer toque');
+
+    derivador.responder(const [1, 2, 3]); // no coincide con la huella
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Código incorrecto, inténtalo de nuevo.'),
+      findsOneWidget,
+    );
+    expect(
+      prefs.getInt(PinStore.claveIntentos),
+      1,
+      reason: 'los dos toques suman un único fallo',
+    );
+    // Terminada la verificación, vuelve a poder pulsarse.
+    expect(tester.widget<FilledButton>(entrar).onPressed, isNotNull);
   });
 
   testWidgets('cinco códigos incorrectos bloquean 60 segundos',
@@ -316,8 +363,15 @@ void main() {
     );
     addTearDown(rutas.dispose);
 
+    // Doble que comprueba que el borrado total cancela los avisos
+    // ya programados (revisión fase 1, MEDIA).
+    final schedulerPrueba = _SchedulerCuenta();
+
     final container = ProviderContainer(
-      overrides: overridesDePadre(prefs, reloj: reloj).cast(),
+      overrides: [
+        ...overridesDePadre(prefs, reloj: reloj),
+        recordatorioSchedulerProvider.overrideWithValue(schedulerPrueba),
+      ].cast(),
     );
     addTearDown(container.dispose);
     await tester.pumpWidget(
@@ -373,6 +427,52 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(prefs.getKeys(), isEmpty, reason: 'prefs.clear() lo borra todo');
+    expect(
+      schedulerPrueba.cancelarTodosLlamado,
+      greaterThanOrEqualTo(1),
+      reason: 'los avisos del horario viejo se cancelan al borrar todo',
+    );
     expect(find.text('PANTALLA DE ONBOARDING'), findsOneWidget);
   });
+}
+
+/// Doble de scheduler que solo cuenta la cancelación total.
+class _SchedulerCuenta implements RecordatorioScheduler {
+  var cancelarTodosLlamado = 0;
+
+  @override
+  Future<void> programar(ScheduleEntry entrada) async {}
+
+  @override
+  Future<void> cancelar(String entryId) async {}
+
+  @override
+  Future<void> cancelarTodos() async => cancelarTodosLlamado++;
+
+  @override
+  Future<bool> pedirPermiso() async => true;
+
+  @override
+  Future<bool> estaPermitido() async => true;
+}
+
+/// Derivador que se queda esperando hasta que el test lo resuelva
+/// (para observar la verificación en curso sin carreras).
+class DerivadorEnEspera implements DerivadorPin {
+  int llamadas = 0;
+  Completer<List<int>>? _pendiente;
+
+  @override
+  Future<List<int>> derivar(String pin, List<int> salt, int iteraciones) {
+    llamadas++;
+    final pendiente = Completer<List<int>>();
+    _pendiente = pendiente;
+    return pendiente.future;
+  }
+
+  /// Responde con la huella indicada (distinta de la sembrada).
+  void responder(List<int> huella) {
+    _pendiente!.complete(huella);
+    _pendiente = null;
+  }
 }
