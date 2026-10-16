@@ -99,15 +99,17 @@ class PinStore {
 
   /// Iteraciones efectivas hoy.
   ///
-  /// 10.000 ≈ 130 ms en un dispositivo modesto; la fuerza real del PIN
-  /// viene de la sal, del bloqueo escalonado y de que solo se guarda la
-  /// huella. El plan 11 §1.2 permite subir a 100.000 **solo** tras medir
-  /// ≤ 500 ms en el AVD de gama baja; esa medición la hace el coordinador.
-  /// El mecanismo ya está listo: basta cambiar este valor, porque cada PIN
+  /// Medido en el AVD de gama baja (API 28, perfil/AOT): 10.000 = 58 ms,
+  /// 50.000 = 301 ms y 100.000 = 586 ms por intento. El plan 11 §1.2
+  /// permite subir a 100.000 **solo** si mide ≤ 500 ms; no llega (586 ms),
+  /// así que se fija el máximo que sí cumple: 50.000, con margen. La
+  /// fuerza real del PIN sigue viniendo de la sal, del bloqueo escalonado
+  /// y de que solo se guarda la huella. El mecanismo ya está listo:
+  /// basta cambiar este valor, porque cada PIN
   /// se re-hashea con los parámetros actuales tras su siguiente acceso
   /// correcto (su hash guardado manda hasta entonces, ver
   /// [_accesoCorrecto]).
-  static const iteracionesActuales = 10000;
+  static const iteracionesActuales = 50000;
 
   static final Random _aleatorio = Random.secure();
 

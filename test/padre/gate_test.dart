@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:bluetalk/features/padre/gate/gate_controller.dart';
 import 'package:bluetalk/features/padre/gate/gate_screen.dart';
+import 'package:bluetalk/features/padre/gate/pin_store.dart';
 import 'package:bluetalk/features/padre/padre_controller.dart';
 
 import 'harness.dart';
@@ -74,7 +75,7 @@ void main() {
     // parámetros quedan registrados junto a ella.
     expect(prefs.getString('padre_pin_hash'), isNotNull);
     expect(prefs.getInt('padre_pin_len'), 6);
-    expect(prefs.getInt('padre_pin_iter'), 10000);
+    expect(prefs.getInt('padre_pin_iter'), PinStore.iteracionesActuales);
     for (final clave in prefs.getKeys()) {
       expect(prefs.get(clave), isNot('123456'));
     }
