@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/calm_mode.dart';
 import '../features/ajustes/settings_controller.dart';
+import '../features/rutinas/recordatorios/recordatorios_controller.dart';
 import 'router.dart';
 
 /// Raíz de la app: tema celeste pastel + router + interruptor global de calma.
@@ -12,6 +13,9 @@ class BlueTalkApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Mantiene vivo el sincronizador de recordatorios (plan 1.1).
+    ref.listen(recordatoriosProvider, (_, _) {});
+
     final calm = ref.watch(calmModeProvider);
     final appScale =
         ref.watch(settingsProvider).value?.textScale ?? 1.0;

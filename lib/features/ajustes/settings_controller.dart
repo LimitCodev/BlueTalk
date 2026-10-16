@@ -22,6 +22,9 @@ class SettingsController extends AsyncNotifier<AppSettings> {
 
   Future<void> setTtsPitch(double value) =>
       _update(state.requireValue.copyWith(ttsPitch: value));
+
+  Future<void> setRemindersEnabled(bool value) =>
+      _update(state.requireValue.copyWith(remindersEnabled: value));
 }
 
 /// Ajustes actuales de la app (`AsyncData` tras cargar).
