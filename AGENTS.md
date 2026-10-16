@@ -20,6 +20,14 @@ App Flutter (Android) de comunicación aumentativa (AAC) para niñas y niños au
 4. Al terminar cada etapa: escribe `docs/informes/<etapa>-evidencia.md`, invoca al subagente `revisor` (`.opencode/agents/revisor.md`) y corrige lo grave. Un commit por paso.
 5. Si dos planes se pisan (ej.: ícono en plan 11 Fase 3 y plan 13 P3; copia de seguridad en plan 11 §2.4 y plan 13 P6.2), **hazlo una sola vez**, en la primera etapa donde aparece, y anótalo en el informe.
 
+## Ejecución desatendida (norma cuando el usuario duerme)
+
+- **Latido:** tras cada commit, añade **una línea** a `estado-vivo.log` (raíz, ignorado por git): `AAAA-MM-DD HH:MM | etapa | paso | analyze=OK/FALLA | test=N/N | nota corta`. Sin pegar logs. Al cerrar una etapa añade `ETAPA X CERRADA`; al terminar todo, `FIN`.
+- **Pide pocos tokens:** no relances comandos que ya pasaron, no releas archivos grandes enteros, no hagas búsquedas amplias si ya sabes dónde está. Un solo emulador a la vez; ciérralo al terminar.
+- **Corte de seguridad:** si el mismo paso falla **3 veces seguidas**, o `analyze`/`test` siguen en rojo tras 3 intentos, **detente**: escribe `BLOQUEADO | paso | motivo` en `estado-vivo.log` y en `docs/informes/decisiones-pendientes.md`, y no sigas con otros pasos que dependan de él.
+- Nada de `git push`, cuentas, claves ni instalar dependencias fuera del plan (ya es regla dura).
+- Si en `estado-vivo.log` aparece una línea `PARAR` escrita por el usuario, termina el paso en curso, haz commit si está verde y detente.
+
 Nadie te va a revisar sobre la marcha. **Tu informe de evidencia es la única prueba de que el trabajo está hecho.** Hazlo honesto: lo no verificado se declara como NO VERIFICADO.
 
 ## Primer comando

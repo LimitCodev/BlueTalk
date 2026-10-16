@@ -50,3 +50,6 @@ Thumbs.db
 reports/
 
 # Nota: pubspec.lock y los .g.dart generados SÍ se commitean (es una app, no un paquete)
+
+# latido de ejecucion desatendida
+estado-vivo.log
