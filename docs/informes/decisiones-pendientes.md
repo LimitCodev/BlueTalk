@@ -11,6 +11,26 @@ Se dejan escritas y se continúa con todo lo que no depende de ellas.
   custodia la clave de firma? (Si la generamos, la frase de paso se la entregamos
   al usuario y no se guarda en el repositorio.)
 
+### Urgente desde 2026-10-15: Play Protect bloquea el APK
+
+- El APK release se firma hoy con la clave de **depuración** de plantilla
+  (`CN=Android Debug`, verificado con `apksigner --print-certs`) y en el
+  teléfono del usuario Play Protect lo bloquea: «Play Protect no vio una
+  app de este desarrollador antes». Instalación posible tocando el enlace
+  «Instalar de todas formas» del propio diálogo.
+- Pregunta: ¿generamos un keystore de firma **release** propio (frase de
+  paso en manos del usuario, jamás en el repositorio) y cambiamos
+  `signingConfig` del release a ese keystore?
+- Aviso honesto (verificado con política actual de Google): una firma
+  release **suaviza** el veredicto (la clave debug es el patrón típico de
+  APKs reempaquetados) pero **no elimina** el aviso de «desarrollador
+  desconocido» al instalar fuera de Play Store. Eliminarlo del todo solo
+  se consigue publicando en Play Store (cuenta de desarrollador =
+  decisión del usuario; el equipo no crea cuentas).
+- Dato del APK actual: `compileSdk/targetSdk 36`, `minSdk 24`
+  (Android 7.0 en adelante — teléfonos anteriores a 2016 no lo
+  instalarían por versión, mensaje distinto al de Play Protect).
+
 ## Botón «Atrás» (PopScope) en `/home/aprender`
 
 - Elevado por el revisor en `docs/informes/ola2-comunicador-juegos.md`
