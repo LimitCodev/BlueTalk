@@ -221,10 +221,7 @@ Esto recoge lo que el dueño preguntó sobre los avisos de WhatsApp y Play Prote
 
 ## Orden recomendado
 
-1. P1 (Atrás) y P2 (Artista): son fallos que el dueño ya sufrió.
-2. P3 (marca) y P4 (colores): se hacen juntos, porque P4 reemplaza la paleta que fija P3.
-3. P5 (panel visual) y P6 (mejoras, solo las de costo bajo).
-4. P7 en paralelo: es documentación y configuración.
+Es el de la tabla de `AGENTS.md` (etapas A, B, E). Resumen: **A** = P1, P2, P6.1 y P7 (APK de prueba nuevo); **B** = P3 y P4 (juntos, porque P4 reemplaza la paleta que fija P3); **E** = P5 y el resto de P6, junto con las fases 4 a 6 del plan 12, porque el panel visual necesita los datos del registro de uso.
 
 ## Cierre
 

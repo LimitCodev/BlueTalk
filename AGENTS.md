@@ -4,12 +4,21 @@ App Flutter (Android) de comunicación aumentativa (AAC) para niñas y niños au
 
 ## Qué hacer, en este orden
 
-1. Lee `docs/informes/auditoria-general.md` (estado real del proyecto y por qué).
-2. Ejecuta `docs/plan/10-fase0-funcional.md` (9 pasos, uno por commit). **Hazlo completo antes de nada más.**
-3. Ejecuta `docs/plan/11-fases-1-a-3-excelencia.md` (Fases 1, 2 y 3). Lee su §0 (estándar de ingeniería y reglas de honestidad) **antes** de escribir código: aplica a todo.
-4. Ejecuta `docs/plan/12-modo-nino-kiosko-y-panel.md` (modo niño restringido, registro de uso, panel y recomendaciones), por fases, tras cerrar su Fase 0.
-5. Ejecuta `docs/plan/13-pulido-uso-real.md` (Atrás, dibujo, marca, colores, panel visual, instalación y gama baja). Hazlo justo después de cerrar la Fase 0 del plan 12 y **antes** de las fases 1+ del plan 12 (decisión por defecto, para dar al usuario un APK de prueba mejor; el usuario puede cambiarla).
-6. Al terminar cada fase: escribe `docs/informes/faseN-evidencia.md`, invoca al subagente `revisor` (`.opencode/agents/revisor.md`) y corrige lo grave.
+1. Lee `docs/informes/auditoria-general.md` (estado real) y el §0 de `docs/plan/11-fases-1-a-3-excelencia.md` (estándar de ingeniería y honestidad; aplica a todo).
+2. **Ya cerrado:** plan 10 (Fase 0) y plan 11 Fase 1 (`docs/informes/fase1-evidencia.md`). No lo repitas.
+3. Ejecuta lo que queda **en este orden** (pensado para dar un APK de prueba mejor cuanto antes y no rehacer trabajo):
+
+| Etapa | Qué | Plan | Por qué en este lugar |
+|---|---|---|---|
+| A | Fallos vistos en el teléfono: **Atrás (P1)**, **dibujo (P2)**, pruebas de nombre y rutinas (P6.1), **instalación y APK liviano (P7)** | 13 | Son lo que el dueño ya sufrió. Cierra con un APK de prueba nuevo. |
+| B | **Marca y logo (P3)** y **colores personalizables (P4)** | 13 | Todo lo visual posterior usa la paleta nueva; hacerlo después obligaría a rehacer pantallas. |
+| C | Vocabulario 200+, Primero–Luego, fotos propias, copia de seguridad (Fase 2) | 11 | Contenido del comunicador, ya con la paleta final. |
+| D | Estabilizar (Fase 0 del plan 12; verifica qué ya está hecho), primera instalación adulto-primero (F1), canal nativo (F2), inicio del niño y salida protegida (F3) | 12 | Base del modo niño. Necesita Atrás de la etapa A funcionando. |
+| E | Registro de uso (F4), **panel visual (P5)**, **emociones y mejoras de reseñas (P6.2–6.4)**, recomendaciones (F5–F6) | 12 y 13 | El panel de P5 pinta datos que solo existen después de F4. Se hacen juntos. |
+| F | Vocabulario y pictogramas (F7 del plan 12), identidad y firma para tienda (Fase 3 del plan 11; el ícono ya viene de P3), APK final y checklist en teléfono (F8) | 12 y 11 | Cierre y publicación; lo último porque depende de todo lo anterior. |
+
+4. Al terminar cada etapa: escribe `docs/informes/<etapa>-evidencia.md`, invoca al subagente `revisor` (`.opencode/agents/revisor.md`) y corrige lo grave. Un commit por paso.
+5. Si dos planes se pisan (ej.: ícono en plan 11 Fase 3 y plan 13 P3; copia de seguridad en plan 11 §2.4 y plan 13 P6.2), **hazlo una sola vez**, en la primera etapa donde aparece, y anótalo en el informe.
 
 Nadie te va a revisar sobre la marcha. **Tu informe de evidencia es la única prueba de que el trabajo está hecho.** Hazlo honesto: lo no verificado se declara como NO VERIFICADO.
 
