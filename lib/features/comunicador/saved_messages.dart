@@ -46,11 +46,22 @@ class SavedMessagesController extends Notifier<List<SavedMessage>> {
   List<SavedMessage> build() {
     final raw = ref.read(sharedPreferencesProvider).getString(prefKey);
     if (raw == null) return const [];
-    final decoded = jsonDecode(raw) as List<dynamic>;
-    return [
-      for (final row in decoded)
-        SavedMessage.fromMap(Map<String, dynamic>.from(row as Map)),
-    ];
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! List<dynamic>) return const [];
+      return [
+        for (final row in decoded)
+          if (row is Map)
+            SavedMessage.fromMap(Map<String, dynamic>.from(row)),
+      ];
+    } on FormatException {
+      // Preferencias corruptas (escritura parcial): lista limpia en vez de
+      // romper la pantalla del niño que observa este provider.
+      return const [];
+    } on TypeError {
+      // Esquema cambiado o fila inesperada: también se empieza de cero.
+      return const [];
+    }
   }
 
   Future<void> save({
