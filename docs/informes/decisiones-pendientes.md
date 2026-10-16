@@ -21,3 +21,14 @@ Se dejan escritas y se continúa con todo lo que no depende de ellas.
   «Comunicar» o (c) lo gestiona el gate de límites del tiempo de pantalla?
 - Mientras tanto: se conserva el comportamiento por defecto (ninguna decisión
   tomada por el equipo).
+
+## Dependencias nuevas de la Fase 1 (constancia, plan 00 §5.5)
+
+No son preguntas: decisiones técnicas ya tomadas conforme al plan,
+anotadas aquí como constancia.
+
+- `flutter_timezone` (runtime): zona horaria real de los avisos,
+  exigida por el plan Fase 1 §1.1 (la del dispositivo, no UTC).
+- `flutter_driver` + `integration_test` (solo `dev_dependencies`):
+  perfilado §1.3.2 y benchmark PBKDF2 §1.2.2. Ambas del SDK de Flutter;
+  no añaden descargas de terceros ni permisos a la app.
