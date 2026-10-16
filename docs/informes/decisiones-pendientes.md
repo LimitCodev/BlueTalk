@@ -18,9 +18,17 @@ Se dejan escritas y se continúa con todo lo que no depende de ellas.
   teléfono del usuario Play Protect lo bloquea: «Play Protect no vio una
   app de este desarrollador antes». Instalación posible tocando el enlace
   «Instalar de todas formas» del propio diálogo.
-- Pregunta: ¿generamos un keystore de firma **release** propio (frase de
-  paso en manos del usuario, jamás en el repositorio) y cambiamos
-  `signingConfig` del release a ese keystore?
+- **RESUELTO (2026-10-15, decisión del usuario: sí)**: keystore propio
+  generado en `~/keystores/bluetalk-release.keystore` (alias `bluetalk`,
+  RSA 2048, validez 10.000 días, `CN=BlueTalk`), **fuera del
+  repositorio**. `android/key.properties` (gitignored, permisos 600)
+  apunta a él y el release ya firma con esa clave; si `key.properties`
+  no existe en otra máquina, el build vuelve a debug para no bloquear
+  el desarrollo. La frase de paso se entregó al usuario en el chat y
+  **no está escrita en ningún archivo del repositorio**. Custodio: el
+  usuario — debe guardarla y copiar el `.keystore` fuera de este
+  equipo; sin ella no se podrán firmar futuras versiones ni dar de alta
+  la app en Play Store.
 - Aviso honesto (verificado con política actual de Google): una firma
   release **suaviza** el veredicto (la clave debug es el patrón típico de
   APKs reempaquetados) pero **no elimina** el aviso de «desarrollador
