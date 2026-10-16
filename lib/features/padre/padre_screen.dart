@@ -73,45 +73,56 @@ class _PadreScreenState extends ConsumerState<PadreScreen> {
     final enSesion = aceptado && vista != PadreVista.gate;
     final indice = _destinos.indexWhere((destino) => destino.vista == vista);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Modo padre'),
-        actions: [
-          if (enSesion)
-            IconButton(
-              icon: const Icon(Icons.lock_outline),
-              tooltip: 'Cerrar sesión',
-              onPressed: () => ref.read(padreProvider.notifier).cerrarSesion(),
-            ),
-          IconButton(
-            icon: const Icon(Icons.close),
-            tooltip: 'Salir del modo padre',
-            onPressed: _salir,
-          ),
-        ],
-      ),
-      body: switch (vista) {
-        PadreVista.legal => LegalScreen(onSalir: _salir),
-        PadreVista.gate => const GateScreen(),
-        PadreVista.resumen => const ResumenScreen(),
-        PadreVista.control => const ControlScreen(),
-        PadreVista.salud => const SaludPadreScreen(),
+    // Fila 4 del plan 13 P1: el Atrás nunca mata el modo padre. Con una
+    // subpantalla empujada (p. ej. recuperación del PIN) la cierra Navigator;
+    // desde el panel, el Atrás sale a Ajustes con la misma lógica del
+    // botón «Salir del modo padre».
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _salir();
       },
-      bottomNavigationBar: enSesion
-          ? NavigationBar(
-              selectedIndex: indice < 0 ? 0 : indice,
-              onDestinationSelected: (i) =>
-                  ref.read(padreProvider.notifier).irA(_destinos[i].vista),
-              destinations: [
-                for (final destino in _destinos)
-                  NavigationDestination(
-                    label: destino.label,
-                    icon: Icon(destino.icono),
-                    selectedIcon: Icon(destino.activo),
-                  ),
-              ],
-            )
-          : null,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Modo padre'),
+          actions: [
+            if (enSesion)
+              IconButton(
+                icon: const Icon(Icons.lock_outline),
+                tooltip: 'Cerrar sesión',
+                onPressed: () =>
+                    ref.read(padreProvider.notifier).cerrarSesion(),
+              ),
+            IconButton(
+              icon: const Icon(Icons.close),
+              tooltip: 'Salir del modo padre',
+              onPressed: _salir,
+            ),
+          ],
+        ),
+        body: switch (vista) {
+          PadreVista.legal => LegalScreen(onSalir: _salir),
+          PadreVista.gate => const GateScreen(),
+          PadreVista.resumen => const ResumenScreen(),
+          PadreVista.control => const ControlScreen(),
+          PadreVista.salud => const SaludPadreScreen(),
+        },
+        bottomNavigationBar: enSesion
+            ? NavigationBar(
+                selectedIndex: indice < 0 ? 0 : indice,
+                onDestinationSelected: (i) =>
+                    ref.read(padreProvider.notifier).irA(_destinos[i].vista),
+                destinations: [
+                  for (final destino in _destinos)
+                    NavigationDestination(
+                      label: destino.label,
+                      icon: Icon(destino.icono),
+                      selectedIcon: Icon(destino.activo),
+                    ),
+                ],
+              )
+            : null,
+      ),
     );
   }
 }
