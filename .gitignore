@@ -53,3 +53,6 @@ reports/
 
 # latido de ejecucion desatendida
 estado-vivo.log
+
+# APK de reparto generado por scripts/build-apk.sh
+dist/
