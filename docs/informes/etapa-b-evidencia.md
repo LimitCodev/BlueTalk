@@ -17,7 +17,12 @@ sección aquí. Lo que solo se ve en un teléfono real se declara
 | P3.7 — primer fotograma celeste (styles/launch) | HECHO (abajo) | `5ef1cd3` |
 | P4 — 6 temas AA + selector + persistencia | HECHO (abajo) | `88a4fbe` + `a251741` |
 | Humo en emulador con capturas | HECHO (abajo) | — |
-| Cierre + revisor | VER EN `etapa-b-revisor.md` | — |
+| Cierre + revisor | HECHO (abajo) | — |
+
+Nota sobre P3.3: el plan separaba «logo + texto» (P3.2) de «logo en
+shell y onboarding» (P3.5); P3.3 (assets de marca en `assets/brand/`)
+quedó absorbido por la decisión de dibujarlo con `CustomPainter` en vez
+de generar archivos: un solo código fuente, sin assets que mantener.
 
 ## P3.1 — extracción de colores del cartel (script, sin inventar)
 
@@ -146,6 +151,36 @@ Capturas en `docs/informes/capturas/`:
 Dos fallos reales encontrados y corregidos gracias a estas capturas:
 logo gigante por stretch (`c466072`) y etiqueta en minúsculas
 (corregido en este cierre).
+
+## Revisión y cierre de la etapa
+
+Subagente `revisor` (informe: `etapa-b-revisor.md`): **0 GRAVE, 2 MEDIO,
+6 LEVE**, todo corregido o documentado:
+
+- **MEDIO-1** (`0979d1d`): los tonos que `ColorScheme.fromSeed` deriva
+  (contenedores, `outline`, `secondary`…) no estaban atados a la
+  paleta ni verificados AA, y la UI real los usa (interruptores,
+  bordes de `OutlinedButton`, contenedores M3); en «Alto contraste»
+  salían grises de croma cero. Ahora `buildBlueTalkTheme` los fija a
+  la paleta y el test de aceptación los verifica por tema.
+- **MEDIO-2** (historial): el cambio de etiqueta del manifiesto
+  (`android:label` → «BlueTalk») quedó dentro de un commit `DOCS:`.
+  Como nunca se hace `push`, se rehizó con `reset --soft` en dos
+  commits limpios: `de7e47a` (FEAT) + `dd385ab` (DOCS).
+- **LEVE**: referencia a `tema_test.dart` corregida a
+  `tokens_test.dart`; `setTema` ahora ignora ids desconocidos
+  (`961193d`, con test); el 💙 del comentario del plan y el 💚
+  visible quedan documentados en el código; P3.3 declarado absorbido;
+  `scripts/gen_icon.py` versionado (regenera el XML byte a byte
+  —verificado— y los PNG visualmente idénticos; los binarios del repo
+  se conservan); el script de extracción de colores (`colores.py`)
+  se perdió con la limpieza de `/tmp` tras un reinicio del servidor —
+  su método y resultados quedan documentados en §P3.1; la vista previa
+  en vivo se verificó con captura manual (sin test automatizado).
+
+**ETAPA B CERRADA** — P3 y P4 completos, 0 problemas de analyze y
+247/247 tests en verde. Siguiente: Etapa C (vocabulario 200+,
+Primero–Luego, fotos propias, copia de seguridad).
 
 ## NO VERIFICADO (requiere teléfono real o no capturable así)
 

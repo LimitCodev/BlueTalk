@@ -5,7 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../core/widgets/logo_bluetalk.dart';
 import 'profile_controller.dart';
 
-/// Onboarding (plan 01 §7): "Tu voz, siempre contigo 💙" → apodo local
+/// Onboarding (plan 01 §7): "Tu voz, siempre contigo 💚" (el plan
+/// escribía 💙; el lema usa el verde del corazón de marca) → apodo local
 /// (sin PII, solo se guarda en el teléfono) → home.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});

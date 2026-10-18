@@ -45,7 +45,7 @@ Pendiente de corrección (en este orden):
    pero §6 exige 1 commit = 1 cambio coherente: un `FIX:`/`CHORE:`
    propio (como el de Etapa A con `c3238d4`) deja rastro limpio de
    cuándo cambió la identidad. → para próximas entregas separar; aquí,
-   anotar en el informe que el label cambió en `813ff18`.
+   anotar que el label cambió en `813ff18` y se rehizo bien en `de7e47a`.
 
 ## LEVE (un `DOCS:` de corrección del informe)
 
@@ -89,7 +89,7 @@ Nota (no nuevo): el correo personal del autor sigue en el historial de
 estos commits; es el hallazgo 9 de `etapa-a-revisor.md`, ya en manos
 del dueño.
 
-Estado: todo commiteado (HEAD `813ff18`), árbol limpio. Este informe
+Estado: todo commiteado (HEAD limpio), árbol limpio. Este informe
 queda listo para commitear como `DOCS: informe del revisor de la etapa
 B`. Tras corregir 1-2 (`FIX:`) y 3-8 (`DOCS:`), Etapa B puede cerrarse
 y seguir con la Etapa C (plan 11).

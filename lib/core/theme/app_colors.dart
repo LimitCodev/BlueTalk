@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 /// El adulto elige un tema de color en Ajustes; la paleta activa llega a
 /// toda la UI mediante `Theme.of(context)` — uso directo:
 /// `context.colores.bg`. Las seis paletas tienen contraste AA verificado
-/// por `test/core/tema_test.dart` (texto ≥4.5:1, elementos de UI ≥3:1).
+/// por `test/core/tokens_test.dart` (texto ≥4.5:1, elementos de UI ≥3:1).
 class AppColors extends ThemeExtension<AppColors> {
   const AppColors({
     required this.bg,
