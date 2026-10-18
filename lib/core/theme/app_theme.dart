@@ -11,10 +11,24 @@ ThemeData buildBlueTalkTheme(AppColors paleta) {
     seedColor: paleta.primary,
     brightness: Brightness.light,
   ).copyWith(
+    // Todos los tonos que la UI real usa quedan atados a la paleta:
+    // los derivados de `fromSeed` (contenedores, outline, secondary)
+    // no estaban verificados AA y en «Alto contraste» salían grises
+    // de croma cero (revisión Etapa B, MEDIO-1).
     primary: paleta.primary,
     onPrimary: paleta.primaryInk,
     surface: paleta.surface,
+    surfaceContainerLowest: paleta.surface,
+    surfaceContainerLow: paleta.surface,
+    surfaceContainer: paleta.bg,
+    surfaceContainerHigh: paleta.bg,
+    surfaceContainerHighest: paleta.bg,
     onSurface: paleta.text,
+    onSurfaceVariant: paleta.text,
+    outline: paleta.primaryStrong,
+    outlineVariant: paleta.primary,
+    secondary: paleta.primaryStrong,
+    onSecondary: paleta.surface,
     error: AppColors.error,
     onError: AppColors.onError,
   );

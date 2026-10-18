@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:bluetalk/core/theme/app_colors.dart';
+import 'package:bluetalk/core/theme/app_theme.dart';
 import 'package:bluetalk/data/models/models.dart';
 
 /// Luminancia relativa según WCAG 2.2 (fórmula oficial).
@@ -82,6 +83,24 @@ void main() {
         expect(_contrast(p.primaryStrong, p.surface),
             greaterThanOrEqualTo(3.0),
             reason: 'borde/icono sobre surface');
+
+        // Tonos derivados que la UI real usa (interruptores, bordes de
+        // OutlinedButton, contenedores M3): fijados a la paleta en
+        // buildBlueTalkTheme y verificados aquí (revisión, MEDIO-1).
+        final esquema = buildBlueTalkTheme(p).colorScheme;
+        expect(_contrast(esquema.outline, esquema.surface),
+            greaterThanOrEqualTo(3.0),
+            reason: 'outline sobre surface');
+        expect(_contrast(esquema.onSurfaceVariant, esquema.surface),
+            greaterThanOrEqualTo(4.5),
+            reason: 'subtítulos sobre surface');
+        expect(
+            _contrast(esquema.onSurfaceVariant, esquema.surfaceContainerHighest),
+            greaterThanOrEqualTo(4.5),
+            reason: 'subtítulos sobre contenedores');
+        expect(_contrast(esquema.onSecondary, esquema.secondary),
+            greaterThanOrEqualTo(4.5),
+            reason: 'texto sobre secondary');
       });
     }
 
