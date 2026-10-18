@@ -17,11 +17,20 @@ class LogoBluetalk extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // El logo es decorativo: el texto del título ya lo nombra.
+    // La caja interior centrada neutraliza columnas con stretch
+    // (onboarding): sin ella, el ancho lo fija la columna y el painter
+    // se desborda gigante; en contexto holgado la caja es exacta.
     return ExcludeSemantics(
       child: SizedBox(
         width: size,
         height: size,
-        child: const CustomPaint(painter: _LogoPainter()),
+        child: Center(
+          child: SizedBox(
+            width: size,
+            height: size,
+            child: const CustomPaint(painter: _LogoPainter()),
+          ),
+        ),
       ),
     );
   }
@@ -33,7 +42,10 @@ class _LogoPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final u = size.width / 100;
+    // Defensa: aunque una columna estirada fuerce la caja, no se pinta
+    // nunca fuera de ella; la unidad sale del lado corto.
+    canvas.clipRect(Offset.zero & size);
+    final u = size.shortestSide / 100;
     final burbuja = Paint()..color = Marca.azul;
     final cara = Paint()..color = const Color(0xFFFFFFFF);
 
