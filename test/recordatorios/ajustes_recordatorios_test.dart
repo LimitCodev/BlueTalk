@@ -50,6 +50,9 @@ void main() {
       find.widgetWithText(SwitchListTile, 'Recordatorios de rutina');
 
   Future<void> hacerVisible(WidgetTester tester, Finder finder) async {
+    // La lista de Ajustes es perezosa y creció con el selector de color:
+    // el interruptor puede estar fuera del pliegue, buscarlo por scroll.
+    await tester.scrollUntilVisible(finder, 300, maxScrolls: 30);
     await tester.ensureVisible(finder);
     await tester.pumpAndSettle();
   }

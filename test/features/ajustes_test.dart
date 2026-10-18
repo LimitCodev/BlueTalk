@@ -37,6 +37,28 @@ void main() {
         reason: 'y en SharedPreferences',
       );
     });
+
+    test('setTema persiste y vuelve tras recargar (plan 13 P4)', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(settingsProvider.future); // carga inicial
+      await container.read(settingsProvider.notifier).setTema('lila');
+      expect((await container.read(settingsProvider.future)).tema, 'lila');
+
+      // Recarga desde el repo (como al reiniciar la app).
+      expect((await PrefsSettingsRepo(prefs).load()).tema, 'lila');
+      final otro = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
+      addTearDown(otro.dispose);
+      expect((await otro.read(settingsProvider.future)).tema, 'lila',
+          reason: 'el tema elegido sobrevive al reinicio');
+    });
   });
 
   group('AjustesScreen', () {
@@ -99,6 +121,35 @@ void main() {
       expect(scale, isNot(1.0));
     });
 
+    testWidgets('el selector de color cambia el tema y lo marca (P4)',
+        (tester) async {
+      final container = await pumpAjustes(tester);
+
+      expect(find.text('Color de la pantalla'), findsOneWidget);
+
+      // Celeste viene marcada por defecto.
+      bool marcado(String nombre) => tester
+          .widgetList<Semantics>(
+            find.ancestor(
+              of: find.text(nombre),
+              matching: find.byType(Semantics),
+            ),
+          )
+          .any((s) => s.properties.selected == true);
+
+      expect(marcado('Celeste (por defecto)'), isTrue);
+
+      // Elegir lila: se guarda y queda marcada (vista previa en vivo).
+      await tester.scrollUntilVisible(find.text('Lila suave'), 300);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Lila suave'));
+      await tester.pumpAndSettle();
+
+      expect((await container.read(settingsProvider.future)).tema, 'lila');
+      expect(marcado('Lila suave'), isTrue);
+      expect(marcado('Celeste (por defecto)'), isFalse);
+    });
+
     testWidgets('el enlace legal abre el placeholder', (tester) async {
       await pumpAjustes(tester);
 
@@ -144,8 +195,15 @@ void main() {
       expect(sliders, hasLength(2));
       expect(sliders.every((s) => s.onChanged == null), isTrue);
       expect(find.text('No se pudieron cargar los ajustes'), findsOneWidget);
-      // La sección de recordatorios explica su estado en vez de
-      // mostrar un interruptor que no funcionaría (revisión fase 1).
+      // La sección de recordatorios quedó bajo el pliegue de la lista
+      // perezosa al añadir el selector de color: hay que desplazarse.
+      await tester.scrollUntilVisible(
+        find.text('No se pueden cambiar los recordatorios ahora.'),
+        300,
+      );
+      await tester.pumpAndSettle();
+      // Explica su estado en vez de mostrar un interruptor que no
+      // funcionaría (revisión fase 1).
       expect(
         find.text('No se pueden cambiar los recordatorios ahora.'),
         findsOneWidget,

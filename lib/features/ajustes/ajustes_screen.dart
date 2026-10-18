@@ -26,6 +26,8 @@ class AjustesScreen extends ConsumerWidget {
       children: [
         const CalmModeToggle(),
         const Divider(),
+        const _TemaSection(),
+        const Divider(),
         switch (settings) {
           AsyncData(:final value) => _TextScaleSection(settings: value),
           AsyncError() => const _SettingsError(),
@@ -459,6 +461,128 @@ class _SettingsError extends ConsumerWidget {
       trailing: TextButton(
         onPressed: () => ref.invalidate(settingsProvider),
         child: const Text('Reintentar'),
+      ),
+    );
+  }
+}
+
+/// Selector del tema de color (plan 13 P4): seis opciones predefinidas,
+/// nunca un selector libre (un color libre rompería el contraste AA).
+/// Al tocar una opción el tema cambia en toda la app al instante
+/// (vista previa en vivo) y se guarda en preferencias locales.
+class _TemaSection extends ConsumerWidget {
+  const _TemaSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final temaActual = ref.watch(settingsProvider).value?.tema ?? 'celeste';
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SectionHeader('Color de la pantalla'),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              alignment: WrapAlignment.center,
+              children: [
+                for (final entrada in AppColors.temas.entries)
+                  _OpcionTema(
+                    id: entrada.key,
+                    paleta: entrada.value,
+                    seleccionado: entrada.key == temaActual,
+                    onTap: () => ref
+                        .read(settingsProvider.notifier)
+                        .setTema(entrada.key),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Una opción del selector: muestra la paleta (fondo + relleno) y su
+/// nombre literal. Toda la opción es táctil (≥48dp de sobra).
+class _OpcionTema extends StatelessWidget {
+  const _OpcionTema({
+    required this.id,
+    required this.paleta,
+    required this.seleccionado,
+    required this.onTap,
+  });
+
+  final String id;
+  final AppColors paleta;
+  final bool seleccionado;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final nombre = AppColors.nombresTemas[id] ?? id;
+
+    return Semantics(
+      button: true,
+      selected: seleccionado,
+      label: 'Color $nombre',
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: paleta.bg,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: seleccionado
+                        ? paleta.primaryStrong
+                        : paleta.primary,
+                    width: seleccionado ? 3 : 1,
+                  ),
+                ),
+                child: Center(
+                  child: Container(
+                    width: 22,
+                    height: 22,
+                    decoration: BoxDecoration(
+                      color: paleta.primary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4),
+              SizedBox(
+                width: 88,
+                child: Text(
+                  nombre,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        fontSize: 13,
+                        fontWeight:
+                            seleccionado ? FontWeight.w700 : FontWeight.w400,
+                      ),
+                ),
+              ),
+              if (seleccionado)
+                const Icon(Icons.check_circle, size: 18)
+              else
+                const SizedBox(height: 18),
+            ],
+          ),
+        ),
       ),
     );
   }
