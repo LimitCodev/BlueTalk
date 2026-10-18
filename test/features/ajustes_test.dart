@@ -59,6 +59,24 @@ void main() {
       expect((await otro.read(settingsProvider.future)).tema, 'lila',
           reason: 'el tema elegido sobrevive al reinicio');
     });
+
+    test('setTema ignora ids desconocidos (valor corrupto)', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(settingsProvider.future); // carga inicial
+      await container
+          .read(settingsProvider.notifier)
+          .setTema('color-inventado');
+
+      expect((await container.read(settingsProvider.future)).tema,
+          'celeste',
+          reason: 'un id desconocido no cambia el tema actual');
+    });
   });
 
   group('AjustesScreen', () {

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/di.dart';
+import '../../core/theme/app_colors.dart';
 import '../../data/models/models.dart';
 
 /// Controlador de ajustes: carga desde `SettingsRepo` y persiste cada cambio.
@@ -26,9 +27,13 @@ class SettingsController extends AsyncNotifier<AppSettings> {
   Future<void> setRemindersEnabled(bool value) =>
       _update(state.requireValue.copyWith(remindersEnabled: value));
 
-  /// Tema de color (plan 13 P4): id de `AppColors.temas`.
-  Future<void> setTema(String id) =>
-      _update(state.requireValue.copyWith(tema: id));
+  /// Tema de color (plan 13 P4): id de `AppColors.temas`. Un id
+  /// desconocido (valor corrupto a mano) no se aplica: se conserva el
+  /// tema actual (revisión Etapa B, LEVE).
+  Future<void> setTema(String id) async {
+    if (!AppColors.temas.containsKey(id)) return;
+    await _update(state.requireValue.copyWith(tema: id));
+  }
 }
 
 /// Ajustes actuales de la app (`AsyncData` tras cargar).
