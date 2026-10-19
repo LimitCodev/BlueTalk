@@ -71,6 +71,42 @@ anotadas aquí como constancia.
   inmediato; el pasado no se reescribe sin su permiso.
 - Pregunta: ¿quiere que ajuste git a «LimitCodev <limitcodev@users.noreply.github.com>»?
 
+## Bloqueo de contenido +18 en todo el teléfono (solicitud del dueño, 2026-10-19)
+
+- Petición: que el modo parental pueda bloquear la búsqueda de páginas +18
+  en el **celular entero**, para que el niño use el dispositivo con
+  libertad. No está en ningún plan; toca permisos y privacidad, así que
+  es decisión del dueño antes de escribir una línea de código.
+- Opciones reales (todas offline: ningún dato sale del dispositivo):
+  1. **VPN local de filtrado DNS** (la única que bloquea el navegador y
+     cualquier app a la vez): BlueTalk crea un túnel local que filtra
+     dominios +18 con una lista incluida en la app. Contrapartidas:
+     Android muestra su propio diálogo «Solicitud de conexión», Google
+     Play exige declarar el uso de `VpnService`, y la documentación de
+     permisos/privacidad hay que reescribirla (la app «no usa internet»
+     pasa a «no envía datos; filtra el tráfico localmente»).
+  2. **DNS privado del sistema**: BlueTalk solo guía con un toque para
+     que el adulto active el «DNS familiar» de Android. Sin permisos
+     nuevos ni VPN, pero se puede desactivar desde Ajustes y solo cubre
+     DNS (no apps con su propia resolución).
+  3. **No implementarlo** y apoyarse en los controles del sistema
+     (Google Family Link / Samsung Kids), que ya hacen esto y están
+     validados.
+- Pregunta: ¿cuál quieres? (Recomendación del equipo: 2 por simplicidad y
+  transparencia; 1 solo si el bloqueo a nivel de teléfono es imprescindible.)
+
+## Cribado/evaluación de TEA con software (solicitud del dueño, 2026-10-19)
+
+- Llegó un texto proponiendo incorporar detección de TEA (M-CHAT-R/F,
+  eye-tracking, análisis de prosodia…). El equipo **no lo implementa**:
+  contradice reglas duras escritas por el propio dueño (plan 00
+  principios de producto «orientativa, no es diagnóstico»; catálogo ético
+  del plan 05 que descarta datasets de screening; disclaimer «no realiza
+  screening ni evaluaciones» ya publicado con su test, commit `00ee6bc`).
+- Si el dueño lo quiere igualmente, debe **reabrir el plan maestro** con
+  una decisión explícita suya y asesoría legal; no se avanza por cuenta
+  propia. Detalle técnico en `docs/informes/mejoras-modo-padre.md` §3.
+
 ## Correo de contacto y soporte (FAQ del modo padre)
 
 - Hoy el correo impreso en los Términos es `demo@bluetalk.app`
