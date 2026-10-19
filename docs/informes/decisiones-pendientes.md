@@ -70,3 +70,12 @@ anotadas aquí como constancia.
   `git config user.name/user.email` para los próximos commits es
   inmediato; el pasado no se reescribe sin su permiso.
 - Pregunta: ¿quiere que ajuste git a «LimitCodev <limitcodev@users.noreply.github.com>»?
+
+## Correo de contacto y soporte (FAQ del modo padre)
+
+- Hoy el correo impreso en los Términos es `demo@bluetalk.app`
+  (dirección de demostración, declarada como tal en el propio texto).
+- El plan 13 P6.2 pide «FAQ y contacto en el modo padre» con un correo
+  real: **no se inventa ninguno**.
+- Pregunta: ¿qué correo de soporte quiere publicar (y crearlo si no
+  existe)? La pantalla de FAQ queda pendiente de esa respuesta.
