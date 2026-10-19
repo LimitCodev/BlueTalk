@@ -119,6 +119,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     onPressed: _saving ? null : _start,
                     child: const Text('Entrar sin apodo'),
                   ),
+                  const SizedBox(height: 16),
+                  // Mini-guía de modelado (auditoría de reseñas: el éxito
+                  // depende de modelar, no del software). Debajo de los
+                  // botones para no mover «Comenzar» con el teclado abierto.
+                  Text(
+                    'Consejo para enseñar: señala y di la palabra mientras '
+                    'el niño toca el pictograma.',
+                    textAlign: TextAlign.center,
+                    style: textTheme.bodyMedium,
+                  ),
                 ],
               ),
             ),
