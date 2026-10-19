@@ -8,11 +8,21 @@ Multiplataforma de comunicación aumentativa y alternativa (AAC) para niños aut
 
 ## Estado
 
-MVP en desarrollo; compila y pasa tests. Documentación:
+MVP funcional por etapas; cada etapa cierra con evidencia y revisión en
+[`docs/informes/`](docs/informes/):
+
+- Fase 0 y Fase 1 cerradas (`docs/informes/fase0-notas.md`,
+  `fase1-evidencia.md`).
+- Etapa A (fallos vistos en el teléfono) y Etapa B (marca y colores
+  personalizables) del plan 13 cerradas y corregidas por el revisor.
+- Gates actuales: `flutter analyze` 0 problemas · `flutter test`
+  252/252.
+
+Documentación:
 
 - [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md) — decisiones técnicas y diagrama
 - [`docs/plan/00-PLAN-MAESTRO.md`](docs/plan/00-PLAN-MAESTRO.md) — plan completo y convenciones
-- `docs/plan/01…08` — planes por agente (cimientos, AAC, juegos, rutinas/salud, modo padre, Supabase, release, revisión)
+- `docs/plan/01…13` — planes por área (cimientos, AAC, juegos, rutinas/salud, modo padre, Supabase, release, revisión, pulido de uso real)
 
 ## Vista previa de pictogramas
 
@@ -33,12 +43,20 @@ MVP en desarrollo; compila y pasa tests. Documentación:
 ## Requisitos para compilar
 
 - Flutter SDK (instalado: 3.44.4 stable)
-- Android SDK (pendiente de instalar — `flutter doctor` lo reporta)
+- Android SDK + Java 17 (para compilar el APK)
 
 ```bash
 flutter pub get
 flutter run
 ```
+
+Para el APK de reparto (release por arquitectura + SHA-256):
+
+```bash
+./scripts/build-apk.sh    # sale en dist/BlueTalk.apk
+```
+
+Guía de instalación con avisos de Play Protect: [`docs/play/instalar-apk.md`](docs/play/instalar-apk.md).
 
 ## Licencia de contenido
 
