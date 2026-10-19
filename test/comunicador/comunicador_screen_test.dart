@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/features/comunicador/comunicador_prefs.dart';
+import 'package:bluetalk/features/comunicador/phrase_controller.dart';
 import 'package:bluetalk/features/comunicador/saved_messages.dart';
 import 'package:bluetalk/features/comunicador/tts_service.dart';
 
@@ -57,6 +58,44 @@ void main() {
     expect(events.single.type, 'picto_tap');
     expect(events.single.data['pictoId'], 'apple');
     expect(events.single.data['categoryId'], 'comida');
+  });
+
+  testWidgets('repetir el mismo picto lo agrega tantas veces',
+      (tester) async {
+    // Regresión de tacto (auditoría de reseñas: «no, no, NO» se rompió en
+    // Proloquo2Go 2026): sin anti-repetición ni límite de toques.
+    final tts = FakeTtsSpeaker();
+    final container = await pumpComunicador(tester, tts: tts);
+
+    await abrirCategoria(tester, 'Comida');
+    final manzana = find.widgetWithText(InkWell, 'Manzana');
+    for (var i = 0; i < 3; i++) {
+      await tester.tap(manzana);
+      await tester.pumpAndSettle();
+    }
+
+    final frase = container.read(phraseProvider);
+    expect(frase, hasLength(3), reason: 'tres toques = tres pictos');
+    expect(frase.map((p) => p.label), everyElement('Manzana'));
+    expect(tts.spoken, ['Manzana', 'Manzana', 'Manzana']);
+  });
+
+  testWidgets('arrastrar el dedo sobre los pictos no los activa',
+      (tester) async {
+    // Regresión de tacto (reseñas: activación al deslizar en Proloquo2Go).
+    final tts = FakeTtsSpeaker();
+    final container = await pumpComunicador(tester, tts: tts);
+
+    await abrirCategoria(tester, 'Comida');
+    await tester.drag(find.text('Manzana'), const Offset(0, -160));
+    await tester.pumpAndSettle();
+
+    expect(
+      container.read(phraseProvider),
+      isEmpty,
+      reason: 'un arrastre no dice nada: solo el toque activa',
+    );
+    expect(tts.spoken, isEmpty);
   });
 
   testWidgets('leer pronuncia la frase y borrar todo la vacía', (tester) async {
