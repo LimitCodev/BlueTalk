@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:bluetalk/features/padre/legal/legal_controller.dart';
+import 'package:bluetalk/features/padre/legal/textos_legales.dart';
 import 'package:bluetalk/features/padre/padre_controller.dart';
 import 'package:bluetalk/features/padre/padre_screen.dart';
 
@@ -18,6 +21,20 @@ Future<void> _hasta(WidgetTester tester, Finder finder) async {
 }
 
 void main() {
+  test('los términos declaran que la app no hace evaluaciones ni detección',
+      () {
+    // Aviso de claridad (auditoría de datos públicos: «sin screening ni
+    // evaluaciones»), en espejo con docs/legal/TERMINOS_Y_CONDICIONES.md §8.
+    const aviso =
+        'Esta app no realiza evaluaciones ni pruebas de detección';
+    expect(terminosYCondiciones, contains(aviso));
+    expect(
+      File('docs/legal/TERMINOS_Y_CONDICIONES.md').readAsStringSync(),
+      contains(aviso),
+      reason: 'el .md maestro y el espejo de la app dicen lo mismo',
+    );
+  });
+
   testWidgets('muestra los dos documentos y exige el consentimiento',
       (tester) async {
     final prefs = await prefsDePrueba();

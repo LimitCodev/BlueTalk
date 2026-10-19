@@ -107,6 +107,7 @@ Los cuentos, textos y actividades incluidos son creaciones propias de este proye
 BlueTalk ofrece ayudas a la comunicación, rutinas y seguimiento de bienestar. Con carácter específico:
 
 - Las observaciones automáticas de la zona de adultos son orientativas y se calculan con reglas deterministas sobre datos locales. No constituyen diagnóstico clínico ni sustituyen a un profesional sanitario o educativo.
+- Esta app no realiza evaluaciones ni pruebas de detección («screening»): no clasifica a las personas ni indica si tienen alguna condición.
 - Los recordatorios de bienestar y las actividades de horario no son dispositivos médicos, no supervisan tratamiento alguno y no emiten alertas clínicas.
 - Si la persona usuaria considera que el menor necesita evaluación o atención, debe acudir a los profesionales correspondientes: pediatra, logopeda, psicólogo o el equipo educativo.
 
