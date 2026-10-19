@@ -10,6 +10,7 @@ import '../legal/legal_controller.dart';
 import '../padre_controller.dart';
 import 'cambiar_codigo.dart';
 import 'control_parental.dart';
+import 'recuperacion_dialogo.dart';
 import 'voz_diagnostico.dart';
 
 /// Control parental (plan 05 §4): tiempo de juegos, secciones, pantalla y
@@ -131,6 +132,18 @@ class ControlScreen extends ConsumerWidget {
           onTap: () => showDialog<void>(
             context: context,
             builder: (_) => const CambiarCodigoDialogo(),
+          ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.vpn_key_outlined),
+          title: const Text('Código de recuperación'),
+          subtitle: const Text(
+            'Para entrar si olvidas el código, sin borrar tus datos.',
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => showDialog<void>(
+            context: context,
+            builder: (_) => const RecuperacionDialogo(),
           ),
         ),
         const SectionHeader('Documentos'),

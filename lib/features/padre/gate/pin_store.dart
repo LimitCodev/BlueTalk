@@ -69,6 +69,21 @@ class PinStore {
   static const claveLongitud = 'padre_pin_len';
   static const claveIteraciones = 'padre_pin_iter';
 
+  // Código de recuperación (solicitud del dueño, 2026-10-19): como el PIN,
+  // solo se guarda su huella PBKDF2; el código en claro se muestra una vez.
+  static const claveRecupHash = 'padre_recup_hash';
+  static const claveRecupSalt = 'padre_recup_salt';
+  static const claveRecupIter = 'padre_recup_iter';
+
+  /// Alfabeto del código de recuperación: 32 caracteres sin la letra I ni
+  /// la O ni el 0 ni el 1 (evita el error de leer o teclear un carácter
+  /// ambiguo).
+  static const alfabetoRecuperacion = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+  /// Caracteres del código de recuperación (sin el guion que lo parte en dos
+  /// grupos de 4 al mostrarse: `XXXX-XXXX`).
+  static const longitudRecuperacion = 8;
+
   /// Intentos fallidos permitidos antes del bloqueo.
   static const intentosMaximos = 5;
 
@@ -124,6 +139,11 @@ class PinStore {
   /// ¿Ya existe un PIN guardado (huella + sal)?
   bool get creado =>
       _prefs.containsKey(claveHash) && _prefs.containsKey(claveSalt);
+
+  /// ¿Ya existe un código de recuperación guardado (huella + sal)?
+  bool get tieneRecuperacion =>
+      _prefs.containsKey(claveRecupHash) &&
+      _prefs.containsKey(claveRecupSalt);
 
   /// Intentos fallidos acumulados en este ciclo (persistidos).
   int get intentosFallidos => _prefs.getInt(claveIntentos) ?? 0;
@@ -185,6 +205,80 @@ class PinStore {
       throw const FormatException('El código debe tener 6 dígitos.');
     }
     await _guardarHuella(pin, longitud: longitudNueva);
+    await _limpiarLockout();
+  }
+
+  /// Genera un código de recuperación nuevo y lo devuelve en claro **una
+  /// sola vez** (formato `XXXX-XXXX`): solo se persiste su huella PBKDF2,
+  /// igual que el PIN. Si ya existía, este lo invalida.
+  Future<String> generarRecuperacion() async {
+    final salt = [for (var i = 0; i < 16; i++) _aleatorio.nextInt(256)];
+    final codigo = [
+      for (var i = 0; i < longitudRecuperacion; i++)
+        alfabetoRecuperacion[_aleatorio.nextInt(alfabetoRecuperacion.length)],
+    ].join();
+    final hash = await derivador.derivar(codigo, salt, iteracionesActuales);
+    await _prefs.setString(claveRecupSalt, _aHex(salt));
+    await _prefs.setString(claveRecupHash, _aHex(hash));
+    await _prefs.setInt(claveRecupIter, iteracionesActuales);
+    return '${codigo.substring(0, 4)}-${codigo.substring(4)}';
+  }
+
+  /// Comprueba el código de recuperación con el mismo bloqueo escalonado que
+  /// el PIN (comparten contadores: el quinto fallo de cualquiera de los dos
+  /// bloquea). Un formato inválido no cuenta como intento, igual que el PIN.
+  Future<VerificacionPin> verificarRecuperacion(String tecleado) async {
+    if (bloqueoRestante() > Duration.zero) return VerificacionPin.bloqueado;
+    if (!tieneRecuperacion) return VerificacionPin.incorrecto;
+
+    // Mayúsculas y sin guiones ni espacios: se teclea como se ve (XXXX-XXXX).
+    final codigo =
+        tecleado.toUpperCase().replaceAll(RegExp('[^A-Z0-9]'), '');
+    final valido = codigo.length == longitudRecuperacion &&
+        codigo.split('').every(alfabetoRecuperacion.contains);
+    if (!valido) return VerificacionPin.incorrecto;
+
+    final List<int> guardado;
+    final List<int> salt;
+    final int iteraciones;
+    try {
+      final hashGuardado = _prefs.getString(claveRecupHash);
+      final salGuardada = _prefs.getString(claveRecupSalt);
+      if (hashGuardado == null || salGuardada == null) {
+        return VerificacionPin.incorrecto;
+      }
+      guardado = _deHex(hashGuardado);
+      salt = _deHex(salGuardada);
+      final leidas = _prefs.getInt(claveRecupIter) ?? iteracionesActuales;
+      if (leidas < 1 || leidas > 1000000) {
+        return VerificacionPin.incorrecto;
+      }
+      iteraciones = leidas;
+    } on FormatException {
+      return VerificacionPin.incorrecto;
+    } on TypeError {
+      return VerificacionPin.incorrecto;
+    }
+
+    final hash = await derivador.derivar(codigo, salt, iteraciones);
+    if (_esIgual(hash, guardado)) {
+      await _limpiarLockout();
+      return VerificacionPin.correcto;
+    }
+    await _registrarFallo();
+    return VerificacionPin.incorrecto;
+  }
+
+  /// Borra **solo** el PIN (huella, sal, parámetros y bloqueo). El resto de
+  /// datos del dispositivo se conserva — progreso, horario, ajustes,
+  /// consentimientos — y también el código de recuperación, que sigue
+  /// valiendo hasta que se regenere. Es la salida no destructiva para un
+  /// PIN olvidado (frente al borrado total con la palabra BORRAR).
+  Future<void> borrarSoloPin() async {
+    await _prefs.remove(claveHash);
+    await _prefs.remove(claveSalt);
+    await _prefs.remove(claveLongitud);
+    await _prefs.remove(claveIteraciones);
     await _limpiarLockout();
   }
 

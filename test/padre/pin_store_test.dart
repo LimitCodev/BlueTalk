@@ -351,4 +351,107 @@ void main() {
     expect(pinLen.longitudGuardada, 6);
     expect(await pinLen.verificar('123456'), VerificacionPin.incorrecto);
   });
+
+  test('el código de recuperación se guarda como huella y valida el acceso',
+      () async {
+    final prefs = await prefsDePrueba();
+    final pin = await store(prefs);
+    await pin.crear('123456');
+
+    expect(pin.tieneRecuperacion, isFalse);
+    final codigo = await pin.generarRecuperacion();
+
+    // Formato visible `XXXX-XXXX` con el alfabeto sin caracteres ambiguos.
+    expect(codigo, matches(RegExp(r'^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$')));
+    expect(codigo.replaceAll('-', '').split('').every(
+          PinStore.alfabetoRecuperacion.contains,
+        ),
+        isTrue);
+    expect(pin.tieneRecuperacion, isTrue);
+
+    // Solo la huella: el código en claro no queda en ningún sitio.
+    final huella = prefs.getString(PinStore.claveRecupHash);
+    expect(huella, isNotNull);
+    expect(huella, isNot(codigo));
+    expect(
+      prefs.getKeys().any((clave) => prefs.get(clave) == codigo),
+      isFalse,
+    );
+
+    expect(await pin.verificarRecuperacion(codigo), VerificacionPin.correcto);
+    expect(pin.intentosFallidos, 0, reason: 'un acierto limpia los fallos');
+
+    // Mayúsculas y sin guion: se teclea como se ve.
+    final sinFormato = codigo.replaceAll('-', '').toLowerCase();
+    expect(
+      await pin.verificarRecuperacion(sinFormato),
+      VerificacionPin.correcto,
+    );
+
+    // Código válido de forma pero erróneo: cuenta intento.
+    expect(
+      await pin.verificarRecuperacion('WWWW-2222'),
+      VerificacionPin.incorrecto,
+    );
+    expect(pin.intentosFallidos, 1);
+
+    // Formato inválido: no cuenta intento (igual que el PIN).
+    expect(await pin.verificarRecuperacion('i'), VerificacionPin.incorrecto);
+    expect(await pin.verificarRecuperacion('IIII-IIII'), // I no está en el alfabeto
+        VerificacionPin.incorrecto);
+    expect(pin.intentosFallidos, 1);
+  });
+
+  test('el código de recuperación comparte el bloqueo escalonado con el PIN',
+      () async {
+    final prefs = await prefsDePrueba();
+    final pin = await store(prefs);
+    await pin.crear('123456');
+    final codigo = await pin.generarRecuperacion();
+
+    // 4 fallos de PIN + 1 fallo de recuperación = 5 → bloqueo de 60 s.
+    for (var i = 0; i < 4; i++) {
+      expect(await pin.verificar('000000'), VerificacionPin.incorrecto);
+    }
+    expect(
+      await pin.verificarRecuperacion('WWWW-2222'),
+      VerificacionPin.incorrecto,
+    );
+    expect(pin.bloqueoRestante(), PinStore.esperaDeBloqueo);
+
+    // Mientras dure, ni el PIN ni el código de recuperación se prueban.
+    expect(await pin.verificar('123456'), VerificacionPin.bloqueado);
+    expect(
+      await pin.verificarRecuperacion(codigo),
+      VerificacionPin.bloqueado,
+    );
+  });
+
+  test('borrarSoloPin conserva los datos y el código de recuperación',
+      () async {
+    final prefs = await prefsDePrueba();
+    final pin = await store(prefs);
+    await pin.crear('123456');
+    final codigo = await pin.generarRecuperacion();
+    await prefs.setString('comunicador_favoritos', '["ayuda"]');
+
+    await pin.borrarSoloPin();
+
+    expect(pin.creado, isFalse, reason: 'el PIN quedó borrado');
+    expect(
+      pin.tieneRecuperacion,
+      isTrue,
+      reason: 'el código de recuperación sigue valiendo',
+    );
+    expect(
+      prefs.getString('comunicador_favoritos'),
+      '["ayuda"]',
+      reason: 'el resto de datos del dispositivo no se toca',
+    );
+    expect(await pin.verificarRecuperacion(codigo), VerificacionPin.correcto);
+
+    // Se puede crear un PIN nuevo y entrar con él.
+    await pin.crear('654321');
+    expect(await pin.verificar('654321'), VerificacionPin.correcto);
+  });
 }

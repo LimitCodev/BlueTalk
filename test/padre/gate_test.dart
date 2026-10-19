@@ -425,6 +425,11 @@ void main() {
     await tester.enterText(find.byType(TextField), 'BORRAR');
     await tester.pump();
     expect(tester.widget<FilledButton>(borrar).onPressed, isNotNull);
+    // La pantalla ahora es más alta (incluye la opción con código de
+    // recuperación, apagada aquí): el botón queda bajo el pliegue y hay
+    // que traerlo a la vista, como haría la persona con el dedo.
+    await tester.ensureVisible(borrar);
+    await tester.pumpAndSettle();
     await tester.tap(borrar);
     await tester.pumpAndSettle();
 

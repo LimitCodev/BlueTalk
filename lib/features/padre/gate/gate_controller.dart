@@ -164,6 +164,43 @@ class GateController extends Notifier<GateEstado> {
     }
   }
 
+  /// ¿Hay código de recuperación guardado en este dispositivo? Lo consulta
+  /// la pantalla «¿Olvidaste el código?» para decidir qué opciones mostrar.
+  bool get tieneRecuperacion => _store().tieneRecuperacion;
+
+  /// Recupera el acceso con el código de recuperación (solicitud del dueño,
+  /// 2026-10-19): si es correcto se borra **solo** el PIN —los datos del
+  /// dispositivo y el código de recuperación se conservan— y el gate queda
+  /// en fase «crear» para elegir un PIN nuevo. Comparte el bloqueo
+  /// escalonado con el PIN.
+  Future<bool> recuperarConCodigo(String tecleado) async {
+    final store = _store();
+    final resultado = await store.verificarRecuperacion(tecleado);
+
+    if (resultado == VerificacionPin.correcto) {
+      await store.borrarSoloPin();
+      _cancelarCuentaAtras();
+      state = const GateEstado(
+        fase: GateFase.crear,
+        mensaje: 'Código correcto. Crea un código nuevo.',
+      );
+      return true;
+    }
+
+    if (resultado == VerificacionPin.bloqueado) {
+      final restante = store.bloqueoRestante();
+      state = _estadoPedir(
+        mensaje: 'Demasiados intentos. Espera ${restante.inSeconds} segundos.',
+        bloqueo: restante,
+      );
+      _iniciarCuentaAtras();
+      return false;
+    }
+
+    state = _estadoPedir(mensaje: 'Código de recuperación incorrecto.');
+    return false;
+  }
+
   /// Cuenta atrás de 1 s para la espera del lockout.
   void _iniciarCuentaAtras() {
     if (_cuentaAtras != null) return;

@@ -293,4 +293,76 @@ void main() {
       reason: 'vuelve al control parental',
     );
   });
+
+  testWidgets('Control genera el código de recuperación y lo muestra una vez',
+      (tester) async {
+    final prefs = await prefsDePrueba();
+    await pumpPadre(
+      tester,
+      home: const Scaffold(body: ControlScreen()),
+      overrides: overridesDePadre(prefs),
+    );
+
+    final entrada = find.widgetWithText(ListTile, 'Código de recuperación');
+    await tester.scrollUntilVisible(
+      entrada,
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(entrada);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AlertDialog), findsOneWidget);
+    final generar = find.widgetWithText(FilledButton, 'Generar mi código');
+    expect(generar, findsOneWidget);
+    await tester.tap(generar);
+    await tester.pumpAndSettle();
+
+    // El código se muestra una sola vez, con su formato y su aviso.
+    final codigo = tester.widget<SelectableText>(find.byType(SelectableText));
+    expect(
+      codigo.data,
+      matches(RegExp(r'^[A-Z2-9]{4}-[A-Z2-9]{4}$')),
+    );
+    expect(
+      find.text(
+        'Se muestra una sola vez. Escríbelo en un papel o guárdalo en un '
+        'lugar seguro: no se puede volver a ver.',
+      ),
+      findsOneWidget,
+    );
+    // Se guarda la huella, nunca el código en claro.
+    expect(prefs.getString(PinStore.claveRecupHash), isNotNull);
+    expect(
+      prefs.getKeys().any((clave) => prefs.get(clave) == codigo.data),
+      isFalse,
+      reason: 'el código en claro no se persiste',
+    );
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Ya lo guardé'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+
+    // Reabrir: ya existe y solo se ofrece regenerar (invalidando el otro).
+    await tester.tap(entrada);
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Generar uno nuevo'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Generar mi código'),
+      ),
+      findsNothing,
+    );
+    await tester.tap(find.widgetWithText(TextButton, 'Cancelar'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+  });
 }

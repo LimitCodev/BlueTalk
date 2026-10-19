@@ -203,6 +203,24 @@ Future<void> crearPinDePrueba(SharedPreferences prefs, {String pin = '1234'}) as
   await prefs.remove(PinStore.claveNivel);
 }
 
+/// Semilla de código de recuperación con hash precalculado (mismo motivo que
+/// [crearPinDePrueba]: nada de PBKDF2 con await dentro de FakeAsync).
+///
+/// Código fijo de prueba `ABCD2345` (dentro del alfabeto sin I/O/0/1), sal
+/// fija `0011…eeff` y 10.000 iteraciones; el hash se derivó con la misma
+/// librería `cryptography` fuera de los tests.
+Future<void> sembrarRecuperacionDePrueba(SharedPreferences prefs) async {
+  await prefs.setString(
+    PinStore.claveRecupSalt,
+    '00112233445566778899aabbccddeeff',
+  );
+  await prefs.setString(
+    PinStore.claveRecupHash,
+    'd7d47a2aacccca9117604f5b8388932eadebc9c5c33818c48258ec11919d1b58',
+  );
+  await prefs.setInt(PinStore.claveRecupIter, 10000);
+}
+
 /// Regla de aceptación legal ya registrada (para arrancar tras el gate).
 String aceptacionLegalDePrueba() =>
     '{"version":"1.0.0","fecha":${ahoraFija.millisecondsSinceEpoch},'
