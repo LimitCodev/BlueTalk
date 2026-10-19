@@ -22,6 +22,7 @@ import 'package:bluetalk/features/juegos/artista/artista_screen.dart';
 import 'package:bluetalk/features/juegos/juegos_screen.dart';
 import 'package:bluetalk/features/padre/gate/gate_controller.dart';
 import 'package:bluetalk/features/padre/legal/legal_screen.dart';
+import 'package:bluetalk/features/padre/padre_controller.dart';
 import 'package:bluetalk/features/onboarding/profile_controller.dart';
 
 import '../comunicador/dobles.dart';
@@ -390,8 +391,10 @@ void main() {
 
     await _entrarAlPanelPadre(tester, container);
 
-    // Cerrar sesión deja el gate en «Escribe tu código».
-    await tester.tap(find.byTooltip('Cerrar sesión'));
+    // Cerrar sesión deja el gate en «Escribe tu código». (El candado del
+    // encabezado se quitó en la mejora del modo padre; el cierre se
+    // dispara desde el controlador, igual que al pulsar la X.)
+    container.read(padreProvider.notifier).cerrarSesion();
     await tester.pumpAndSettle();
     expect(find.text('Escribe tu código'), findsOneWidget);
 

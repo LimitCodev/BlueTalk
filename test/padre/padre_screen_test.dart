@@ -60,7 +60,8 @@ void main() {
     expect(find.text('Uso del día'), findsOneWidget);
   });
 
-  testWidgets('cerrar sesión vuelve al gate con el PIN', (tester) async {
+  testWidgets('salir del modo padre cierra la sesión y el gate pide el PIN',
+      (tester) async {
     final prefs = await _prefsDeSesion();
     final container = await pumpPadre(
       tester,
@@ -69,7 +70,7 @@ void main() {
     );
     await _entrar(tester);
 
-    await tester.tap(find.byTooltip('Cerrar sesión'));
+    await tester.tap(find.byTooltip('Salir del modo padre'));
     await tester.pumpAndSettle();
 
     expect(container.read(padreProvider), PadreVista.gate);

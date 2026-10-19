@@ -98,13 +98,10 @@ class _PadreScreenState extends ConsumerState<PadreScreen> {
         appBar: AppBar(
           title: const Text('Modo padre'),
           actions: [
-            if (enSesion)
-              IconButton(
-                icon: const Icon(Icons.lock_outline),
-                tooltip: 'Cerrar sesión',
-                onPressed: () =>
-                    ref.read(padreProvider.notifier).cerrarSesion(),
-              ),
+            // Sin candado en la cabecera: «Salir del modo padre» (la X)
+            // ya cierra la sesión y re-bloquea el gate al mismo tiempo;
+            // un candado que solo volvía al PIN dentro del propio modo
+            // padre confundía (queja del dueño, 2026-10-19).
             IconButton(
               icon: const Icon(Icons.close),
               tooltip: 'Salir del modo padre',
