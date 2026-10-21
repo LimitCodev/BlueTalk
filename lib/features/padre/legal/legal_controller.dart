@@ -51,7 +51,7 @@ class LegalController extends Notifier<AceptacionLegal?> {
       final decoded = jsonDecode(raw);
       if (decoded is! Map<String, dynamic>) return null;
       final aceptacion = AceptacionLegal.fromMap(decoded);
-      return aceptacion.version.isEmpty ? null : aceptacion;
+      return aceptacion.version == versionLegal ? aceptacion : null;
     } catch (_) {
       // Preferencias corruptas: se vuelve a pedir la aceptación.
       return null;

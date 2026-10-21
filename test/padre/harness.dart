@@ -223,5 +223,5 @@ Future<void> sembrarRecuperacionDePrueba(SharedPreferences prefs) async {
 
 /// Regla de aceptación legal ya registrada (para arrancar tras el gate).
 String aceptacionLegalDePrueba() =>
-    '{"version":"1.0.0","fecha":${ahoraFija.millisecondsSinceEpoch},'
+    '{"version":"1.1.0","fecha":${ahoraFija.millisecondsSinceEpoch},'
     '"consentimientoPadre":true}';

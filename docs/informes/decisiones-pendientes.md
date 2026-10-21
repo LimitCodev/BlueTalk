@@ -75,25 +75,37 @@ anotadas aquí como constancia.
 
 - Petición: que el modo parental pueda bloquear la búsqueda de páginas +18
   en el **celular entero**, para que el niño use el dispositivo con
-  libertad. No está en ningún plan; toca permisos y privacidad, así que
-  es decisión del dueño antes de escribir una línea de código.
-- Opciones reales (todas offline: ningún dato sale del dispositivo):
-  1. **VPN local de filtrado DNS** (la única que bloquea el navegador y
-     cualquier app a la vez): BlueTalk crea un túnel local que filtra
-     dominios +18 con una lista incluida en la app. Contrapartidas:
-     Android muestra su propio diálogo «Solicitud de conexión», Google
-     Play exige declarar el uso de `VpnService`, y la documentación de
-     permisos/privacidad hay que reescribirla (la app «no usa internet»
-     pasa a «no envía datos; filtra el tráfico localmente»).
-  2. **DNS privado del sistema**: BlueTalk solo guía con un toque para
-     que el adulto active el «DNS familiar» de Android. Sin permisos
-     nuevos ni VPN, pero se puede desactivar desde Ajustes y solo cubre
-     DNS (no apps con su propia resolución).
-  3. **No implementarlo** y apoyarse en los controles del sistema
-     (Google Family Link / Samsung Kids), que ya hacen esto y están
-     validados.
-- Pregunta: ¿cuál quieres? (Recomendación del equipo: 2 por simplicidad y
-  transparencia; 1 solo si el bloqueo a nivel de teléfono es imprescindible.)
+  libertad.
+- **Estado:** implementado el 2026-10-20 en el plan 14
+  (`docs/plan/14-filtro-web.md`) como **VPN local que solo intercepta DNS**.
+  El adulto lo enciende desde Control › Filtro de páginas. La app no envía
+  datos a servidores del desarrollador; las consultas permitidas se
+  reenvían al DNS de la red y las bloqueadas se responden en el teléfono.
+- **Límites que el dueño debe conocer** (están también en la pantalla y en
+  la evidencia):
+  - bloquea el dominio completo, no una página suelta;
+  - no bloquea direcciones IP literales, apps con su propia resolución
+    (DoH/DoT) ni DNS sobre TCP;
+  - un niño que apague la VPN en Ajustes de Android la desactiva;
+  - si el teléfono se reinicia, hay que activar «VPN siempre activa» en
+    Android para que el filtro vuelva solo;
+  - el filtro no sustituye el filtrado del Wi-Fi escolar ni la supervisión.
+- **Decisiones que siguen en manos del dueño:**
+  1. Revisar y publicar la política de privacidad 1.1.0 y los términos
+     1.1.0 (la app ahora pide aceptarlos de nuevo; el cambio explica la
+     VPN y el DNS).
+  2. Decidir cómo se distribuye el APK de la prueba escolar. Si se publica
+     en Google Play, hay que declarar el uso de `VpnService` en Play
+     Console y completar la declaración de seguridad de datos.
+  3. Decidir si los teléfonos del colegio serán administrados (MDM) y si
+     se añadirá una lista de dominios propia del colegio.
+  4. Configurar «VPN siempre activa» y el DNS familiar del router en los
+     equipos de la prueba; son ajustes del colegio, no de la app.
+- Alternativas descartadas para esta entrega: el DNS privado del sistema
+  (solo guía, se puede desactivar y no cubre apps con DNS propio) y no
+  implementar nada (Family Link/Samsung Kids). Se prefirió la VPN local
+  porque es la única que filtra el navegador y las apps a la vez sin enviar
+  datos a un servidor.
 
 ## Cribado/evaluación de TEA con software (solicitud del dueño, 2026-10-19)
 
