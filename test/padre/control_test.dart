@@ -7,6 +7,7 @@ import 'package:bluetalk/features/comunicador/tts_service.dart';
 import 'package:bluetalk/features/padre/control/control_parental.dart';
 import 'package:bluetalk/features/padre/control/control_screen.dart';
 import 'package:bluetalk/features/padre/control/juegos_gate.dart';
+import 'package:bluetalk/features/padre/gate/almacen_pin.dart';
 import 'package:bluetalk/features/padre/gate/pin_store.dart';
 
 import '../comunicador/dobles.dart';
@@ -239,7 +240,9 @@ void main() {
     // Verificación real con el derivador por defecto (isolate): fuera del
     // FakeAsync de testWidgets, vía `runAsync` (plan 12 §0.2).
     final resultado = await tester.runAsync(
-      () => PinStore(prefs, ahora: () => ahoraFija).verificar('111111'),
+      () =>
+          PinStore(prefs, almacen: AlmacenPin(prefs: prefs), ahora: () => ahoraFija)
+              .verificar('111111'),
     );
     expect(resultado, VerificacionPin.correcto);
 

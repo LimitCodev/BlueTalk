@@ -12,6 +12,7 @@ import 'package:bluetalk/data/local/mock_repos.dart';
 import 'package:bluetalk/data/local/seed_store.dart';
 import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/padre/gate/biometria.dart';
+import 'package:bluetalk/features/padre/gate/almacen_pin.dart';
 import 'package:bluetalk/features/padre/gate/gate_controller.dart';
 import 'package:bluetalk/features/padre/gate/pin_store.dart';
 import 'package:bluetalk/features/padre/reloj.dart';
@@ -182,6 +183,7 @@ Future<void> crearPinDePrueba(SharedPreferences prefs, {String pin = '1234'}) as
   if (pin != '1234') {
     await PinStore(
       prefs,
+      almacen: AlmacenPin(prefs: prefs),
       ahora: () => ahoraFija,
       derivador: const DerivadorPinPrueba(),
     ).crear(pin);

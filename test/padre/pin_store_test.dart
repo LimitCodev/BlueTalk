@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:bluetalk/features/padre/gate/almacen_pin.dart';
 import 'package:bluetalk/features/padre/gate/pin_store.dart';
 
 import 'harness.dart';
@@ -14,8 +15,12 @@ void main() {
 
   late RelojPrueba reloj;
 
-  Future<PinStore> store(SharedPreferences prefs) async =>
-      PinStore(prefs, ahora: reloj.decir, derivador: const DerivadorPinPrueba());
+  Future<PinStore> store(SharedPreferences prefs) async => PinStore(
+        prefs,
+        almacen: AlmacenPin(prefs: prefs),
+        ahora: reloj.decir,
+        derivador: const DerivadorPinPrueba(),
+      );
 
   setUp(() => reloj = RelojPrueba());
 

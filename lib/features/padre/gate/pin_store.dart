@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:cryptography/cryptography.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'almacen_pin.dart';
+
 /// Resultado de verificar el PIN en el gate.
 enum VerificacionPin { correcto, incorrecto, bloqueado }
 
@@ -40,7 +42,9 @@ class DerivadorPinAislamiento implements DerivadorPin {
 /// endurecido en plan 11 §1.2).
 ///
 /// El PIN **nunca** se guarda: solo su huella PBKDF2-HMAC-SHA256 (librería
-/// `cryptography`) con una sal aleatoria de 16 bytes por PIN. Junto a la
+/// `cryptography`) con una sal aleatoria de 16 bytes por PIN, y esa huella
+/// y su sal viven en el almacén cifrado del sistema [AlmacenPin], no en
+/// preferencias en claro. Junto a la
 /// huella se persisten los parámetros con los que se derivó
 /// ([claveLongitud] y [claveIteraciones]): los PIN creados antes de esta
 /// versión (4 dígitos, 10 000 iteraciones sin registrar) **siguen
@@ -56,9 +60,14 @@ class DerivadorPinAislamiento implements DerivadorPin {
 class PinStore {
   PinStore(
     this._prefs, {
+    required this.almacen,
     required this.ahora,
     this.derivador = const DerivadorPinAislamiento(),
   });
+
+  /// Almacén cifrado de huellas y sales (encargo 3.1): ahí vive el secreto,
+  /// nunca en `SharedPreferences`. Ver [AlmacenPin].
+  final AlmacenPin almacen;
 
   static const claveHash = 'padre_pin_hash';
   static const claveSalt = 'padre_pin_salt';
@@ -137,13 +146,11 @@ class PinStore {
   final DerivadorPin derivador;
 
   /// ¿Ya existe un PIN guardado (huella + sal)?
-  bool get creado =>
-      _prefs.containsKey(claveHash) && _prefs.containsKey(claveSalt);
+  bool get creado => almacen.tiene(claveHash) && almacen.tiene(claveSalt);
 
   /// ¿Ya existe un código de recuperación guardado (huella + sal)?
   bool get tieneRecuperacion =>
-      _prefs.containsKey(claveRecupHash) &&
-      _prefs.containsKey(claveRecupSalt);
+      almacen.tiene(claveRecupHash) && almacen.tiene(claveRecupSalt);
 
   /// Intentos fallidos acumulados en este ciclo (persistidos).
   int get intentosFallidos => _prefs.getInt(claveIntentos) ?? 0;
@@ -218,8 +225,8 @@ class PinStore {
         alfabetoRecuperacion[_aleatorio.nextInt(alfabetoRecuperacion.length)],
     ].join();
     final hash = await derivador.derivar(codigo, salt, iteracionesActuales);
-    await _prefs.setString(claveRecupSalt, _aHex(salt));
-    await _prefs.setString(claveRecupHash, _aHex(hash));
+    await almacen.guardar(claveRecupSalt, _aHex(salt));
+    await almacen.guardar(claveRecupHash, _aHex(hash));
     await _prefs.setInt(claveRecupIter, iteracionesActuales);
     return '${codigo.substring(0, 4)}-${codigo.substring(4)}';
   }
@@ -242,8 +249,8 @@ class PinStore {
     final List<int> salt;
     final int iteraciones;
     try {
-      final hashGuardado = _prefs.getString(claveRecupHash);
-      final salGuardada = _prefs.getString(claveRecupSalt);
+      final hashGuardado = almacen.leer(claveRecupHash);
+      final salGuardada = almacen.leer(claveRecupSalt);
       if (hashGuardado == null || salGuardada == null) {
         return VerificacionPin.incorrecto;
       }
@@ -275,8 +282,8 @@ class PinStore {
   /// valiendo hasta que se regenere. Es la salida no destructiva para un
   /// PIN olvidado (frente al borrado total con la palabra BORRAR).
   Future<void> borrarSoloPin() async {
-    await _prefs.remove(claveHash);
-    await _prefs.remove(claveSalt);
+    await almacen.borrar(claveHash);
+    await almacen.borrar(claveSalt);
     await _prefs.remove(claveLongitud);
     await _prefs.remove(claveIteraciones);
     await _limpiarLockout();
@@ -309,8 +316,8 @@ class PinStore {
     final List<int> guardado;
     final List<int> salt;
     try {
-      final hashGuardado = _prefs.getString(claveHash);
-      final salGuardada = _prefs.getString(claveSalt);
+      final hashGuardado = almacen.leer(claveHash);
+      final salGuardada = almacen.leer(claveSalt);
       // Clave ausente o con un tipo que no es texto (almacenamiento
       // corrupto): se trata como código incorrecto, igual que el resto.
       if (hashGuardado == null || salGuardada == null) {
@@ -391,8 +398,8 @@ class PinStore {
   Future<void> _guardarHuella(String pin, {required int longitud}) async {
     final salt = [for (var i = 0; i < 16; i++) _aleatorio.nextInt(256)];
     final hash = await derivador.derivar(pin, salt, iteracionesActuales);
-    await _prefs.setString(claveSalt, _aHex(salt));
-    await _prefs.setString(claveHash, _aHex(hash));
+    await almacen.guardar(claveSalt, _aHex(salt));
+    await almacen.guardar(claveHash, _aHex(hash));
     await _prefs.setInt(claveLongitud, longitud);
     await _prefs.setInt(claveIteraciones, iteracionesActuales);
   }
