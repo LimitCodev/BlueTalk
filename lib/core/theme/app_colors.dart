@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 ///
 /// El adulto elige un tema de color en Ajustes; la paleta activa llega a
 /// toda la UI mediante `Theme.of(context)` — uso directo:
-/// `context.colores.bg`. Las seis paletas tienen contraste AA verificado
+/// `context.colores.bg`. Las siete paletas tienen contraste AA verificado
 /// por `test/core/tokens_test.dart` (texto ≥4.5:1, elementos de UI ≥3:1).
 class AppColors extends ThemeExtension<AppColors> {
   const AppColors({
@@ -17,6 +17,8 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.header,
     required this.onHeader,
     required this.text,
+    this.brillo = Brightness.light,
+    this.borde = bordeNeutro,
   });
 
   /// Fondo general. Nunca blanco puro en las paletas pastel.
@@ -46,6 +48,14 @@ class AppColors extends ThemeExtension<AppColors> {
 
   /// Texto principal sobre [bg]/[surface] — ≥4.5:1 (AA texto).
   final Color text;
+
+  /// Brillo del tema. La web oficial tiene `.dark`, así que la app también:
+  /// la paleta oscura usa `Brightness.dark` y el resto, claro.
+  final Brightness brillo;
+
+  /// Borde de tarjetas e inputs. Fijo en las paletas claras; la paleta
+  /// oscura usa el `--border` del `.dark` de la web.
+  final Color borde;
 
   /// Por defecto: la identidad de la web de BlueTalk (fondo azul muy claro,
   /// acción azul fuerte y acentos verdes). Mantiene AA en botones.
@@ -122,6 +132,25 @@ class AppColors extends ThemeExtension<AppColors> {
     text: Color(0xFF000000),
   );
 
+  /// Modo oscuro del sitio oficial (`.dark` de `index.css`, ver
+  /// `docs/branding/WEB-EXTRACCION.md` §2). La web sí lo tiene, así que la
+  /// app lo ofrece. Diferencia deliberada con la web: allí el texto del
+  /// botón es blanco sobre `#3095E8` (3,19:1, no pasa AA), y aquí se pinta
+  /// con el propio `--background` oscuro de la web, `#171D26` (5,31:1).
+  static const oscuro = AppColors(
+    bg: Color(0xFF171D26),
+    surface: Color(0xFF1F2733),
+    primary: Color(0xFF3095E8),
+    primaryInk: Color(0xFF171D26),
+    primaryStrong: Color(0xFF3095E8),
+    primaryStrongText: Color(0xFF3095E8),
+    header: Color(0xFF3095E8),
+    onHeader: Color(0xFFFFFFFF),
+    text: Color(0xFFE7EBEF),
+    brillo: Brightness.dark,
+    borde: Color(0xFF2D3643),
+  );
+
   /// Temas predefinidos, en el orden del selector (plan 13 P4: un solo
   /// selector de color principal; nunca un selector libre de colores).
   static const temas = <String, AppColors>{
@@ -131,6 +160,7 @@ class AppColors extends ThemeExtension<AppColors> {
     'durazno': durazno,
     'gris': gris,
     'contraste': altoContraste,
+    'oscuro': oscuro,
   };
 
   /// Nombres para el selector: literales, sin jerga.
@@ -141,10 +171,12 @@ class AppColors extends ThemeExtension<AppColors> {
     'durazno': 'Durazno',
     'gris': 'Gris calmado',
     'contraste': 'Alto contraste',
+    'oscuro': 'Modo oscuro (como la web)',
   };
 
-  /// Borde neutro de tarjetas e inputs (web: hsl 210 20% 88%).
-  static const borde = Color(0xFFDCE3EA);
+  /// Borde neutro de tarjetas e inputs en paleta clara (web:
+  /// `--border: 210 20% 88%`). La paleta oscura trae la suya.
+  static const bordeNeutro = Color(0xFFDCE3EA);
 
   /// Estados. Semánticos, no de marca ni de tema: no cambian nunca
   /// (plan 00 §4). Relleno pastel + su tinta oscura.
@@ -165,6 +197,8 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? header,
     Color? onHeader,
     Color? text,
+    Brightness? brillo,
+    Color? borde,
   }) =>
       AppColors(
         bg: bg ?? this.bg,
@@ -176,6 +210,8 @@ class AppColors extends ThemeExtension<AppColors> {
         header: header ?? this.header,
         onHeader: onHeader ?? this.onHeader,
         text: text ?? this.text,
+        brillo: brillo ?? this.brillo,
+        borde: borde ?? this.borde,
       );
 
   /// El cambio de tema es instantáneo: no se anima entre paletas.

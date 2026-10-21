@@ -315,7 +315,7 @@ class _FilaUso extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: razon,
                     minHeight: 7,
-                    backgroundColor: AppColors.borde,
+                    backgroundColor: context.colores.borde,
                   ),
                 ),
               ],
@@ -357,7 +357,7 @@ class _IconoApp extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colores.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borde),
+        border: Border.all(color: context.colores.borde),
       ),
       child: imagen ??
           Center(

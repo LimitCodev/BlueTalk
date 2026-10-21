@@ -73,7 +73,7 @@ void main() {
     });
   });
 
-  group('los 6 temas tienen contraste AA (plan 13 P4, aceptación)', () {
+  group('los 7 temas tienen contraste AA (plan 13 P4, aceptación)', () {
     for (final entry in AppColors.temas.entries) {
       test('tema «${entry.key}»: texto >= 4.5:1 e ink >= 4.5:1', () {
         final p = entry.value;
@@ -126,6 +126,44 @@ void main() {
       for (final nombre in AppColors.nombresTemas.values) {
         expect(nombre, isNotEmpty);
       }
+    });
+  });
+
+  group('modo oscuro de la web (docs/branding/WEB-EXTRACCION.md §2)', () {
+    test('la paleta «oscuro» usa los valores del .dark del sitio', () {
+      final p = AppColors.oscuro;
+      expect(p.bg, const Color(0xFF171D26)); // --background 215 25% 12%
+      expect(p.surface, const Color(0xFF1F2733)); // --card 215 25% 16%
+      expect(p.primary, const Color(0xFF3095E8)); // --primary 207 80% 55%
+      expect(p.text, const Color(0xFFE7EBEF)); // --foreground 210 20% 92%
+      expect(p.borde, const Color(0xFF2D3643)); // --border 215 20% 22%
+      expect(p.brillo, Brightness.dark);
+    });
+
+    test('solo la paleta «oscuro» es oscura; el resto sigue en claro', () {
+      for (final entry in AppColors.temas.entries) {
+        expect(
+          entry.value.brillo,
+          entry.key == 'oscuro' ? Brightness.dark : Brightness.light,
+          reason: entry.key,
+        );
+      }
+    });
+
+    test('el tema Material hereda el brillo de la paleta', () {
+      expect(
+        buildBlueTalkTheme(AppColors.oscuro).brightness,
+        Brightness.dark,
+      );
+      expect(
+        buildBlueTalkTheme(AppColors.celeste).brightness,
+        Brightness.light,
+      );
+    });
+
+    test('la paleta oscura tiene borde propio, no el de las claras', () {
+      expect(AppColors.oscuro.borde, isNot(AppColors.bordeNeutro));
+      expect(AppColors.celeste.borde, AppColors.bordeNeutro);
     });
   });
 }

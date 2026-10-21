@@ -31,7 +31,7 @@ class PictoTile extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: AppColors.borde),
+        side: BorderSide(color: context.colores.borde),
       ),
       child: InkWell(
         onTap: onTap,

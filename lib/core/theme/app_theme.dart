@@ -11,7 +11,7 @@ import 'app_colors.dart';
 ThemeData buildBlueTalkTheme(AppColors paleta) {
   final colorScheme = ColorScheme.fromSeed(
     seedColor: paleta.primary,
-    brightness: Brightness.light,
+    brightness: paleta.brillo,
   ).copyWith(
     // Todos los tonos que la UI real usa quedan atados a la paleta:
     // los derivados de `fromSeed` (contenedores, outline, secondary)
@@ -28,7 +28,7 @@ ThemeData buildBlueTalkTheme(AppColors paleta) {
     onSurface: paleta.text,
     onSurfaceVariant: paleta.text,
     outline: paleta.primaryStrong,
-    outlineVariant: AppColors.borde,
+    outlineVariant: paleta.borde,
     secondary: paleta.primaryStrong,
     onSecondary: paleta.surface,
     error: AppColors.error,
@@ -38,7 +38,7 @@ ThemeData buildBlueTalkTheme(AppColors paleta) {
   final base = ThemeData(useMaterial3: true, fontFamily: 'Nunito');
   final radio = BorderRadius.circular(16);
   final radioBoton = BorderRadius.circular(14);
-  final borde = AppColors.borde;
+  final borde = paleta.borde;
 
   final texto = base.textTheme.copyWith(
     bodyLarge: base.textTheme.bodyLarge?.copyWith(
