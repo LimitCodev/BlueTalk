@@ -15,6 +15,7 @@ class PictoTile extends StatelessWidget {
     required this.onTap,
     this.onLongPress,
     this.favorited = false,
+    this.categoria,
   });
 
   final Pictogram pictogram;
@@ -24,14 +25,36 @@ class PictoTile extends StatelessWidget {
   final VoidCallback? onLongPress;
   final bool favorited;
 
+  /// Color de la categoría a la que pertenece. La web tiñe la tarjeta del
+  /// pictograma con el tono de su categoría (`--cat-*` / .1 de relleno y
+  /// / .3 de borde); aquí se usa el mismo lenguaje. En modo oscuro el
+  /// relleno pastel sería un bloque claro sobre la página, así que se
+  /// aplica la regla de alpha de la web sobre el tono de la categoría.
+  final ColoresCategoria? categoria;
+
+  Color _relleno(AppColors colores) {
+    final c = categoria;
+    if (c == null) return colores.surface;
+    if (colores.brillo == Brightness.light) return c.fondo;
+    return c.tinta.withValues(alpha: 0.10);
+  }
+
+  Color _borde(AppColors colores) {
+    final c = categoria;
+    if (c == null) return colores.borde;
+    if (colores.brillo == Brightness.light) return c.borde;
+    return c.tinta.withValues(alpha: 0.30);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final colores = context.colores;
     return Material(
-      color: context.colores.surface,
+      color: _relleno(colores),
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: context.colores.borde),
+        side: BorderSide(color: _borde(colores)),
       ),
       child: InkWell(
         onTap: onTap,

@@ -369,6 +369,9 @@ class _CategoryView extends ConsumerWidget {
       AsyncData(:final value) => _PictoGrid(
           pictograms: value.pictogramsOf(categoryId),
           emptyText: 'Esta categoría todavía no tiene pictogramas.',
+          // La web tiñe los pictogramas con el tono de su categoría
+          // (docs/branding/WEB-EXTRACCION.md §2); la app hace lo mismo.
+          categoria: coloresCategorias[categoryId],
         ),
       AsyncError() => const _CatalogError(),
       _ => const Center(child: CircularProgressIndicator()),
@@ -464,10 +467,18 @@ class _CategoryGrid extends ConsumerWidget {
 /// Rejilla de pictogramas; tocar agrega a la frase y habla (bajo tap),
 /// mantener presionado fija o desfija el picto en el inicio.
 class _PictoGrid extends ConsumerWidget {
-  const _PictoGrid({required this.pictograms, required this.emptyText});
+  const _PictoGrid({
+    required this.pictograms,
+    required this.emptyText,
+    this.categoria,
+  });
 
   final List<Pictogram> pictograms;
   final String emptyText;
+
+  /// Tono de la categoría cuando toda la rejilla es de una sola; en
+  /// Inicio o en la búsqueda las tarjetas quedan neutras.
+  final ColoresCategoria? categoria;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -493,6 +504,7 @@ class _PictoGrid extends ConsumerWidget {
         final picto = pictograms[index];
         return PictoTile(
           pictogram: picto,
+          categoria: categoria,
           favorited: favorites.contains(picto.id),
           onTap: () => _onPictoTap(context, ref, picto),
           onLongPress: () => _onPictoLongPress(context, ref, picto),
