@@ -12,6 +12,7 @@ import '../legal/legal_controller.dart';
 import '../monitoreo/uso_telefono_controller.dart';
 import '../monitoreo/uso_telefono_screen.dart';
 import '../padre_controller.dart';
+import '../proteccion/proteccion_tile.dart';
 import 'cambiar_codigo.dart';
 import 'control_parental.dart';
 import 'recuperacion_dialogo.dart';
@@ -105,6 +106,7 @@ class ControlScreen extends ConsumerWidget {
               ref.read(bloqueosProvider.notifier).setEntorno(!valor),
         ),
         const SectionHeader('Permisos del teléfono'),
+        const ProteccionTile(),
         ListTile(
           leading: const Icon(Icons.shield_outlined),
           title: const Text('Permiso de VPN para el filtro'),

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Registrа BlueTalk como administrador del dispositivo.
+
+     No se pide ningún poder: <uses-policies> queda vacío a propósito.
+     Solo se quiere que, si un niño toca «Desinstalar» desde Ajustes de
+     Android, el sistema exija primero pasar por la pantalla de
+     desactivación del administrador. Es un escollo, no un muro: ver el
+     aviso de límites en PROGRESO.md. -->
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-policies />
+</device-admin>

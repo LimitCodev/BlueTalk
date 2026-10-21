@@ -73,6 +73,20 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="parental_control_dns_filter"/>
         </service>
+        <!-- Administrador del dispositivo (encargo §3.2): no pide poderes;
+             solo hace que desinstalar la app exija antes pasar por la
+             pantalla de desactivación del administrador. -->
+        <receiver
+            android:name=".ProteccionReceiver"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
         <!-- flutter_local_notifications (README 22.x): avisos programados
              del horario y repaso de la lista tras un reinicio. -->
         <receiver
