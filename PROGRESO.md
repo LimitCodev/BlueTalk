@@ -280,3 +280,67 @@ de consola está oculto por el sandbox). Gradle y Kotlin daemon: `--stop`.
 ---
 
 **FIN DE LA FASE 2. Esperando confirmación para pasar a la FASE 3a.**
+
+---
+
+# FASE 3 — Control parental real (dividida: 3a · 3b · 3c)
+
+El dueño pidió dividir la Fase 3 en tres con parada de confirmación entre
+cada una. Este es el contenido de la Fase 3 original del encargo:
+PIN con hash en `EncryptedSharedPreferences`, asistente de permisos,
+`DeviceAdminReceiver`, SafeSearch forzado, bloqueo por palabras,
+perfiles por edad, límites de tiempo por app, horarios, «pedir más
+tiempo», persistencia en Room y panel de uso.
+
+## Fase 3a — PIN cifrado · asistente de permisos · desinstalación bloqueada
+
+### 3a.1 PIN en el keystore (hecho, `34448cd`)
+
+Antes: la huella PBKDF2 del PIN vivía en `SharedPreferences`, que en
+Android es un XML en claro dentro del almacenamiento privado de la app.
+
+Ahora: vive en el keystore del sistema vía `flutter_secure_storage`.
+
+- `lib/features/padre/gate/almacen_pin.dart` (nuevo). Lee el keystore en
+  `main()` antes del primer frame y lo sirve por caché en memoria, así el
+  gate sigue consultando el PIN de forma síncrona. Migra las huellas que
+  estuvieran en preferencias: **primero escribe en el keystore, y solo
+  entonces borra de preferencias**, con una escritura de prueba antes de
+  tocar nada. Un fallo a mitad no puede dejar a nadie sin PIN.
+- Solo se mueven lo que es secreto (`padre_pin_hash`, `padre_pin_salt`,
+  `padre_recup_hash`, `padre_recup_salt`). Longitud, iteraciones y
+  contadores de bloqueo **no** son secretos y se quedan donde estaban:
+  moverlos a un almacén asíncrono rompería lecturas síncronas del gate.
+- `almacen` es parámetro obligatorio de `PinStore`, así que el compilador
+  coge cualquier sitio que olvide conectarlo.
+- **Sin keystore no se pierde acceso**: no se migra, no se borra, y el
+  estado se expone por `AlmacenPin.cifrado` para poder enseñarlo en
+  pantalla. No hay degradación silenciosa.
+
+**Verificado:** `flutter analyze` 0 · `flutter test` **304/304** (298 + 6
+nuevos en `test/padre/almacen_pin_test.dart`: migración, que el PIN
+antiguo sigue abriendo tras migrar, que con keystore caído no se pierde el
+acceso, que una huella nueva se escribe cifrada, que lo no secreto no se
+mueve y que el PIN en claro no aparece en ningún almacén).
+
+**NO VERIFICADO:** que el keystore funcione en un teléfono real. Los tests
+usan un keystore falso; en el emulador API 28 haría falta una pasada de
+verificación. Queda para la Fase 3c, que ya pide emulador.
+
+### 3a.2 Desinstalación bloqueada (pendiente)
+
+`DeviceAdminReceiver` para que un niño no pueda desinstalar la app ni
+desactivar la protección sin el PIN del adulto.
+
+### 3a.3 Asistente de permisos del padre (pendiente)
+
+Pantalla que explica en lenguaje llano y pide cada permiso, comprueba si
+está concedido y no deja avanzar si falta alguno: `PACKAGE_USAGE_STATS`,
+servicio de accesibilidad, `VpnService`, `SYSTEM_ALERT_WINDOW`,
+`DeviceAdminReceiver`, `POST_NOTIFICATIONS` + servicio en primer plano y
+exención de optimización de batería.
+
+**Nota de alcance:** accesibilidad y `SYSTEM_ALERT_WINDOW` solo tienen
+sentido cuando exista el servicio de bloqueo que los usa. Si ese servicio
+va en la 3b, el asistente no puede exigirlos aún sin dejar la pantalla
+trabada. Se decidirá al montar el asistente y se anotará aquí.
