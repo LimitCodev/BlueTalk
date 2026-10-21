@@ -155,7 +155,7 @@ void main() {
           )
           .any((s) => s.properties.selected == true);
 
-      expect(marcado('Celeste (por defecto)'), isTrue);
+      expect(marcado('Azul BlueTalk (por defecto)'), isTrue);
 
       // Elegir lila: se guarda y queda marcada (vista previa en vivo).
       await tester.scrollUntilVisible(find.text('Lila suave'), 300);
@@ -165,7 +165,7 @@ void main() {
 
       expect((await container.read(settingsProvider.future)).tema, 'lila');
       expect(marcado('Lila suave'), isTrue);
-      expect(marcado('Celeste (por defecto)'), isFalse);
+      expect(marcado('Azul BlueTalk (por defecto)'), isFalse);
     });
 
     testWidgets('el enlace legal abre el placeholder', (tester) async {

@@ -61,6 +61,16 @@ void main() {
       expect(_contrast(AppColors.onWarning, AppColors.warning), greaterThanOrEqualTo(4.5));
       expect(_contrast(AppColors.onError, AppColors.error), greaterThanOrEqualTo(4.5));
     });
+
+    test('texto de categorías >= 4.5:1 sobre su tarjeta', () {
+      for (final entry in coloresCategorias.entries) {
+        expect(
+          _contrast(entry.value.tinta, entry.value.fondo),
+          greaterThanOrEqualTo(4.5),
+          reason: entry.key,
+        );
+      }
+    });
   });
 
   group('los 6 temas tienen contraste AA (plan 13 P4, aceptación)', () {
@@ -83,6 +93,8 @@ void main() {
         expect(_contrast(p.primaryStrong, p.surface),
             greaterThanOrEqualTo(3.0),
             reason: 'borde/icono sobre surface');
+        expect(_contrast(p.onHeader, p.header), greaterThanOrEqualTo(3.0),
+            reason: 'texto grande de la barra superior');
 
         // Tonos derivados que la UI real usa (interruptores, bordes de
         // OutlinedButton, contenedores M3): fijados a la paleta en
