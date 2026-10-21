@@ -38,7 +38,7 @@ class AppAvatar extends ConsumerWidget {
           ? Icon(
               Icons.child_care,
               size: size * 0.7,
-              color: context.colores.primaryStrong,
+              color: context.colores.primaryInk,
             )
           : SvgPicture.asset(
               asset,

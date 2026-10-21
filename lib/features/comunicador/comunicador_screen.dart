@@ -401,44 +401,58 @@ class _CategoryGrid extends ConsumerWidget {
       itemBuilder: (context, index) {
         final category = categories[index];
         final iconAsset = catalog.iconAssetOf(category);
+        final colores = coloresCategorias[category.id];
+        final fondo = colores?.fondo ?? context.colores.surface;
+        final borde = colores?.borde ?? context.colores.primary;
+        final tinta = colores?.tinta ?? context.colores.primaryStrongText;
 
-        return InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: () => ref
-              .read(comunicadorProvider.notifier)
-              .openCategory(category.id),
-          child: Padding(
-            padding: const EdgeInsets.all(6),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 52,
-                  height: 52,
-                  child: iconAsset == null
-                      ? Icon(
-                          Icons.grid_view_rounded,
-                          size: 44,
-                          color: context.colores.primaryStrong,
-                        )
-                      : SvgPicture.asset(
-                          iconAsset,
-                          fit: BoxFit.contain,
-                          placeholderBuilder: (context) => const SizedBox(
-                            width: 52,
-                            height: 52,
+        return Material(
+          color: fondo,
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(color: borde, width: 1),
+          ),
+          child: InkWell(
+            onTap: () => ref
+                .read(comunicadorProvider.notifier)
+                .openCategory(category.id),
+            child: Padding(
+              padding: const EdgeInsets.all(6),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 52,
+                    height: 52,
+                    child: iconAsset == null
+                        ? Icon(
+                            Icons.grid_view_rounded,
+                            size: 44,
+                            color: tinta,
+                          )
+                        : SvgPicture.asset(
+                            iconAsset,
+                            fit: BoxFit.contain,
+                            placeholderBuilder: (context) => const SizedBox(
+                              width: 52,
+                              height: 52,
+                            ),
                           ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    category.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: tinta,
+                          fontWeight: FontWeight.w700,
                         ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  category.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         );

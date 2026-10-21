@@ -26,52 +26,59 @@ class PictoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Stack(
-          children: [
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    pictogram.asset,
-                    width: 52,
-                    height: 52,
-                    fit: BoxFit.contain,
-                    // Sin spinner animado: solo un espacio neutro al cargar.
-                    placeholderBuilder: (context) => const SizedBox(
+    return Material(
+      color: context.colores.surface,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(color: AppColors.borde),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child: Stack(
+            children: [
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      pictogram.asset,
                       width: 52,
                       height: 52,
+                      fit: BoxFit.contain,
+                      // Sin spinner animado: solo un espacio neutro al cargar.
+                      placeholderBuilder: (context) => const SizedBox(
+                        width: 52,
+                        height: 52,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    pictogram.label,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
-              ),
-            ),
-            if (favorited)
-              Positioned(
-                top: 2,
-                right: 2,
-                child: Icon(
-                  Icons.star,
-                  size: 18,
-                  color: context.colores.primaryStrong,
-                  semanticLabel: 'Fijado en Inicio',
+                    const SizedBox(height: 4),
+                    Text(
+                      pictogram.label,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
                 ),
               ),
-          ],
+              if (favorited)
+                Positioned(
+                  top: 2,
+                  right: 2,
+                  child: Icon(
+                    Icons.star,
+                    size: 18,
+                    color: context.colores.primaryStrong,
+                    semanticLabel: 'Fijado en Inicio',
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

@@ -36,6 +36,43 @@ class LogoBluetalk extends StatelessWidget {
   }
 }
 
+/// Logotipo oficial de la web de BlueTalk («BlueTalk innovation»).
+///
+/// Usa el PNG de la web empaquetado con la app: no hay red ni caché.
+/// [pill] lo coloca sobre la pastilla blanca de la cabecera web.
+class LogoBluetalkWordmark extends StatelessWidget {
+  const LogoBluetalkWordmark({
+    super.key,
+    this.height = 32,
+    this.pill = false,
+  });
+
+  final double height;
+
+  /// Pastilla blanca redondeada, como la cabecera de la web.
+  final bool pill;
+
+  @override
+  Widget build(BuildContext context) {
+    final imagen = Image.asset(
+      'assets/brand/logo_bluetalk.png',
+      height: height,
+      fit: BoxFit.contain,
+      filterQuality: FilterQuality.high,
+      semanticLabel: 'BlueTalk',
+    );
+    if (!pill) return imagen;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: imagen,
+    );
+  }
+}
+
 /// Lienzo de 100×100 escalado al tamaño pedido.
 class _LogoPainter extends CustomPainter {
   const _LogoPainter();
