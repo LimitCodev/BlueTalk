@@ -16,9 +16,8 @@ git log --oneline    → HEAD cdce74b (DOCS: mejoras del modo padre…)
 ```
 
 Verificación de "compila": `flutter analyze` (Dart, sin Gradle, sin emulador,
-envuelto en `taskset -c 0-3`). **2 avisos, 0 errores**, ambos en un test:
-`test/padre/uso_telefono_test.dart:1` import sin usar y parámetro `abrirOk`
-nunca usado.
+envuelto en `taskset -c 0-3`). Al empezar: **2 avisos, 0 errores**, ambos en
+un test (`test/padre/uso_telefono_test.dart`). Ya corregidos, ver "Cierre".
 
 ### Archivos modificados
 
@@ -52,7 +51,7 @@ nunca usado.
 | `lib/features/padre/filtro_web/` (4 archivos, 1281) | Completo | Modelo, controlador, gateway y pantalla |
 | `lib/features/padre/monitoreo/` (4 archivos, 705) | Completo | Resumen por periodo desde `UsageStats` |
 | `test/padre/filtro_web_test.dart` (397) | Completo | |
-| `test/padre/uso_telefono_test.dart` (246) | Completo con 2 avisos | Import sin usar y parámetro sin usar (arreglables en 1 min) |
+| `test/padre/uso_telefono_test.dart` (246) | Completo | Avisos corregados |
 | `integration_test/filtro_web_test.dart` (64) | Completo | Requiere dispositivo |
 | `integration_test/pbkdf2_bench_test.dart` (27) | Completo | Requiere dispositivo |
 | `integration_test/perfilado_rejilla_test.dart` (39) | Completo | Requiere dispositivo |
@@ -97,15 +96,53 @@ nunca usado.
    Dado que el niño usa un AVD simple, propongo: **sí, pero solo con el
    ajuste global de "DNS privado" forzado vía Device Owner** (sin eso no se
    puede bloquear por app sin root); si no, se documenta el límite.
-4. ¿Dónde está el AVD `bluetalk_gama_baja`? Tú avisas de revisar la ruta.
+4. ~~¿Dónde está el AVD `bluetalk_gama_baja`?~~ Resuelto: existe en
+   `~/.android/avd/bluetalk_gama_baja.avd`; el emulador está en
+   `~/android-sdk/emulator/emulator`.
 
-### Carga medida
+### Cierre de la FASE 1
 
-```
-17:04:49  up 5:21   load average: 0,95 / 0,69 / 1,57   (16 hilos, 13 GB)
-```
+Todo el trabajo suelto del agente anterior estaba sin commitear. Se revisó y
+se separó en cambios coherentes (una responsabilidad por commit):
+
+| Commit | Qué |
+|---|---|
+| `105e307` | `DOCS:` auditoría en PROGRESO.md |
+| `4293f46` | `TEST:` quita los 2 avisos del doble del gateway de uso |
+| `e41cb68` | `FEAT:` identidad de la web: paleta, Nunito, logo, tarjetas |
+| `9cd0798` | `TEST:` contraste de barra superior, tarjetas y nombre del tema |
+| `1f9451d` | `DOCS:` permisos y privacidad del filtro y del uso de teléfono |
+| `e8a6fb1` | `FEAT:` filtro de páginas con VPN local DNS |
+| `ac89c2f` | `FEAT:` diagnóstico de uso por app (UsageStats) |
+| `667f8e2` | `FEAT:` entradas del filtro y del diagnóstico en el panel |
+
+Árbol limpio (`git status` vacío).
+
+Verificado en esta fase:
+
+- `flutter analyze` → **0 problemas**.
+- `flutter test test/padre/uso_telefono_test.dart test/padre/filtro_web_test.dart`
+  → **28/28 en verde**.
+- **NO VERIFICADO**: compilación Kotlin de `FiltroWebVpnService.kt`,
+  `FiltroWebChannel.kt` y `UsoTelefonoChannel.kt`; comportamiento en
+  dispositivo. Es Fase 4.
 
 ### Pendiente para la FASE 2
 
-- `flutter analyze` en verde (2 avisos en un test) — pendiente de corregir.
-- Ajustar `android/gradle.properties` a los límites del §0.
+- `docs/plan/14-filtro-web.md` no existe y lo citan los comentarios del
+  código: hay que redactarlo (o quitar la cita).
+- Ajustar `android/gradle.properties` a los límites del §0 (queda para
+  Fase 4, paso 1).
+- AVD comprobado: `~/.android/avd/bluetalk_gama_baja.avd` existe. El binario
+  del emulador **no** está en el PATH: usar
+  `~/android-sdk/emulator/emulator` (SDK en `~/android-sdk`).
+
+### Carga medida al cerrar
+
+```
+17:08:28  up 5:24   load average: 2,07 / 1,50 / 1,72   (16 hilos, 13 GB)
+```
+
+---
+
+**FIN DE LA FASE 1. Esperando confirmación para pasar a la FASE 2 (diseño).**
