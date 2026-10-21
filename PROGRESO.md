@@ -251,20 +251,22 @@ Verificado:
 
 **NO VERIFICADO / límites:**
 
-- El **ícono adaptativo y el splash no se regeneraron de la web**: no hay
-  logo original extraíble. Queda pendiente de que el dueño facilite el
-  archivo. El ícono actual es el del cartel y sigue funcionando.
+- El **ícono adaptativo y el splash no se regeneraron**. Cerrado el
+  2026-10-21: el dueño aportó los dos originales (`docs/branding/
+  favicon-web.ico`, 256×256, y `logo-wordmark.png`, 284×85) y **decidió
+  conservar el ícono actual**, que deriva del wordmark y es vectorial.
+  El favicon queda archivado como referencia de marca. §2.4 cumplida con
+  «se conserva», no con «se regenera».
 - El header de la app lleva el **título de la pestaña**, no el lema «Tu voz,
   siempre contigo» de la web. Es decisión de producto (una app no es una
   landing); no se cambia sin confirmación.
 - No se comparó contra la web **en vivo renderizada**, solo contra la
   captura oficial y las variables del CSS.
 
-### Pregunta pendiente para el dueño
+### Preguntas cerradas con el dueño
 
-- ¿Me pasas el **archivo original del logo** (SVG o PNG grande)? Sin él no
-  puedo generar el ícono adaptativo y el splash a partir del original, que
-  es lo que pide la §2.4.
+- ~~Archivo original del logo~~ → aportado el 2026-10-21; ambos archivados
+  en `docs/branding/`. Ícono adaptativo: **se conserva el actual**.
 
 ### Carga medida al cerrar la FASE 2
 

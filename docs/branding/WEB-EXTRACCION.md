@@ -8,16 +8,32 @@ carpeta salió del sitio; no se ha inventado ningún valor.
 | `index.html` | `https://bluetalk.lovable.app/` | 200 · 12 014 B |
 | `index.css` | `https://bluetalk.lovable.app/assets/index-7L25lExW.css` | 200 · 74 174 B |
 | `og-preview.png` | `og:image` (R2 de Lovable) | 200 · 95 007 B · 1920×1080 |
+| `favicon-web.ico` | Aportado por el dueño (lo usa la app) | 256×256 RGBA · 59 564 B |
+| `logo-wordmark.png` | Aportado por el dueño (lo usa la app) | 284×85 RGBA · 24 661 B |
 
 ## 1. Qué NO se pudo extraer (no inventado)
+
+> **Actualización 2026-10-21, tarde:** el dueño localizó y guardó los dos
+> logos que usa la app. Ya están archivados aquí, así que §1 pasa a ser la
+> lista de lo que el *sitio* no sirve por HTTP, no de lo que falta.
+> - `favicon-web.ico` — 256×256 RGBA (PNG embebido): insignia circular con
+>   anillo navy, burbuja azul con cara, micrófono, destello y «BlueTalk».
+>   Es el badge que se ve arriba a la izquierda en `og-preview.png`.
+> - `logo-wordmark.png` — 284×85 RGBA: burbuja con sonrisa y corazón verde
+>   + «BlueTalk innovation». Es el que la app ya muestra en la cabecera.
+>
+> **Decisión del dueño (2026-10-21):** el ícono adaptativo y el splash
+> **se conservan como están hoy** (derivados del wordmark y vectoriales);
+> el favicon queda como referencia de marca. No se cambia el lanzador.
+
+Lo que el sitio no sirve por sí mismo:
 
 - **No hay favicon, ni `<link rel="icon">`, ni `apple-touch-icon`.**
 - **No hay ningún `<img>` ni `<svg>` en el HTML.** El `<head>` solo lleva
   `og:type`, `og:image`, `og:title`, `twitter:*` y `author: Lovable`.
-- **No hay archivo de logo.** El único original disponible es el logo
-  circular de ~40 px de diámetro **dentro** de la captura `og-preview.png`
-  (arriba a la izquierda, sobre la barra azul). A esa resolución no se puede
-  regenerar un ícono adaptativo fiel: se pixela al escalar.
+- **El sitio no enlaza su propio logo.** El badge circular solo aparece
+  embebido a ~40 px en `og-preview.png`; el archivo original es
+  `favicon-web.ico`, aportado por el dueño (ver recuadro arriba).
 - **La web no carga la tipografía que declara.** El CSS pone
   `font-family: Nunito, sans-serif`, pero **no hay `@font-face` (0 en el
   archivo) ni enlace a Google Fonts**. Nunito es la intención de diseño; el
