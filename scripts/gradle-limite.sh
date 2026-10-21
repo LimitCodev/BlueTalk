@@ -5,7 +5,7 @@
 #   scripts/gradle-limite.sh testDebugUnitTest
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../android"
 
 exec systemd-run --user --scope \
   -p CPUQuota=400% \
