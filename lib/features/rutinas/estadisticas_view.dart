@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/theme/app_colors.dart';
 import '../../core/widgets/section_header.dart';
 import 'horario_view.dart';
 import 'rutinas_controller.dart';
@@ -156,9 +157,9 @@ class _BarraDiaria extends StatelessWidget {
             const SizedBox(height: 4),
             Container(
               height: altura < 4 ? 4 : altura,
-              decoration: const BoxDecoration(
-                color: Color(0xFF7FC9EA),
-                borderRadius: BorderRadius.vertical(
+              decoration: BoxDecoration(
+                color: context.colores.primary,
+                borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(6),
                 ),
               ),
