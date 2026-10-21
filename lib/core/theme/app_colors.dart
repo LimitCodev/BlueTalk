@@ -253,6 +253,27 @@ class ColoresCategoria {
 
   /// Texto de la categoría: ≥4.5:1 sobre [fondo].
   final Color tinta;
+
+  /// Relleno de la tarjeta sobre la paleta activa.
+  ///
+  /// En claro, el pastel propio. En oscuro, la regla de alpha de la web
+  /// (`hsl(var(--cat-*) / .1)`) aplicada al tono de la categoría: el
+  /// pastel sería un bloque claro sobre la página oscura.
+  Color relleno(AppColors paleta) =>
+      paleta.brillo == Brightness.light ? fondo : tinta.withValues(alpha: 0.10);
+
+  /// Borde de la tarjeta sobre la paleta activa: pastel en claro y el 30 %
+  /// del tono en oscuro (la web usa `hsl(var(--cat-*) / .3)`).
+  Color bordeSobre(AppColors paleta) =>
+      paleta.brillo == Brightness.light ? borde : tinta.withValues(alpha: 0.30);
+
+  /// Color del texto y del icono de la tarjeta, ≥4.5:1 siempre.
+  ///
+  /// En claro es [tinta], oscurecida hasta pasar AA. En oscuro [tinta] es
+  /// un tono profundo pensado sobre pastel y no se lee sobre la página
+  /// oscura, así que manda el texto del tema.
+  Color texto(AppColors paleta) =>
+      paleta.brillo == Brightness.light ? tinta : paleta.text;
 }
 
 /// Categorías del comunicador con el mismo lenguaje de color de la web:

@@ -404,10 +404,13 @@ class _CategoryGrid extends ConsumerWidget {
       itemBuilder: (context, index) {
         final category = categories[index];
         final iconAsset = catalog.iconAssetOf(category);
+        // Mismo lenguaje que la web (docs/branding/WEB-EXTRACCION.md §2):
+        // pastel en claro y regla de alpha sobre el tono en oscuro.
+        final paleta = context.colores;
         final colores = coloresCategorias[category.id];
-        final fondo = colores?.fondo ?? context.colores.surface;
-        final borde = colores?.borde ?? context.colores.primary;
-        final tinta = colores?.tinta ?? context.colores.primaryStrongText;
+        final fondo = colores?.relleno(paleta) ?? paleta.surface;
+        final borde = colores?.bordeSobre(paleta) ?? paleta.primary;
+        final tinta = colores?.texto(paleta) ?? paleta.primaryStrongText;
 
         return Material(
           color: fondo,

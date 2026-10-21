@@ -165,5 +165,45 @@ void main() {
       expect(AppColors.oscuro.borde, isNot(AppColors.bordeNeutro));
       expect(AppColors.celeste.borde, AppColors.bordeNeutro);
     });
+
+    test('el texto de cada categoría es legible en claro y en oscuro', () {
+      // El relleno en oscuro es translúcido (10 % del tono) y se compone
+      // sobre el fondo de la tarjeta: se verifica contra el color ya
+      // mezclado, no contra la capa suelta.
+      Color mezcla(Color capa, Color base) => Color.fromARGB(
+            255,
+            (255 * (capa.a * capa.r + (1 - capa.a) * base.r)).round(),
+            (255 * (capa.a * capa.g + (1 - capa.a) * base.g)).round(),
+            (255 * (capa.a * capa.b + (1 - capa.a) * base.b)).round(),
+          );
+
+      for (final entry in coloresCategorias.entries) {
+        expect(
+          _contrast(entry.value.texto(AppColors.celeste),
+              entry.value.relleno(AppColors.celeste)),
+          greaterThanOrEqualTo(4.5),
+          reason: '${entry.key} en claro',
+        );
+        final tarjetaOscura = mezcla(
+          entry.value.relleno(AppColors.oscuro),
+          AppColors.oscuro.bg,
+        );
+        expect(
+          _contrast(entry.value.texto(AppColors.oscuro), tarjetaOscura),
+          greaterThanOrEqualTo(4.5),
+          reason: '${entry.key} en oscuro',
+        );
+      }
+    });
+
+    test('en oscuro la tarjeta de categoría nunca usa el pastel claro', () {
+      for (final entry in coloresCategorias.entries) {
+        expect(
+          entry.value.relleno(AppColors.oscuro),
+          isNot(entry.value.fondo),
+          reason: entry.key,
+        );
+      }
+    });
   });
 }

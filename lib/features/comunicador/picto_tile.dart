@@ -26,35 +26,20 @@ class PictoTile extends StatelessWidget {
   final bool favorited;
 
   /// Color de la categoría a la que pertenece. La web tiñe la tarjeta del
-  /// pictograma con el tono de su categoría (`--cat-*` / .1 de relleno y
-  /// / .3 de borde); aquí se usa el mismo lenguaje. En modo oscuro el
-  /// relleno pastel sería un bloque claro sobre la página, así que se
-  /// aplica la regla de alpha de la web sobre el tono de la categoría.
+  /// pictograma con el tono de su categoría; aquí se usa el mismo lenguaje
+  /// (ver [ColoresCategoria.relleno]). Sin categoría, tarjeta neutra.
   final ColoresCategoria? categoria;
-
-  Color _relleno(AppColors colores) {
-    final c = categoria;
-    if (c == null) return colores.surface;
-    if (colores.brillo == Brightness.light) return c.fondo;
-    return c.tinta.withValues(alpha: 0.10);
-  }
-
-  Color _borde(AppColors colores) {
-    final c = categoria;
-    if (c == null) return colores.borde;
-    if (colores.brillo == Brightness.light) return c.borde;
-    return c.tinta.withValues(alpha: 0.30);
-  }
 
   @override
   Widget build(BuildContext context) {
     final colores = context.colores;
+    final c = categoria;
     return Material(
-      color: _relleno(colores),
+      color: c?.relleno(colores) ?? colores.surface,
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: _borde(colores)),
+        side: BorderSide(color: c?.bordeSobre(colores) ?? colores.borde),
       ),
       child: InkWell(
         onTap: onTap,
@@ -84,7 +69,9 @@ class PictoTile extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: c?.texto(colores),
+                          ),
                     ),
                   ],
                 ),
