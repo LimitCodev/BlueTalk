@@ -12,6 +12,7 @@ import '../legal/legal_controller.dart';
 import '../monitoreo/uso_telefono_controller.dart';
 import '../monitoreo/uso_telefono_screen.dart';
 import '../padre_controller.dart';
+import '../permisos/permisos_asistente_screen.dart';
 import '../proteccion/proteccion_tile.dart';
 import 'cambiar_codigo.dart';
 import 'control_parental.dart';
@@ -37,9 +38,7 @@ class ControlScreen extends ConsumerWidget {
     final biometria = ref.watch(biometriaHabilitadaProvider);
     final aceptacion = ref.watch(legalProvider);
     final filtro = ref.watch(filtroWebProvider);
-    final filtroEstado = ref.watch(filtroWebEstadoProvider).value;
     final permisoUso = ref.watch(permisoUsoProvider).value;
-    final vpnConcedida = filtroEstado?.consentimiento ?? false;
     final usoConcedido = permisoUso ?? false;
 
     return ListView(
@@ -108,29 +107,14 @@ class ControlScreen extends ConsumerWidget {
         const SectionHeader('Permisos del teléfono'),
         const ProteccionTile(),
         ListTile(
-          leading: const Icon(Icons.shield_outlined),
-          title: const Text('Permiso de VPN para el filtro'),
-          subtitle: Text(
-            vpnConcedida
-                ? 'Concedido. Android ya autorizó la VPN local.'
-                : 'Pendiente: se pide al encender el filtro de páginas.',
+          leading: const Icon(Icons.rule_outlined),
+          title: const Text('Revisar los permisos'),
+          subtitle: const Text(
+            'Qué pide BlueTalk, para qué sirve y qué no lee.',
           ),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => Navigator.of(context).push<void>(
-            MaterialPageRoute(builder: (_) => const FiltroWebScreen()),
-          ),
-        ),
-        ListTile(
-          leading: const Icon(Icons.query_stats),
-          title: const Text('Acceso al uso de las apps'),
-          subtitle: Text(
-            usoConcedido
-                ? 'Concedido. Ya se puede ver el tiempo por app.'
-                : 'Pendiente: necesario para el diagnóstico de uso.',
-          ),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => Navigator.of(context).push<void>(
-            MaterialPageRoute(builder: (_) => const UsoTelefonoScreen()),
+            MaterialPageRoute(builder: (_) => const PermisosAsistenteScreen()),
           ),
         ),
         const SectionHeader('Protección en internet'),

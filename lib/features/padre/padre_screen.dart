@@ -8,6 +8,8 @@ import 'gate/gate_screen.dart';
 import 'legal/legal_controller.dart';
 import 'legal/legal_screen.dart';
 import 'padre_controller.dart';
+import 'permisos/permisos_asistente_screen.dart';
+import 'permisos/permisos_controller.dart';
 import 'salud_padre/salud_screen.dart';
 
 /// Pantalla raíz de la zona de adultos (ruta `/padre`).
@@ -73,6 +75,13 @@ class _PadreScreenState extends ConsumerState<PadreScreen> {
     final enSesion = aceptado && vista != PadreVista.gate;
     final indice = _destinos.indexWhere((destino) => destino.vista == vista);
 
+    // Asistente de permisos (encargo §3.2): mientras falte alguno de los
+    // que son obligatorios, el panel no se enseña. Un «no se pudo
+    // comprobar» no bloquea, para no dejar al adulto sin salida.
+    final faltanPermisos =
+        enSesion && (ref.watch(permisosProvider).value?.faltanRequeridos ??
+            false);
+
     // Fila 4 del plan 13 P1 (corregido tras la revisión de la etapa A): el
     // Atrás nunca mata el modo padre. Con una subpantalla empujada (p. ej.
     // recuperación del PIN) la cierra Navigator; desde una pestaña que no
@@ -109,14 +118,16 @@ class _PadreScreenState extends ConsumerState<PadreScreen> {
             ),
           ],
         ),
-        body: switch (vista) {
-          PadreVista.legal => LegalScreen(onSalir: _salir),
-          PadreVista.gate => const GateScreen(),
-          PadreVista.resumen => const ResumenScreen(),
-          PadreVista.control => const ControlScreen(),
-          PadreVista.salud => const SaludPadreScreen(),
-        },
-        bottomNavigationBar: enSesion
+        body: faltanPermisos
+            ? const PermisosAsistenteScreen(comoPaso: true)
+            : switch (vista) {
+                PadreVista.legal => LegalScreen(onSalir: _salir),
+                PadreVista.gate => const GateScreen(),
+                PadreVista.resumen => const ResumenScreen(),
+                PadreVista.control => const ControlScreen(),
+                PadreVista.salud => const SaludPadreScreen(),
+              },
+        bottomNavigationBar: enSesion && !faltanPermisos
             ? NavigationBar(
                 selectedIndex: indice < 0 ? 0 : indice,
                 onDestinationSelected: (i) =>
