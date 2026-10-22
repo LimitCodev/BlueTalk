@@ -27,6 +27,7 @@ class FiltroWebEstado {
     this.consentimiento = false,
     this.dnsPrivado = false,
     this.bloqueos = const [],
+    this.comprobado = true,
   });
 
   final bool activo;
@@ -39,7 +40,15 @@ class FiltroWebEstado {
 
   final List<BloqueoWeb> bloqueos;
 
+  /// `false` cuando el canal nativo no contestó: `activo` y
+  /// `consentimiento` dejan de significar algo, así que el asistente de
+  /// permisos enseña «no se pudo comprobar» en vez de «falta concederlo».
+  final bool comprobado;
+
   static const inactivo = FiltroWebEstado();
+
+  /// Canal caído o sin contestar.
+  static const sinComprobar = FiltroWebEstado(comprobado: false);
 
   factory FiltroWebEstado.fromMap(Map<Object?, Object?> map) {
     final crudos = map['bloqueos'];
@@ -83,12 +92,12 @@ class PlatformFiltroWebGateway implements FiltroWebGateway {
     try {
       final mapa = await _canal.invokeMethod<Map<Object?, Object?>>('estado');
       return mapa == null
-          ? FiltroWebEstado.inactivo
+          ? FiltroWebEstado.sinComprobar
           : FiltroWebEstado.fromMap(mapa);
     } on MissingPluginException {
-      return FiltroWebEstado.inactivo;
+      return FiltroWebEstado.sinComprobar;
     } on PlatformException {
-      return FiltroWebEstado.inactivo;
+      return FiltroWebEstado.sinComprobar;
     }
   }
 

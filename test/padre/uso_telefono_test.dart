@@ -6,6 +6,8 @@ import 'package:bluetalk/features/padre/monitoreo/uso_telefono_gateway.dart';
 import 'package:bluetalk/features/padre/monitoreo/uso_telefono_model.dart';
 import 'package:bluetalk/features/padre/monitoreo/uso_telefono_screen.dart';
 
+import 'package:bluetalk/features/padre/permisos/permiso_model.dart';
+
 import 'harness.dart';
 
 class _GatewayUsoFalso implements UsoTelefonoGateway {
@@ -19,6 +21,10 @@ class _GatewayUsoFalso implements UsoTelefonoGateway {
 
   @override
   Future<bool> estaPermitido() async => permiso;
+
+  @override
+  Future<EstadoPermiso> estadoPermiso() async =>
+      permiso ? EstadoPermiso.concedido : EstadoPermiso.pendiente;
 
   @override
   Future<bool> abrirAjustes() async {

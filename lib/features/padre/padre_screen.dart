@@ -28,7 +28,8 @@ class PadreScreen extends ConsumerStatefulWidget {
   ConsumerState<PadreScreen> createState() => _PadreScreenState();
 }
 
-class _PadreScreenState extends ConsumerState<PadreScreen> {
+class _PadreScreenState extends ConsumerState<PadreScreen>
+    with WidgetsBindingObserver {
   static const _destinos = [
     (
       vista: PadreVista.resumen,
@@ -55,6 +56,31 @@ class _PadreScreenState extends ConsumerState<PadreScreen> {
       activo: Icons.description,
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // Caché de permisos: si no se refresca, el panel admitiría un estado
+    // antiguo (visto en el emulador: revocar un permiso desde Android no
+    // desbloqueaba el paso). Se lee al entrar en la zona cada vez.
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => mounted ? ref.invalidate(permisosProvider) : null,
+    );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Volvemos de una pantalla de Android: alguien pudo conceder o
+    // revocar un permiso con la app en segundo plano.
+    if (state == AppLifecycleState.resumed) ref.invalidate(permisosProvider);
+  }
 
   void _salir() {
     if (ref.read(legalProvider) != null) {

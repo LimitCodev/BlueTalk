@@ -4,7 +4,9 @@ import 'package:cryptography/cryptography.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart' show MissingPluginException;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:bluetalk/app/di.dart';
@@ -13,6 +15,9 @@ import 'package:bluetalk/data/local/seed_store.dart';
 import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/padre/gate/biometria.dart';
 import 'package:bluetalk/features/padre/gate/almacen_pin.dart';
+import 'package:bluetalk/features/padre/permisos/permiso_model.dart';
+import 'package:bluetalk/features/padre/permisos/permisos_controller.dart';
+import 'package:bluetalk/features/padre/permisos/permisos_gateway.dart';
 import 'package:bluetalk/features/padre/gate/gate_controller.dart';
 import 'package:bluetalk/features/padre/gate/pin_store.dart';
 import 'package:bluetalk/features/padre/reloj.dart';
@@ -42,6 +47,71 @@ class DiskAssetBundle extends AssetBundle {
       SynchronousFuture<String>(File(key).readAsStringSync());
 }
 
+/// Keystore falso: `write/readAll/delete` sobre un mapa, y marca si alguna
+/// vez se intentó escribir el PIN en claro por el camino equivocado.
+///
+/// [borradoFallido] emula un keystore que no deja borrar, para comprobar
+/// que el borrado total de datos no se declara hecho si no lo está.
+class KeystorePrueba implements FlutterSecureStorage {
+  KeystorePrueba({this.conKeystore = true});
+
+  final Map<String, String> datos = {};
+  bool conKeystore;
+  bool borradoFallido = false;
+  int escrituras = 0;
+
+  @override
+  Future<Map<String, String>> readAll({
+    AndroidOptions? aOptions,
+    AppleOptions? iOptions,
+    LinuxOptions? lOptions,
+    AppleOptions? mOptions,
+    WindowsOptions? wOptions,
+    WebOptions? webOptions,
+  }) async {
+    if (!conKeystore) throw MissingPluginException('sin keystore');
+    return Map.of(datos);
+  }
+
+  @override
+  Future<void> write({
+    required String key,
+    required String? value,
+    AndroidOptions? aOptions,
+    AppleOptions? iOptions,
+    LinuxOptions? lOptions,
+    AppleOptions? mOptions,
+    WindowsOptions? wOptions,
+    WebOptions? webOptions,
+  }) async {
+    if (!conKeystore) throw MissingPluginException('sin keystore');
+    escrituras++;
+    if (value == null) {
+      datos.remove(key);
+    } else {
+      datos[key] = value;
+    }
+  }
+
+  @override
+  Future<void> delete({
+    required String key,
+    AndroidOptions? aOptions,
+    AppleOptions? iOptions,
+    LinuxOptions? lOptions,
+    AppleOptions? mOptions,
+    WindowsOptions? wOptions,
+    WebOptions? webOptions,
+  }) async {
+    if (!conKeystore) throw MissingPluginException('sin keystore');
+    if (borradoFallido) throw Exception('keystore que no deja borrar');
+    datos.remove(key);
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 /// Reloj falso: los tests avanzan 60 segundos de un golpe para el lockout.
 class RelojPrueba {
   RelojPrueba([DateTime? inicio]) : ahora = inicio ?? ahoraFija;
@@ -66,6 +136,24 @@ class BiometriaPrueba implements Biometria {
     autenticaciones++;
     return autenticarOk;
   }
+}
+
+/// Canal de permisos que siempre dice «concedido», para que el
+/// diagnóstico del asistente termine en los tests.
+class _PermisosDePrueba implements PermisosGateway {
+  const _PermisosDePrueba();
+
+  @override
+  Future<EstadoPermiso> estadoAvisos() async => EstadoPermiso.concedido;
+
+  @override
+  Future<EstadoPermiso> estadoBateria() async => EstadoPermiso.concedido;
+
+  @override
+  Future<bool> pedirAvisos() async => true;
+
+  @override
+  Future<bool> pedirBateria() async => true;
 }
 
 /// PBKDF2 en la zona del test: misma huella que [DerivadorPinAislamiento],
@@ -101,6 +189,7 @@ List<Object> overridesDePadre(
   RelojPrueba? reloj,
   BiometriaPrueba? biometria,
   DerivadorPin? derivador,
+  PermisosGateway? permisos,
 }) =>
     [
       sharedPreferencesProvider.overrideWithValue(prefs),
@@ -117,6 +206,12 @@ List<Object> overridesDePadre(
       ),
       if (biometria != null)
         biometriaProvider.overrideWithValue(biometria),
+      // Doble del canal nativo de permisos: en `flutter test` el canal no
+      // contesta y el diagnóstico se quedaría sin resolver. Todo concedido
+      // es lo inofensivo de esta casa: no bloquea el modo padre.
+      permisosGatewayProvider.overrideWithValue(
+        permisos ?? const _PermisosDePrueba(),
+      ),
     ];
 
 /// Bombea una pantalla suelta con seeds del disco y prefs locales.

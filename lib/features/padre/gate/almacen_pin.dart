@@ -97,6 +97,10 @@ class AlmacenPin {
       await _sistema.write(key: _pruebaKeystore, value: '1');
       await _sistema.delete(key: _pruebaKeystore);
       _keystoreListo = true;
+      // El keystore acepta escrituras: ahí van las huellas de ahora en
+      // adelante, aunque todavía no existan. [cifrado] lo cuenta en
+      // pantalla sin esperar a que alguien cree un PIN.
+      _cifrado = true;
     } on MissingPluginException {
       return;
     } on Exception {
@@ -112,6 +116,9 @@ class AlmacenPin {
       try {
         await _sistema.write(key: clave, value: antigua);
       } on Exception {
+        // Alguna huella sigue en texto plano: [cifrado] no puede decir
+        // que todo está cifrado.
+        _cifrado = false;
         return;
       }
       _cache[clave] = antigua;
@@ -119,8 +126,11 @@ class AlmacenPin {
       _cifrado = true;
     }
 
-    // Si ya había huellas en el keystore, está cifrado.
-    if (_cache.isNotEmpty) _cifrado = true;
+    // Si ya había huellas en el keystore, está cifrado. Si hay alguna en
+    // preferencias (migración a medias), no.
+    if (_cache.isNotEmpty && _keystoreListo) {
+      _cifrado = !clavesSecretas.any(_preferencias.containsKey);
+    }
   }
 
   /// Lectura síncrona: caché primero, preferencias después.
@@ -168,4 +178,37 @@ class AlmacenPin {
     }
   }
 
+  /// Borra **todas** las huellas secretas: del keystore, de preferencias y
+  /// de la caché.
+  ///
+  /// Es el cierre que necesita el borrado total de `RecuperarScreen`:
+  /// `prefs.clear()` por sí solo no toca el keystore y dejaría la huella del
+  /// PIN vivo, con lo que el próximo arranque volvería a pedir el código
+  /// que la persona adulta acaba de decir que ha olvidado.
+  ///
+  /// El keystore va **primero**: si alguna huella no se puede borrar ahí,
+  /// devuelve `false` sin tocar preferencias ni caché, para no declarar un
+  /// borrado que no ocurrió y dejar los datos sin cambios. Con alguna
+  /// huella menos el gate cae en fase «crear» (o en «sin código de
+  /// recuperación»), que sí se puede salir; con el PIN viejo a medias no.
+  Future<bool> borrarSecretas() async {
+    if (_keystoreListo) {
+      for (final clave in clavesSecretas) {
+        try {
+          await _sistema.delete(key: clave);
+        } on MissingPluginException {
+          // Nunca llegó a escribirse ahí: no hay nada que borrar.
+        } on Exception {
+          return false;
+        } on Error {
+          return false;
+        }
+      }
+    }
+    for (final clave in clavesSecretas) {
+      await _preferencias.remove(clave);
+    }
+    _cache.clear();
+    return true;
+  }
 }

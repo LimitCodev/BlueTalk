@@ -8,6 +8,7 @@ import 'package:bluetalk/features/padre/control/control_parental.dart';
 import 'package:bluetalk/features/padre/control/control_screen.dart';
 import 'package:bluetalk/features/padre/control/juegos_gate.dart';
 import 'package:bluetalk/features/padre/gate/almacen_pin.dart';
+import 'package:bluetalk/features/padre/gate/gate_controller.dart';
 import 'package:bluetalk/features/padre/gate/pin_store.dart';
 
 import '../comunicador/dobles.dart';
@@ -367,5 +368,67 @@ void main() {
     await tester.tap(find.widgetWithText(TextButton, 'Cancelar'));
     await tester.pumpAndSettle();
     expect(find.byType(AlertDialog), findsNothing);
+  });
+
+  testWidgets('Control enseña dónde se guarda el código (cifrado)', (
+    tester,
+  ) async {
+    final prefs = await prefsDePrueba();
+    final almacen = AlmacenPin(prefs: prefs, sistema: KeystorePrueba());
+    await almacen.cargar();
+
+    await pumpPadre(
+      tester,
+      home: const Scaffold(body: ControlScreen()),
+      overrides: [
+        ...overridesDePadre(prefs),
+        almacenPinProvider.overrideWithValue(almacen),
+      ],
+    );
+
+    await tester.scrollUntilVisible(
+      find.text('Dónde se guarda tu código'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Dónde se guarda tu código'), findsOneWidget);
+    expect(
+      find.textContaining('Cifrado por este teléfono'),
+      findsOneWidget,
+      reason: 'si está cifrado hay que poder decirlo',
+    );
+    expect(find.textContaining('no pudo cifrarlo'), findsNothing);
+  });
+
+  testWidgets('Control avisa si la huella del código no se pudo cifrar', (
+    tester,
+  ) async {
+    final prefs = await prefsDePrueba();
+    final almacen = AlmacenPin(
+      prefs: prefs,
+      sistema: KeystorePrueba(conKeystore: false),
+    );
+    await almacen.cargar();
+
+    await pumpPadre(
+      tester,
+      home: const Scaffold(body: ControlScreen()),
+      overrides: [
+        ...overridesDePadre(prefs),
+        almacenPinProvider.overrideWithValue(almacen),
+      ],
+    );
+
+    await tester.scrollUntilVisible(
+      find.text('Dónde se guarda tu código'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(
+      find.textContaining('no pudo cifrarlo'),
+      findsOneWidget,
+      reason: 'un respaldo sin cifrar no puede pasar desapercibido',
+    );
+    expect(find.textContaining('Cifrado por este teléfono'), findsNothing);
   });
 }

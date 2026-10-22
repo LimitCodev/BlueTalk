@@ -6,11 +6,18 @@ import 'package:flutter/services.dart';
 /// administrador del dispositivo: desinstalarla desde Ajustes exige antes
 /// pasar por la pantalla de desactivación.
 class ProteccionEstado {
-  const ProteccionEstado({this.activo = false});
+  const ProteccionEstado({this.activo = false, this.comprobado = true});
 
   final bool activo;
 
+  /// `false` cuando el canal nativo no contestó y el estado anterior no
+  /// significa nada: no se puede decir ni «activo» ni «falta concederlo».
+  final bool comprobado;
+
   static const inactiva = ProteccionEstado();
+
+  /// Canal caído o sin contestar: nada de lo de arriba es cierto.
+  static const sinComprobar = ProteccionEstado(comprobado: false);
 }
 
 /// Acceso a la protección contra desinstalación (administrador de
@@ -38,12 +45,12 @@ class PlatformProteccionGateway implements ProteccionGateway {
   Future<ProteccionEstado> estado() async {
     try {
       final mapa = await _canal.invokeMethod<Map<Object?, Object?>>('activo');
-      if (mapa == null) return ProteccionEstado.inactiva;
+      if (mapa == null) return ProteccionEstado.sinComprobar;
       return ProteccionEstado(activo: mapa['activo'] == true);
     } on MissingPluginException {
-      return ProteccionEstado.inactiva;
+      return ProteccionEstado.sinComprobar;
     } on PlatformException {
-      return ProteccionEstado.inactiva;
+      return ProteccionEstado.sinComprobar;
     }
   }
 

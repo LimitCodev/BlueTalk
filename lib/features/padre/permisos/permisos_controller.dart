@@ -14,7 +14,9 @@ final permisosGatewayProvider = Provider<PermisosGateway>(
 /// Diagnóstico de todos los permisos, leído de Android de una vez.
 ///
 /// Las cinco consultas corren en paralelo y nunca lanzan: una que falle
-/// deja su permiso como [EstadoPermiso.desconocido].
+/// deja su permiso como [EstadoPermiso.desconocido], y los desconocidos
+/// **no bloquean** (`PermisosEstado.faltanRequeridos`), porque cerrar el
+/// paso por un fallo de consulta dejaría a la persona adulta sin salida.
 final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
   final avisos = ref.watch(permisosGatewayProvider);
   final uso = ref.watch(usoTelefonoGatewayProvider);
@@ -25,9 +27,24 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
   // Disparadas todas antes de esperar: que no se serialicen.
   final avisosP = avisos.estadoAvisos();
   final bateriaP = avisos.estadoBateria();
-  final usoP = uso.estaPermitido();
+  final usoP = uso.estadoPermiso();
   final vpnP = filtro.estado();
   final adminP = admin.estado();
+
+  final adminActual = await adminP;
+
+  // La VPN solo se espera si el filtro está encendido. Si no, su canal no
+  // se consulta: en pruebas (y en un teléfono sin el puente) no contesta y
+  // el diagnóstico entero se quedaría girando sin terminar.
+  EstadoPermiso? estadoVpn;
+  if (filtroActivo) {
+    final vpn = await vpnP;
+    estadoVpn = !vpn.comprobado
+        ? EstadoPermiso.desconocido
+        : vpn.consentimiento
+            ? EstadoPermiso.concedido
+            : EstadoPermiso.pendiente;
+  }
 
   final lista = <PermisoPadre>[
     PermisoPadre(
@@ -36,8 +53,8 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
       paraQueSirve:
           'Para que el horario avise cuando toque pasar de actividad.',
       queNoLee:
-          'BlueTalk no lee los avisos de otras apps y no manda ninguno '
-          'solo, sin que tú lo toques.',
+          'BlueTalk no lee los avisos de otras apps. Solo avisa de las '
+          'actividades del horario, a la hora que tú pusiste.',
       estado: await avisosP,
       requerido: true,
     ),
@@ -48,9 +65,10 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
       queNoLee:
           'Solo se leen el nombre de la app y el tiempo en primer plano. '
           'No se leen mensajes, fotos, historiales ni nada escrito.',
-      estado: (await usoP)
-          ? EstadoPermiso.concedido
-          : EstadoPermiso.pendiente,
+      // Tri-estado: si el canal no contesta, «no se pudo comprobar» no
+      // bloquea. Bloquear con un fallo de consulta dejaría al adulto sin
+      // salida, porque «pedir» devuelve lo mismo que ya falló.
+      estado: await usoP,
       requerido: true,
     ),
     PermisoPadre(
@@ -73,9 +91,11 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
       queNoLee:
           'BlueTalk no cambia la configuración del teléfono, no bloquea '
           'otras apps y no borra nada.',
-      estado: (await adminP).activo
-          ? EstadoPermiso.concedido
-          : EstadoPermiso.pendiente,
+      estado: adminActual.comprobado
+          ? (adminActual.activo
+              ? EstadoPermiso.concedido
+              : EstadoPermiso.pendiente)
+          : EstadoPermiso.desconocido,
       requerido: false,
     ),
     // La VPN solo se necesita si el filtro está encendido: mientras no lo
@@ -89,9 +109,7 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
         queNoLee:
             'El tráfico no pasa por servidores de BlueTalk: la app solo '
             'comprueba nombres de dominio en el propio teléfono.',
-        estado: (await vpnP).consentimiento
-            ? EstadoPermiso.concedido
-            : EstadoPermiso.pendiente,
+        estado: estadoVpn ?? EstadoPermiso.desconocido,
         requerido: true,
       ),
   ];

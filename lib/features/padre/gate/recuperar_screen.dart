@@ -26,7 +26,13 @@ const palabraDeConfirmacion = 'BORRAR';
 /// 2. **BORRAR** (destructivo, literal del plan 11 §1.2): se borrarán el
 ///    progreso, el horario y los ajustes **de este dispositivo**, exige
 ///    escribir la palabra `BORRAR`, limpia **todas** las claves de
-///    `SharedPreferences` (`prefs.clear()`) y vuelve a `/onboarding`.
+///    `SharedPreferences` (`prefs.clear()`) **y las huellas del PIN y del
+///    código de recuperación, que desde la 3a.1 viven en el keystore**
+///    (`AlmacenPin.borrarSecretas`), y vuelve a `/onboarding`.
+///
+/// Si las huellas no se pueden borrar del keystore, no se borra nada y se
+/// dice en pantalla: un borrado a medias dejaría el código viejo vivo para
+/// el próximo arranque.
 ///
 /// La app sigue sin guardar el PIN ni el código en claro ni aceptar
 /// respuestas de seguridad; ninguna huella sale del dispositivo.
@@ -46,6 +52,9 @@ class _RecuperarScreenState extends ConsumerState<RecuperarScreen> {
 
   /// Aviso de código de recuperación erróneo (null = sin aviso).
   String? _errorCodigo;
+
+  /// Aviso de que el borrado total no se pudo hacer (null = sin aviso).
+  String? _errorBorrado;
 
   @override
   void initState() {
@@ -97,6 +106,20 @@ class _RecuperarScreenState extends ConsumerState<RecuperarScreen> {
 
   Future<void> _borrar() async {
     if (!_confirmado) return;
+    // Las huellas del PIN y del código viven en el keystore (3a.1):
+    // `prefs.clear()` no las toca y el gate volvería a pedir el código que
+    // la persona adulta acaba de decir que ha olvidado. Si no se pueden
+    // borrar, aquí no se borra nada y se dice en pantalla.
+    final borrado = await ref.read(almacenPinProvider).borrarSecretas();
+    if (!mounted) return;
+    if (!borrado) {
+      setState(() {
+        _errorBorrado =
+            'No se pudo borrar el código guardado en este teléfono. No se '
+            'borró nada. Cierra la app y vuelve a intentarlo.';
+      });
+      return;
+    }
     // Los avisos ya programados apuntan al horario viejo: se cancelan
     // antes de borrar (plan 11 §1.2), que no llegue ningún aviso de
     // datos que ya no existen.
@@ -251,6 +274,16 @@ class _RecuperarScreenState extends ConsumerState<RecuperarScreen> {
                   onPressed: _confirmado ? _borrar : null,
                   child: const Text('Borrar todo y empezar de nuevo'),
                 ),
+                if (_errorBorrado != null) ...[
+                  const SizedBox(height: 8),
+                  Semantics(
+                    liveRegion: true,
+                    child: Text(
+                      _errorBorrado!,
+                      style: const TextStyle(color: AppColors.error),
+                    ),
+                  ),
+                ],
                 TextButton(
                   onPressed: () => Navigator.of(context).maybePop(),
                   child: const Text('Volver'),

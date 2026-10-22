@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Registrа BlueTalk como administrador del dispositivo.
+<!-- Registra BlueTalk como administrador del dispositivo.
 
      No se pide ningún poder: <uses-policies> queda vacío a propósito.
      Solo se quiere que, si un niño toca «Desinstalar» desde Ajustes de

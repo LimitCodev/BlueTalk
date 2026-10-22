@@ -11,6 +11,9 @@ import 'package:bluetalk/features/padre/permisos/permiso_model.dart';
 import 'package:bluetalk/features/padre/permisos/permisos_asistente_screen.dart';
 import 'package:bluetalk/features/padre/permisos/permisos_controller.dart';
 import 'package:bluetalk/features/padre/permisos/permisos_gateway.dart';
+import 'package:bluetalk/features/padre/filtro_web/filtro_web_controller.dart';
+import 'package:bluetalk/features/padre/filtro_web/filtro_web_gateway.dart';
+import 'package:bluetalk/features/padre/filtro_web/filtro_web_model.dart';
 import 'package:bluetalk/features/padre/padre_screen.dart';
 import 'package:bluetalk/features/padre/proteccion/proteccion_controller.dart';
 import 'package:bluetalk/features/padre/proteccion/proteccion_gateway.dart';
@@ -52,16 +55,26 @@ class _PermisosFalsos implements PermisosGateway {
 
 /// «Acceso al uso» con el estado fijado por el test.
 class _UsoFalso implements UsoTelefonoGateway {
-  _UsoFalso(this.concedido);
+  _UsoFalso(this.concedido, {this.estado});
 
   bool concedido;
+
+  /// Fija un «no se pudo comprobar» de verdad, para el test que comprueba
+  /// que un fallo de consulta no se convierte en bloqueo.
+  EstadoPermiso? estado;
 
   @override
   Future<bool> estaPermitido() async => concedido;
 
   @override
+  Future<EstadoPermiso> estadoPermiso() async =>
+      estado ??
+      (concedido ? EstadoPermiso.concedido : EstadoPermiso.pendiente);
+
+  @override
   Future<bool> abrirAjustes() async {
     concedido = true;
+    estado = null;
     return true;
   }
 
@@ -93,35 +106,93 @@ class _AdminFalso implements ProteccionGateway {
   }
 }
 
-/// Los tres gateways del asistente, decididos por el test.
+/// Los gateways del asistente que no son de permisos, decididos por el test.
+/// El de permisos vive en [overridesDePadre] (o en [_fuentes]) para no
+/// declarar la misma doble dos veces en el mismo contenedor.
 List<Object> _gateways({
-  PermisosGateway? permisos,
   bool usoConcedido = true,
+  EstadoPermiso? usoEstado,
   bool adminActivo = true,
 }) =>
     [
-      permisosGatewayProvider.overrideWithValue(permisos ?? _PermisosFalsos()),
-      usoTelefonoGatewayProvider.overrideWithValue(_UsoFalso(usoConcedido)),
+      usoTelefonoGatewayProvider.overrideWithValue(
+        _UsoFalso(usoConcedido, estado: usoEstado),
+      ),
       proteccionGatewayProvider.overrideWithValue(_AdminFalso(adminActivo)),
     ];
 
-/// [_gateways] más las preferencias: sin ellas `filtroWebProvider` (que el
-/// asistente consulta) lanza `UnimplementedError` y el diagnóstico no
-/// termina nunca.
+/// [_gateways] más las preferencias y el canal de permisos: sin ellas
+/// `filtroWebProvider` (que el asistente consulta) lanza
+/// `UnimplementedError` y el diagnóstico no termina nunca.
 List<Object> _fuentes(
   SharedPreferences prefs, {
   PermisosGateway? permisos,
   bool usoConcedido = true,
+  EstadoPermiso? usoEstado,
   bool adminActivo = true,
 }) =>
     [
       sharedPreferencesProvider.overrideWithValue(prefs),
+      permisosGatewayProvider.overrideWithValue(permisos ?? _PermisosFalsos()),
       ..._gateways(
-        permisos: permisos,
         usoConcedido: usoConcedido,
+        usoEstado: usoEstado,
         adminActivo: adminActivo,
       ),
     ];
+
+/// Filtro con el estado que fije el test: sirve para emular el canal
+/// nativo caído (`comprobado == false`).
+class _FiltroFalso implements FiltroWebGateway {
+  _FiltroFalso(this.estadoFijo);
+
+  final FiltroWebEstado estadoFijo;
+
+  @override
+  Future<FiltroWebEstado> estado() async => estadoFijo;
+
+  @override
+  Future<bool> activar() async => false;
+
+  @override
+  Future<void> desactivar() async {}
+
+  @override
+  Future<void> actualizar(FiltroWebConfig config) async {}
+
+  @override
+  Future<void> limpiarRegistro() async {}
+
+  @override
+  Future<bool> abrirAjustesVpn() async => false;
+
+  @override
+  Future<bool> abrirAjustesDns() async => false;
+}
+
+/// Diagnóstico completo con el filtro encendido y el estado de VPN que se
+/// le pida: es lo que hace el canal nativo en un teléfono real.
+Future<PermisosEstado> _diagnostico({required FiltroWebEstado filtro}) async {
+  final prefs = await prefsDePrueba(
+    iniciales: {'padre_filtro_web_activo': true},
+  );
+  final container = ProviderContainer(
+    overrides: [
+      sharedPreferencesProvider.overrideWithValue(prefs),
+      permisosGatewayProvider.overrideWithValue(
+        _PermisosFalsos(
+          avisos: EstadoPermiso.concedido,
+          bateria: EstadoPermiso.concedido,
+        ),
+      ),
+      usoTelefonoGatewayProvider.overrideWithValue(_UsoFalso(true)),
+      proteccionGatewayProvider.overrideWithValue(_AdminFalso(true)),
+      filtroWebGatewayProvider.overrideWithValue(_FiltroFalso(filtro)),
+    ],
+  );
+  addTearDown(container.dispose);
+  return container.read(permisosProvider.future);
+}
 
 void main() {
   group('PermisosEstado', () {
@@ -189,6 +260,7 @@ void main() {
       WidgetTester tester, {
       PermisosGateway? permisos,
       bool usoConcedido = true,
+      EstadoPermiso? usoEstado,
       bool adminActivo = true,
     }) async {
       final prefs = await prefsDePrueba();
@@ -198,6 +270,7 @@ void main() {
             prefs,
             permisos: permisos,
             usoConcedido: usoConcedido,
+            usoEstado: usoEstado,
             adminActivo: adminActivo,
           ).cast(),
           child: const MaterialApp(
@@ -265,6 +338,22 @@ void main() {
       expect(find.textContaining('Falta concederlo'), findsWidgets);
     });
 
+    testWidgets(
+        'un «no se pudo comprobar» del uso no bloquea ni se disfraza de '
+        'falta', (tester) async {
+      await bombear(
+        tester,
+        permisos: _PermisosFalsos(
+          avisos: EstadoPermiso.concedido,
+          bateria: EstadoPermiso.concedido,
+        ),
+        usoEstado: EstadoPermiso.desconocido,
+      );
+
+      expect(find.textContaining('No se pudo comprobar'), findsOneWidget);
+      expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
+    });
+
     testWidgets('el asistente es accesible', (tester) async {
       final prefs = await prefsDePrueba();
       await expectSinProblemasDeAccesibilidad(
@@ -299,8 +388,8 @@ void main() {
         tester,
         home: PadreScreen(onSalir: () {}),
         overrides: [
-          ...overridesDePadre(prefs),
-          ..._gateways(permisos: _PermisosFalsos()),
+          ...overridesDePadre(prefs, permisos: _PermisosFalsos()),
+          ..._gateways(),
         ],
       );
 
@@ -326,13 +415,14 @@ void main() {
         tester,
         home: PadreScreen(onSalir: () {}),
         overrides: [
-          ...overridesDePadre(prefs),
-          ..._gateways(
+          ...overridesDePadre(
+            prefs,
             permisos: _PermisosFalsos(
               avisos: EstadoPermiso.concedido,
               bateria: EstadoPermiso.concedido,
             ),
           ),
+          ..._gateways(),
         ],
       );
 
@@ -341,6 +431,61 @@ void main() {
       expect(find.byType(NavigationBar), findsOneWidget);
       expect(find.text('Uso del día'), findsOneWidget);
       expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
+    });
+
+    testWidgets(
+        'si el adulto revoca un permiso fuera de la app, al volver se '
+        'vuelve a comprobar', (tester) async {
+      final prefs = await prefsDeSesion();
+      final avisos = _PermisosFalsos(
+        avisos: EstadoPermiso.concedido,
+        bateria: EstadoPermiso.concedido,
+      );
+      await pumpPadre(
+        tester,
+        home: PadreScreen(onSalir: () {}),
+        overrides: [
+          ...overridesDePadre(prefs, permisos: avisos),
+          ..._gateways(),
+        ],
+      );
+      await entrar(tester);
+      expect(find.byType(NavigationBar), findsOneWidget,
+          reason: 'con los permisos concedidos el panel se enseña');
+
+      // Con la app detrás, el adulto revoca el permiso desde Android.
+      tester.binding
+          .handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      avisos.avisos = EstadoPermiso.pendiente;
+      tester.binding
+          .handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(NavigationBar), findsNothing,
+          reason: 'una caché vieja no puede dejar pasar el panel');
+      expect(find.textContaining('Todavía no se puede avanzar'), findsOneWidget);
+      expect(find.text('Uso del día'), findsNothing);
+    });
+  });
+
+  group('tri-estado: un fallo de consulta no se vuelve bloqueo', () {
+    test('la VPN sin canal se enseña «no se pudo comprobar» y no bloquea',
+        () async {
+      final estado =
+          await _diagnostico(filtro: const FiltroWebEstado(comprobado: false));
+
+      expect(estado.de(PermisoId.vpn)?.estado, EstadoPermiso.desconocido);
+      expect(estado.faltanRequeridos, isFalse,
+          reason: 'un canal caído no puede encerrar al adulto');
+    });
+
+    test('con el canal vivo y la VPN sin conceder sí bloquea', () async {
+      final estado = await _diagnostico(
+        filtro: const FiltroWebEstado(activo: true, comprobado: true),
+      );
+
+      expect(estado.de(PermisoId.vpn)?.estado, EstadoPermiso.pendiente);
+      expect(estado.faltanRequeridos, isTrue);
     });
   });
 }

@@ -1,5 +1,3 @@
-import 'package:flutter/services.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -8,71 +6,11 @@ import 'package:bluetalk/features/padre/gate/pin_store.dart';
 
 import 'harness.dart';
 
-/// Keystore falso: `write/readAll/delete` sobre un mapa, y marca si alguna
-/// vez se intentó escribir el PIN en claro por el camino equivocado.
-class _KeystoreFalso implements FlutterSecureStorage {
-  _KeystoreFalso({this.conKeystore = true});
-
-  final Map<String, String> datos = {};
-  bool conKeystore;
-  int escrituras = 0;
-
-  @override
-  Future<Map<String, String>> readAll({
-    AndroidOptions? aOptions,
-    AppleOptions? iOptions,
-    LinuxOptions? lOptions,
-    AppleOptions? mOptions,
-    WindowsOptions? wOptions,
-    WebOptions? webOptions,
-  }) async {
-    if (!conKeystore) throw MissingPluginException('sin keystore');
-    return Map.of(datos);
-  }
-
-  @override
-  Future<void> write({
-    required String key,
-    required String? value,
-    AndroidOptions? aOptions,
-    AppleOptions? iOptions,
-    LinuxOptions? lOptions,
-    AppleOptions? mOptions,
-    WindowsOptions? wOptions,
-    WebOptions? webOptions,
-  }) async {
-    if (!conKeystore) throw MissingPluginException('sin keystore');
-    escrituras++;
-    if (value == null) {
-      datos.remove(key);
-    } else {
-      datos[key] = value;
-    }
-  }
-
-  @override
-  Future<void> delete({
-    required String key,
-    AndroidOptions? aOptions,
-    AppleOptions? iOptions,
-    LinuxOptions? lOptions,
-    AppleOptions? mOptions,
-    WindowsOptions? wOptions,
-    WebOptions? webOptions,
-  }) async {
-    if (!conKeystore) throw MissingPluginException('sin keystore');
-    datos.remove(key);
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   /// Huellas sembradas en preferencias, como estaban antes de esta versión.
-  Future<(SharedPreferences, _KeystoreFalso, AlmacenPin)> conHuellaVieja() async {
+  Future<(SharedPreferences, KeystorePrueba, AlmacenPin)> conHuellaVieja() async {
     final prefs = await prefsDePrueba();
     await prefs.setString(PinStore.claveSalt, '4c2c421d3df371b269aa7772ee5336d3');
     await prefs.setString(
@@ -81,7 +19,7 @@ void main() {
     );
     await prefs.setInt(PinStore.claveLongitud, 4);
     await prefs.setInt(PinStore.claveIteraciones, 10000);
-    final keystore = _KeystoreFalso();
+    final keystore = KeystorePrueba();
     return (prefs, keystore, AlmacenPin(prefs: prefs, sistema: keystore));
   }
 
@@ -140,7 +78,7 @@ void main() {
       await prefs.setInt(PinStore.claveIteraciones, 10000);
       final almacen = AlmacenPin(
         prefs: prefs,
-        sistema: _KeystoreFalso(conKeystore: false),
+        sistema: KeystorePrueba(conKeystore: false),
       );
 
       await almacen.cargar();
@@ -161,7 +99,7 @@ void main() {
 
     test('una huella nueva se escribe cifrada y sale de preferencias', () async {
       final prefs = await prefsDePrueba();
-      final keystore = _KeystoreFalso();
+      final keystore = KeystorePrueba();
       final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
       await almacen.cargar();
       final store = PinStore(
@@ -182,7 +120,7 @@ void main() {
 
     test('el PIN en claro no aparece en ningún almacén', () async {
       final prefs = await prefsDePrueba();
-      final keystore = _KeystoreFalso();
+      final keystore = KeystorePrueba();
       final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
       await almacen.cargar();
       final store = PinStore(
@@ -202,6 +140,62 @@ void main() {
         final valor = keystore.datos[clave] ?? prefs.get(clave)?.toString();
         expect(valor, isNot('445566'), reason: clave);
       }
+    });
+  });
+
+  group('borrado total de las huellas (revisión de la fase 3a)', () {
+    test('las borra del keystore, de preferencias y de la caché', () async {
+      final (prefs, keystore, almacen) = await conHuellaVieja();
+      await almacen.cargar();
+      // Precondición: la huella vive en el keystore, no en preferencias.
+      expect(keystore.datos[PinStore.claveHash], isNotNull);
+
+      final hecho = await almacen.borrarSecretas();
+
+      expect(hecho, isTrue);
+      for (final clave in AlmacenPin.clavesSecretas) {
+        expect(keystore.datos.containsKey(clave), isFalse, reason: clave);
+        expect(prefs.containsKey(clave), isFalse, reason: clave);
+        expect(almacen.tiene(clave), isFalse, reason: clave);
+        expect(almacen.leer(clave), isNull, reason: clave);
+      }
+    });
+
+    test(
+        'si el keystore no deja borrar, no se declara hecho ni se toca nada',
+        () async {
+      final (prefs, keystore, almacen) = await conHuellaVieja();
+      await almacen.cargar();
+      keystore.borradoFallido = true;
+
+      final hecho = await almacen.borrarSecretas();
+
+      expect(hecho, isFalse,
+          reason: 'un borrado a medias no puede presentarse como hecho');
+      expect(keystore.datos[PinStore.claveHash], isNotNull,
+          reason: 'la huella sigue donde estaba: nada quedó a medias');
+      expect(almacen.tiene(PinStore.claveHash), isTrue);
+      expect(almacen.leer(PinStore.claveHash), isNotNull,
+          reason: 'el PIN que había sigue validando hasta que se resuelva');
+      // Preferencias no se tocaron: los datos del modo padre siguen.
+      expect(prefs.getInt(PinStore.claveLongitud), 4);
+    });
+
+    test('sin keystore operativo se borra de preferencias', () async {
+      final prefs = await prefsDePrueba();
+      await prefs.setString(PinStore.claveSalt, '4c2c421d3df371b269aa7772ee5336d3');
+      await prefs.setString(PinStore.claveHash, '6ef6f3446c');
+      final almacen = AlmacenPin(
+        prefs: prefs,
+        sistema: KeystorePrueba(conKeystore: false),
+      );
+
+      final hecho = await almacen.borrarSecretas();
+
+      expect(hecho, isTrue);
+      expect(prefs.containsKey(PinStore.claveHash), isFalse);
+      expect(prefs.containsKey(PinStore.claveSalt), isFalse);
+      expect(almacen.tiene(PinStore.claveHash), isFalse);
     });
   });
 }
