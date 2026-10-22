@@ -191,8 +191,17 @@ class GateController extends Notifier<GateEstado> {
     final resultado = await store.verificarRecuperacion(tecleado);
 
     if (resultado == VerificacionPin.correcto) {
-      await store.borrarSoloPin();
+      final borrado = await store.borrarSoloPin();
       _cancelarCuentaAtras();
+      if (!borrado) {
+        // El keystore no dejó borrar la huella vieja: no se anuncia un
+        // PIN borrado que seguiría valiendo.
+        state = _estadoPedir(
+          mensaje: 'El código es correcto, pero este teléfono no dejó '
+              'borrar el código antiguo. Inténtalo de nuevo.',
+        );
+        return false;
+      }
       state = const GateEstado(
         fase: GateFase.crear,
         mensaje: 'Código correcto. Crea un código nuevo.',

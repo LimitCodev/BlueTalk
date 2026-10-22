@@ -281,12 +281,18 @@ class PinStore {
   /// consentimientos — y también el código de recuperación, que sigue
   /// valiendo hasta que se regenere. Es la salida no destructiva para un
   /// PIN olvidado (frente al borrado total con la palabra BORRAR).
-  Future<void> borrarSoloPin() async {
-    await almacen.borrar(claveHash);
-    await almacen.borrar(claveSalt);
+  ///
+  /// Devuelve `false` si alguna huella no se pudo borrar en el keystore:
+  /// en ese caso no se toca nada más y quien llama avisa, en vez de fingir
+  /// un PIN borrado que seguiría valiendo.
+  Future<bool> borrarSoloPin() async {
+    final hash = await almacen.borrar(claveHash);
+    final sal = await almacen.borrar(claveSalt);
+    if (!hash || !sal) return false;
     await _prefs.remove(claveLongitud);
     await _prefs.remove(claveIteraciones);
     await _limpiarLockout();
+    return true;
   }
 
   /// Comprueba el PIN. No guarda ni registra el valor en claro en ningún

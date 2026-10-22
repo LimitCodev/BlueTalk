@@ -57,7 +57,14 @@ class KeystorePrueba implements FlutterSecureStorage {
 
   final Map<String, String> datos = {};
   bool conKeystore;
+
+  /// El keystore responde al leer pero falla al escribir (caso raro de un
+  /// keystore dañado o bloqueado).
+  bool escrituraFallida = false;
+
+  /// El keystore falla al borrar.
   bool borradoFallido = false;
+
   int escrituras = 0;
 
   @override
@@ -85,6 +92,7 @@ class KeystorePrueba implements FlutterSecureStorage {
     WebOptions? webOptions,
   }) async {
     if (!conKeystore) throw MissingPluginException('sin keystore');
+    if (escrituraFallida) throw Exception('keystore que no escribe');
     escrituras++;
     if (value == null) {
       datos.remove(key);

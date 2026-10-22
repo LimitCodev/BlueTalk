@@ -33,9 +33,11 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
 
   final adminActual = await adminP;
 
-  // La VPN solo se espera si el filtro está encendido. Si no, su canal no
-  // se consulta: en pruebas (y en un teléfono sin el puente) no contesta y
-  // el diagnóstico entero se quedaría girando sin terminar.
+  // El canal de la VPN se dispara siempre, pero **solo se espera** si el
+  // filtro está encendido: sin filtro no hay nada que pedir, y esperarlo
+  // en pruebas (donde ese canal no contesta) dejaría el diagnóstico entero
+  // girando sin terminar. El gateway nunca lanza, así que no queda ningún
+  // futuro sin consumir.
   EstadoPermiso? estadoVpn;
   if (filtroActivo) {
     final vpn = await vpnP;

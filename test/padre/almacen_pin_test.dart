@@ -198,4 +198,70 @@ void main() {
       expect(almacen.tiene(PinStore.claveHash), isFalse);
     });
   });
+
+  group('keystore que lee pero no escribe (revisión 2 de la fase 3a)', () {
+    test('no manda en las lecturas ni en lo que se muestra', () async {
+      final prefs = await prefsDePrueba();
+      final keystore = KeystorePrueba();
+      await keystore.write(key: PinStore.claveHash, value: 'huella-vieja');
+      keystore.escrituraFallida = true;
+
+      final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+      await almacen.cargar();
+
+      expect(almacen.leer(PinStore.claveHash), isNull,
+          reason: 'una huella de un keystore que no escribe no se usa');
+      expect(almacen.tiene(PinStore.claveHash), isFalse);
+      expect(almacen.cifrado, isFalse,
+          reason: 'en pantalla no se anuncia cifrado donde no se puede escribir');
+    });
+
+    test('el borrado total aun así va al keystore y no miente', () async {
+      final prefs = await prefsDePrueba();
+      final keystore = KeystorePrueba();
+      await keystore.write(key: PinStore.claveHash, value: 'huella-vieja');
+      keystore.escrituraFallida = true;
+
+      final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+      await almacen.cargar();
+
+      // Si el borrado del keystore funciona, la huella vieja sale de ahí.
+      expect(await almacen.borrarSecretas(), isTrue);
+      expect(keystore.datos, isEmpty,
+          reason: 'estaba ahí y se pudo borrar: de ahí tenía que salir');
+
+      // Y si además no deja borrar, no se declara hecho nada.
+      keystore.escrituraFallida = false;
+      await keystore.write(key: PinStore.claveHash, value: 'otra-vieja');
+      keystore.escrituraFallida = true;
+      keystore.borradoFallido = true;
+      final segunda = AlmacenPin(prefs: prefs, sistema: keystore);
+      await segunda.cargar();
+
+      expect(await segunda.borrarSecretas(), isFalse);
+      expect(keystore.datos[PinStore.claveHash], isNotNull);
+      expect(await segunda.borrar(PinStore.claveHash), isFalse);
+      expect(prefs.containsKey(PinStore.claveHash), isFalse,
+          reason: 'en preferencias no había nada: solo estaba en el keystore');
+    });
+
+    test('borrar una clave devuelve false sin tocar nada si falla', () async {
+      final prefs = await prefsDePrueba();
+      await prefs.setString(PinStore.claveHash, '6ef6f3446c');
+      final keystore = KeystorePrueba();
+      await keystore.write(key: PinStore.claveHash, value: 'huella-en-keystore');
+      final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+      await almacen.cargar();
+      keystore.borradoFallido = true;
+
+      final hecho = await almacen.borrar(PinStore.claveHash);
+
+      expect(hecho, isFalse);
+      expect(prefs.getString(PinStore.claveHash), '6ef6f3446c',
+          reason: 'nada se borra de preferencias si sigue viva en el keystore');
+      expect(keystore.datos[PinStore.claveHash], 'huella-en-keystore');
+      expect(almacen.tiene(PinStore.claveHash), isTrue,
+          reason: 'el PIN que había sigue abriendo hasta que se pueda borrar');
+    });
+  });
 }
