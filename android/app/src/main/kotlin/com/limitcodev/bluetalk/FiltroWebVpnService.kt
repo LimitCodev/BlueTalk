@@ -330,7 +330,8 @@ class FiltroWebVpnService : VpnService() {
 
     private fun construirConsulta(nombre: String, tipo: Int): ByteArray {
         val etiquetas = nombre.split('.').filter { it.isNotEmpty() }
-        var total = 12 + 4
+        // 12 de encabezado + el byte cero que cierra el nombre + tipo y clase.
+        var total = 12 + 1 + 4
         for (etiqueta in etiquetas) total += etiqueta.length + 1
         val datos = ByteArray(total)
         putU16(datos, 0, 0x1234)
@@ -343,6 +344,11 @@ class FiltroWebVpnService : VpnService() {
             System.arraycopy(bytes, 0, datos, offset + 1, bytes.size)
             offset += bytes.size + 1
         }
+        // Sin este cero el nombre no está cerrado y el DNS de la red no
+        // entiende la consulta: se cuelga el SafeSearch y se cae al
+        // reenvío normal (comprobado en el emulador el 2026-10-21).
+        datos[offset] = 0
+        offset += 1
         putU16(datos, offset, tipo)
         putU16(datos, offset + 2, 1) // clase IN
         return datos
