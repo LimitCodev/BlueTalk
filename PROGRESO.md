@@ -402,5 +402,25 @@ corregirlos. Se corrigió todo en esta rama:
 
 Detalle y tabla en `docs/informes/3a-evidencia.md`.
 
+### Segunda ronda de revisión (`revisor`) — cerrada en `f82c49a`
+
+No dio la fase por cerrada: **2 medios y 3 leves**, todos sobre el
+borrado del PIN.
+
+- **Medio 1:** con un keystore que lee pero no escribe, el borrado total
+  no lo intentaba y devolvía «hecho» con la huella vieja aún ahí.
+  Arreglo: `_huellasEnSistema`; el borrado se intenta si el keystore está
+  listo **o contiene** huellas, y una caché de un keystore que no escribe
+  ya no manda en las lecturas.
+- **Medio 2:** `borrar()` tragaba el fallo de borrado y `borrarSoloPin()`
+  fingía el PIN borrado. Arreglo: keystore primero, `false` sin tocar nada
+  si falla, y el gate avisa en lugar de pedir un PIN nuevo.
+- **Leves:** comentario falso de `permisos_controller.dart`, mensaje de
+  `6028256` que no mencionaba el arreglo del panel con caché vieja (la
+  tabla del informe ahora dice en qué commit va) y test del aviso
+  «No se borró nada…».
+
+Suite: **334/334** · `flutter analyze` sin problemas. Sin push, sin merge.
+
 **FIN DE LA FASE 3a. Esperando confirmación para pasar a la 3b**
 (SafeSearch forzado, bloqueo por palabras, perfiles por edad).

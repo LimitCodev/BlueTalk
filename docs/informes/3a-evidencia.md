@@ -13,7 +13,9 @@ si falta un permiso obligatorio.
 | `34448cd` | `3a.1` PIN y código de recuperación en `flutter_secure_storage` (keystore) con migración desde `SharedPreferences` |
 | `5bb784d` | `3a.2` `DeviceAdminReceiver` + `ProteccionChannel` + tile en Control |
 | `53c9350` | `3a.3` `PermisosChannel` + asistente de permisos + bloqueo del paso al panel |
-| *(este)* | Arreglo del defecto visto al ejecutarlo: el diagnóstico de permisos se servía de una caché vieja |
+| `6028256` | Primera ronda de revisión: borrado de huellas del keystore al pulsar BORRAR, tri-estado en los diagnósticos, tile del cifrado y arreglo del defecto visto al ejecutarlo (el diagnóstico de permisos se servía de una caché vieja; vive en `padre_screen.dart`, **en este mismo commit**) |
+| `1a0f96d` | Este informe y el checkpoint de `PROGRESO.md` |
+| `f82c49a` | Segunda ronda de revisión: el borrado del PIN ya no declara hecho lo que el keystore no dejó borrar (ver más abajo) |
 
 ## Qué se ejecutó y qué se vio
 
@@ -21,7 +23,11 @@ si falta un permiso obligatorio.
 `./scripts/gradle-limite.sh`):**
 
 - `flutter analyze` → **`No issues found!`**
-- `flutter test` → **321/321 en verde** (320 previos + 1 test de regresión nuevo)
+- `flutter test` → **321/321 en verde** en el commit `53c9350` (320 previos +
+  1 test de regresión); **329/329** tras la primera ronda de revisión y
+  **334/334** tras la segunda. El recuento total al cerrar la fase es
+  `334` (`All tests passed!`); no se cuentan a ojo: es la salida del
+  comando.
 - `flutter build apk --debug` → `✓ Built build/app/outputs/flutter-apk/app-debug.apk`
 - `gradle-limite.sh --stop` después de cada tarea pesada; `uptime` tras los
   lanzamientos (máx. 1 min subió a 6,75 tras la suite → esperado; bajó a 2,30
@@ -116,10 +122,27 @@ Leves también corregidos: comentario del doble de permisos pegado al de
 `а` cirílica de «Registrа» en `device_admin.xml`, y este latido de
 `estado-vivo.log`, reanudado después de los commits de hoy.
 
+## Segunda ronda de revisión (`revisor`) — cerrada en `f82c49a`
+
+El segundo repaso no dio la fase por cerrada: encontró **2 medios y 3
+leves**, todos en el mismo sitio (el borrado del PIN). Todo se corrigió y
+se volvió a pasar la suite completa (334/334):
+
+| Hallazgo | Qué se hizo |
+|---|---|
+| **Medio:** si el keystore **leía pero no escribía**, `borrarSecretas()` no intentaba el keystore (miraba solo «¿puedo escribir?»), devolvía `true` y `prefs.clear()` dejaba la huella vieja viva: mismo bucle del hallazgo grave, por otra puerta | Nuevo campo `_huellasEnSistema` («hay huellas ahí») que se activa al leerlas o al migrarlas. El borrado se intenta si el keystore **está listo o contiene** huellas, y una lectura que no admite escrituras ya no se usa (la caché se vacía) para que una huella guardada después en preferencias no se lea vieja. Test: «keystore que lee pero no escribe» |
+| **Medio:** `AlmacenPin.borrar()` tragaba el fallo de borrado del keystore, y `borrarSoloPin()` (la salida no destructiva con el código de recuperación) fingía el PIN borrado | `borrar()` va al keystore **primero** y devuelve `false` sin tocar nada si no se puede borrar; `borrarSoloPin()` propaga el `false` y el gate enseña «El código es correcto, pero este teléfono no dejó borrar el código antiguo.» en vez de «Crea un código nuevo» con el PIN viejo aún ahí. 2 tests unitarios + 2 de widget (recuperación y BORRAR) |
+| **Leve:** comentario de `permisos_controller.dart` que decía «si no, su canal no se consulta» (falso: el canal se dispara, no se espera) | Redactado como es: se dispara siempre, solo se espera con el filtro encendido |
+| **Leve:** el mensaje del commit `6028256` no mencionaba el arreglo del panel con caché vieja, y la tabla de arriba decía «*(este)» como si fuera un commit aparte | El commit no se puede reescribir sin arrastrar los dos siguientes (y nada está publicado, pero el resto de la rama ya lo referencia). Se corrigió la tabla: el arreglo viaja en `6028256`, en `padre_screen.dart` |
+| **Leve:** no había test del aviso «No se borró nada…» | Test de widget «si el keystore no deja borrar, BORRAR no borra nada y lo dice» (comprobado que **falla si se quita el aviso**) |
+
 ## NO VERIFICADO
 
 - **Keystore real.** `3a.1` se probó con doble de keystore en tests y no se
   pasó por la pantalla de migración en un dispositivo. Queda en 3c.
+- **Keystore dañado (lee, no escribe o no borra).** El caso está cubierto
+  con dobles: se deja de usar, el borrado se niega y se avisa en pantalla.
+  No se ha provocado en un teléfono real, así que no está probado ahí.
 - **Fricción real de desinstalación.** El `DeviceAdminReceiver` pide
   **cero políticas** (`<uses-policies />` vacío en `res/xml/device_admin.xml`):
   es fricción, no un muro. Que Android ofrezca o no «desactivar la
