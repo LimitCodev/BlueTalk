@@ -16,6 +16,9 @@ class FiltroWebPrefs {
   static const juegos = 'padre_filtro_web_juegos';
   static const buscadores = 'padre_filtro_web_buscadores';
   static const personalizados = 'padre_filtro_web_custom';
+  static const safeSearch = 'padre_filtro_web_safesearch';
+  static const palabras = 'padre_filtro_web_palabras';
+  static const permitidos = 'padre_filtro_web_permitidos';
 
   static FiltroWebConfig leer(SharedPreferences prefs) {
     final crudos = prefs.getString(personalizados);
@@ -45,7 +48,38 @@ class FiltroWebPrefs {
       bloquearJuegos: prefs.getBool(juegos) ?? false,
       bloquearBuscadores: prefs.getBool(buscadores) ?? false,
       dominiosPersonalizados: List.unmodifiable(dominios),
+      // Encendido por defecto: es lo protector, y el adulto puede apagarlo.
+      forzarSafeSearch: prefs.getBool(safeSearch) ?? true,
+      palabrasProhibidas: _listaDeTexto(prefs, palabras, normalizarPalabra),
+      dominiosPermitidos: _listaDeTexto(prefs, permitidos, normalizarDominio),
     );
+  }
+
+  /// Lee una lista de texto guardada como JSON, normalizando cada entrada.
+  static List<String> _listaDeTexto(
+    SharedPreferences prefs,
+    String clave,
+    String? Function(String) normalizar,
+  ) {
+    final crudos = prefs.getString(clave);
+    if (crudos == null) return const [];
+    final salida = <String>[];
+    try {
+      final lista = jsonDecode(crudos);
+      if (lista is List) {
+        for (final item in lista) {
+          if (item is String) {
+            final normalizado = normalizar(item);
+            if (normalizado != null && !salida.contains(normalizado)) {
+              salida.add(normalizado);
+            }
+          }
+        }
+      }
+    } on FormatException {
+      // Lista corrupta: se ignora y el adulto puede volver a agregar.
+    }
+    return List.unmodifiable(salida);
   }
 
   static Future<void> guardar(
@@ -62,6 +96,9 @@ class FiltroWebPrefs {
       personalizados,
       jsonEncode(config.dominiosPersonalizados),
     );
+    await prefs.setBool(safeSearch, config.forzarSafeSearch);
+    await prefs.setString(palabras, jsonEncode(config.palabrasProhibidas));
+    await prefs.setString(permitidos, jsonEncode(config.dominiosPermitidos));
   }
 }
 
@@ -152,6 +189,80 @@ class FiltroWebController extends Notifier<FiltroWebConfig> {
         .where((item) => item != dominio)
         .toList();
     final next = state.copyWith(dominiosPersonalizados: lista);
+    await _guardar(next);
+    if (next.activo) {
+      await ref.read(filtroWebGatewayProvider).actualizar(next);
+    }
+  }
+
+  Future<void> setSafeSearch(bool valor) async {
+    if (valor == state.forzarSafeSearch) return;
+    final next = state.copyWith(forzarSafeSearch: valor);
+    await _guardar(next);
+    if (next.activo) {
+      await ref.read(filtroWebGatewayProvider).actualizar(next);
+    }
+  }
+
+  /// Agrega una palabra a la lista de bloqueadas. Igual que con los
+  /// dominios, el resultado dice literalmente qué pasó para la pantalla.
+  Future<ResultadoDominio> agregarPalabra(String entrada) async {
+    final palabra = normalizarPalabra(entrada);
+    if (palabra == null) {
+      return (resultado: ResultadoAgregar.invalido, dominio: null);
+    }
+    if (state.palabrasProhibidas.contains(palabra)) {
+      return (resultado: ResultadoAgregar.duplicado, dominio: palabra);
+    }
+    if (state.palabrasProhibidas.length >= FiltroWebConfig.maxPalabras) {
+      return (resultado: ResultadoAgregar.lleno, dominio: palabra);
+    }
+    final lista = [...state.palabrasProhibidas, palabra]..sort();
+    final next = state.copyWith(palabrasProhibidas: lista);
+    await _guardar(next);
+    if (next.activo) {
+      await ref.read(filtroWebGatewayProvider).actualizar(next);
+    }
+    return (resultado: ResultadoAgregar.agregado, dominio: palabra);
+  }
+
+  Future<void> quitarPalabra(String palabra) async {
+    final lista = state.palabrasProhibidas
+        .where((item) => item != palabra)
+        .toList();
+    final next = state.copyWith(palabrasProhibidas: lista);
+    await _guardar(next);
+    if (next.activo) {
+      await ref.read(filtroWebGatewayProvider).actualizar(next);
+    }
+  }
+
+  /// Agrega un sitio que sí puede abrirse aunque se parezca a una palabra.
+  Future<ResultadoDominio> agregarPermitido(String entrada) async {
+    final dominio = normalizarDominio(entrada);
+    if (dominio == null) {
+      return (resultado: ResultadoAgregar.invalido, dominio: null);
+    }
+    if (state.dominiosPermitidos.contains(dominio)) {
+      return (resultado: ResultadoAgregar.duplicado, dominio: dominio);
+    }
+    if (state.dominiosPermitidos.length >= FiltroWebConfig.maxPermitidos) {
+      return (resultado: ResultadoAgregar.lleno, dominio: dominio);
+    }
+    final lista = [...state.dominiosPermitidos, dominio]..sort();
+    final next = state.copyWith(dominiosPermitidos: lista);
+    await _guardar(next);
+    if (next.activo) {
+      await ref.read(filtroWebGatewayProvider).actualizar(next);
+    }
+    return (resultado: ResultadoAgregar.agregado, dominio: dominio);
+  }
+
+  Future<void> quitarPermitido(String dominio) async {
+    final lista = state.dominiosPermitidos
+        .where((item) => item != dominio)
+        .toList();
+    final next = state.copyWith(dominiosPermitidos: lista);
     await _guardar(next);
     if (next.activo) {
       await ref.read(filtroWebGatewayProvider).actualizar(next);

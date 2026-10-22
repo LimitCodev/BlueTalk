@@ -24,6 +24,8 @@ class FiltroWebScreen extends ConsumerStatefulWidget {
 
 class _FiltroWebScreenState extends ConsumerState<FiltroWebScreen> {
   final _campo = TextEditingController();
+  final _campoPalabra = TextEditingController();
+  final _campoPermitido = TextEditingController();
   Timer? _refresco;
 
   @override
@@ -40,6 +42,8 @@ class _FiltroWebScreenState extends ConsumerState<FiltroWebScreen> {
   void dispose() {
     _refresco?.cancel();
     _campo.dispose();
+    _campoPalabra.dispose();
+    _campoPermitido.dispose();
     super.dispose();
   }
 
@@ -83,6 +87,74 @@ class _FiltroWebScreenState extends ConsumerState<FiltroWebScreen> {
     await ref.read(filtroWebProvider.notifier).setActivo(false);
     if (!mounted) return;
     await _cambiarActivo(true);
+  }
+
+  Future<void> _agregarPalabra() async {
+    FocusScope.of(context).unfocus();
+    final resultado = await ref
+        .read(filtroWebProvider.notifier)
+        .agregarPalabra(_campoPalabra.text);
+    if (!mounted) return;
+
+    switch (resultado.resultado) {
+      case ResultadoAgregar.agregado:
+        _campoPalabra.clear();
+        _snack(
+          'Se bloqueará cualquier sitio cuyo nombre contenga '
+          '«${resultado.dominio}».',
+        );
+      case ResultadoAgregar.invalido:
+        _snack('Escribe una sola palabra, sin espacios.');
+      case ResultadoAgregar.duplicado:
+        _snack('Esa palabra ya está en la lista.');
+      case ResultadoAgregar.lleno:
+        _snack(
+          'La lista está llena (${FiltroWebConfig.maxPalabras} palabras). '
+          'Quita alguna para agregar otra.',
+        );
+    }
+    ref.invalidate(filtroWebEstadoProvider);
+  }
+
+  Future<void> _quitarPalabra(String palabra) async {
+    await ref.read(filtroWebProvider.notifier).quitarPalabra(palabra);
+    if (!mounted) return;
+    _snack('Se quitó «$palabra» de la lista.');
+    ref.invalidate(filtroWebEstadoProvider);
+  }
+
+  Future<void> _agregarPermitido() async {
+    FocusScope.of(context).unfocus();
+    final resultado = await ref
+        .read(filtroWebProvider.notifier)
+        .agregarPermitido(_campoPermitido.text);
+    if (!mounted) return;
+
+    switch (resultado.resultado) {
+      case ResultadoAgregar.agregado:
+        _campoPermitido.clear();
+        _snack(
+          'Se podrá abrir ${resultado.dominio} aunque se parezca a una '
+          'palabra prohibida.',
+        );
+      case ResultadoAgregar.invalido:
+        _snack('Eso no parece un nombre de sitio válido.');
+      case ResultadoAgregar.duplicado:
+        _snack('Ese sitio ya está en la lista de permitidos.');
+      case ResultadoAgregar.lleno:
+        _snack(
+          'La lista está llena (${FiltroWebConfig.maxPermitidos} sitios). '
+          'Quita alguno para agregar otro.',
+        );
+    }
+    ref.invalidate(filtroWebEstadoProvider);
+  }
+
+  Future<void> _quitarPermitido(String dominio) async {
+    await ref.read(filtroWebProvider.notifier).quitarPermitido(dominio);
+    if (!mounted) return;
+    _snack('Se quitó $dominio de los sitios permitidos.');
+    ref.invalidate(filtroWebEstadoProvider);
   }
 
   Future<void> _agregar() async {
@@ -227,6 +299,20 @@ class _FiltroWebScreenState extends ConsumerState<FiltroWebScreen> {
                 ref.invalidate(filtroWebEstadoProvider);
               },
             ),
+          SwitchListTile(
+            title: const Text('Google con SafeSearch obligatorio'),
+            subtitle: const Text(
+              'Las búsquedas de Google se contestan con SafeSearch '
+              'obligatorio: no aparecen imágenes ni vídeos para adultos. '
+              'Solo aplica a Google; los demás buscadores se bloquean con '
+              'el grupo de arriba.',
+            ),
+            value: config.forzarSafeSearch,
+            onChanged: (valor) {
+              ref.read(filtroWebProvider.notifier).setSafeSearch(valor);
+              ref.invalidate(filtroWebEstadoProvider);
+            },
+          ),
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Text(
@@ -282,6 +368,103 @@ class _FiltroWebScreenState extends ConsumerState<FiltroWebScreen> {
                   tooltip: 'Quitar $dominio',
                   icon: const Icon(Icons.delete_outline),
                   onPressed: () => _quitar(dominio),
+                ),
+              ),
+          const SectionHeader('Bloquear por palabras'),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+            child: TextField(
+              controller: _campoPalabra,
+              textInputAction: TextInputAction.done,
+              autocorrect: false,
+              enableSuggestions: false,
+              onSubmitted: (_) => _agregarPalabra(),
+              decoration: const InputDecoration(
+                labelText: 'Palabra que no debe aparecer',
+                hintText: 'ejemplo',
+                helperText:
+                    'Se compara sin acentos y como parte del nombre del sitio.',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(64, 48),
+              ),
+              onPressed: _agregarPalabra,
+              icon: const Icon(Icons.text_fields_outlined),
+              label: const Text('Bloquear palabra'),
+            ),
+          ),
+          if (config.palabrasProhibidas.isEmpty)
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text(
+                'Aún no agregaste palabras. Si una bloquea un sitio que sí '
+                'querías abrir, agrégalo abajo a los permitidos.',
+              ),
+            )
+          else
+            for (final palabra in config.palabrasProhibidas)
+              ListTile(
+                leading: const Icon(Icons.text_fields_outlined),
+                title: Text(palabra),
+                subtitle: const Text('Bloquea el sitio que la contenga'),
+                trailing: IconButton(
+                  tooltip: 'Quitar $palabra',
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () => _quitarPalabra(palabra),
+                ),
+              ),
+          const SectionHeader('Permitir un sitio'),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+            child: TextField(
+              controller: _campoPermitido,
+              keyboardType: TextInputType.url,
+              textInputAction: TextInputAction.done,
+              autocorrect: false,
+              enableSuggestions: false,
+              onSubmitted: (_) => _agregarPermitido(),
+              decoration: const InputDecoration(
+                labelText: 'Dirección del sitio que sí puede abrirse',
+                hintText: 'https://ejemplo.com',
+                helperText:
+                    'Sirve si una palabra bloqueó un sitio que querías abrir.',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(64, 48),
+              ),
+              onPressed: _agregarPermitido,
+              icon: const Icon(Icons.check_circle_outline),
+              label: const Text('Permitir sitio'),
+            ),
+          ),
+          if (config.dominiosPermitidos.isEmpty)
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text('Aún no agregaste sitios permitidos.'),
+            )
+          else
+            for (final dominio in config.dominiosPermitidos)
+              ListTile(
+                leading: const Icon(Icons.check_circle_outline),
+                title: Text(dominio),
+                subtitle: const Text('Sí puede abrirse, aunque se parezca '
+                    'a una palabra prohibida'),
+                trailing: IconButton(
+                  tooltip: 'Quitar $dominio',
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () => _quitarPermitido(dominio),
                 ),
               ),
           const SectionHeader('Intentos bloqueados'),

@@ -127,10 +127,7 @@ class PlatformFiltroWebGateway implements FiltroWebGateway {
   Future<void> actualizar(FiltroWebConfig config) async {
     try {
       await _canal.invokeMethod<void>('actualizar', {
-        'config': jsonEncode({
-          'activo': config.activo,
-          'dominios': config.dominiosActivos,
-        }),
+        'config': jsonEncode(config.paraServicioNativo),
       });
     } on MissingPluginException {
       // Sin canal (tests/escritorio): la configuración queda en prefs.

@@ -5,6 +5,17 @@
 /// bloquear una página suelta dentro de un sitio, una dirección IP ni una
 /// app que use su propio resolutor: eso se explica en la pantalla del
 /// adulto y en `docs/plan/14-filtro-web.md`.
+///
+/// Además de la lista de sitios, el filtro hace dos cosas (fase 3b):
+///
+/// - **SafeSearch forzado** en Google: las búsquedas se contestan con la
+///   IP de `forcesafesearch.google.com`, así el navegador abre Google con
+///   SafeSearch obligatorio. Solo aplica a Google; los demás buscadores se
+///   bloquean con la categoría «Buscadores».
+/// - **Bloqueo por palabras**: si el nombre del sitio que se pide contiene
+///   una palabra que la persona adulta escribió, no se resuelve. La lista
+///   de sitios permitidos sirve de escape: un sitio autorizado no se
+///   bloquea por parecerse a una palabra.
 library;
 
 /// Grupos de sitios que el adulto puede encender o apagar.
@@ -225,6 +236,9 @@ class FiltroWebConfig {
     this.bloquearJuegos = false,
     this.bloquearBuscadores = false,
     this.dominiosPersonalizados = const [],
+    this.forzarSafeSearch = true,
+    this.palabrasProhibidas = const [],
+    this.dominiosPermitidos = const [],
   });
 
   final bool activo;
@@ -235,7 +249,18 @@ class FiltroWebConfig {
   final bool bloquearBuscadores;
   final List<String> dominiosPersonalizados;
 
+  /// Fuerza SafeSearch en Google con la IP de SafeSearch.
+  final bool forzarSafeSearch;
+
+  /// Palabras que, si aparecen en el nombre de un sitio, lo bloquean.
+  final List<String> palabrasProhibidas;
+
+  /// Sitios que la persona adulta autorizó: no se bloquean por palabras.
+  final List<String> dominiosPermitidos;
+
   static const maxPersonalizados = 200;
+  static const maxPalabras = 100;
+  static const maxPermitidos = 100;
 
   FiltroWebConfig copyWith({
     bool? activo,
@@ -245,6 +270,9 @@ class FiltroWebConfig {
     bool? bloquearJuegos,
     bool? bloquearBuscadores,
     List<String>? dominiosPersonalizados,
+    bool? forzarSafeSearch,
+    List<String>? palabrasProhibidas,
+    List<String>? dominiosPermitidos,
   }) =>
       FiltroWebConfig(
         activo: activo ?? this.activo,
@@ -255,6 +283,9 @@ class FiltroWebConfig {
         bloquearBuscadores: bloquearBuscadores ?? this.bloquearBuscadores,
         dominiosPersonalizados:
             dominiosPersonalizados ?? this.dominiosPersonalizados,
+        forzarSafeSearch: forzarSafeSearch ?? this.forzarSafeSearch,
+        palabrasProhibidas: palabrasProhibidas ?? this.palabrasProhibidas,
+        dominiosPermitidos: dominiosPermitidos ?? this.dominiosPermitidos,
       );
 
   bool estaActiva(CategoriaSitio categoria) => switch (categoria) {
@@ -278,6 +309,16 @@ class FiltroWebConfig {
   ///
   /// Los dominios técnicos solo se incluyen cuando el filtro está activo:
   /// no tiene sentido bloquear el resolutor de Firefox si no hay filtro.
+  /// Mapa que el servicio nativo entiende. Va todo junto porque el bloqueo
+  /// por palabras necesita saber también de los sitios permitidos.
+  Map<String, Object> get paraServicioNativo => {
+        'activo': activo,
+        'dominios': dominiosActivos,
+        'palabras': palabrasProhibidas,
+        'permitidos': dominiosPermitidos,
+        'safeSearch': forzarSafeSearch,
+      };
+
   List<String> get dominiosActivos {
     final dominios = <String>{};
     for (final categoria in CategoriaSitio.values) {
@@ -288,6 +329,27 @@ class FiltroWebConfig {
     dominios.addAll(dominiosPersonalizados);
     if (activo) dominios.addAll(dominiosTecnicos);
     return dominios.toList()..sort();
+  }
+
+  /// `true` si [host] se bloquea por estar en la lista de sitios
+  /// prohibidos, o por contener una palabra prohibida (y no estar en la
+  /// lista de permitidos).
+  bool deberiaBloquear(String host) =>
+      estaBloqueado(host) || bloqueaPorPalabra(host);
+
+  /// `true` si [host] se bloquea por parecerse a una de las palabras.
+  ///
+  /// Se comparan sin tildes ni eñes y como fragmento: «porno» bloquea
+  /// «pornositio.com». Un sitio de la lista permitida no se bloquea aquí.
+  bool bloqueaPorPalabra(String host) {
+    if (palabrasProhibidas.isEmpty) return false;
+    if (dominioBloqueado(host, dominiosPermitidos)) return false;
+    final normalizado = sinTildes(host).toLowerCase().trim();
+    if (normalizado.isEmpty) return false;
+    for (final palabra in palabrasProhibidas) {
+      if (normalizado.contains(palabra)) return true;
+    }
+    return false;
   }
 
   /// `true` si [host] es un dominio bloqueado o un subdominio suyo.
@@ -358,6 +420,27 @@ bool dominioBloqueado(String host, Iterable<String> dominios) {
   }
   return false;
 }
+
+/// Palabra escrita por la persona adulta, tal como se guarda y se compara.
+///
+/// Devuelve `null` si no hay nada que guardar: vacío, solo espacios o una
+/// palabra ya usada (la lista no admite repetidas).
+String? normalizarPalabra(String entrada) {
+  final normalizado = sinTildes(entrada).toLowerCase().trim();
+  if (normalizado.isEmpty) return null;
+  if (normalizado.split(' ').length > 1) return null;
+  return normalizado;
+}
+
+/// Quita tildes y eñes para comparar nombres de sitio y palabras: los
+/// nombres de sitio en internet son en letras simples.
+String sinTildes(String texto) => texto
+    .replaceAll(RegExp('[áàäâ]'), 'a')
+    .replaceAll(RegExp('[éèëê]'), 'e')
+    .replaceAll(RegExp('[íìïî]'), 'i')
+    .replaceAll(RegExp('[óòöô]'), 'o')
+    .replaceAll(RegExp('[úùüû]'), 'u')
+    .replaceAll('ñ', 'n');
 
 final _dominioValido = RegExp(
   r'^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?'

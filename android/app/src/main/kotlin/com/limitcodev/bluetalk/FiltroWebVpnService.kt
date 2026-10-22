@@ -40,16 +40,41 @@ import java.util.concurrent.RejectedExecutionException
  */
 class FiltroWebVpnService : VpnService() {
 
-    private data class Config(val activo: Boolean, val dominios: List<String>) {
+    private data class Config(
+        val activo: Boolean,
+        val dominios: List<String>,
+        val palabras: List<String> = emptyList(),
+        val permitidos: List<String> = emptyList(),
+        val safeSearch: Boolean = true,
+    ) {
+        // Las palabras se comparan sin acentos ni eñes: un nombre de sitio
+        // nunca trae acentos, así «niño» o «sexo» encuentran igual.
+        private val palabrasNormalizadas = palabras
+            .map { sinTildes(it).lowercase().trim() }
+            .filter { it.isNotBlank() }
+
+        private val permitidosNormalizados = permitidos
+            .map { sinTildes(it).lowercase().trimEnd('.').removePrefix("www.") }
+            .filter { it.isNotBlank() }
+
         fun bloquea(host: String): Boolean {
             if (!activo) return false
-            val normalizado = host.lowercase().trimEnd('.')
+            val normalizado = sinTildes(host).lowercase().trimEnd('.')
             if (normalizado.isEmpty()) return false
-            return dominios.any { dominio ->
+            if (esDominioBloqueado(normalizado)) return true
+            // La lista permitida es el escape: un sitio que el adulto
+            // autorizó no se bloquea por parecerse a una palabra.
+            if (permitidosNormalizados.any { normalizado == it || normalizado.endsWith(".$it") }) {
+                return false
+            }
+            return palabrasNormalizadas.any { normalizado.contains(it) }
+        }
+
+        private fun esDominioBloqueado(normalizado: String) =
+            dominios.any { dominio ->
                 val d = dominio.lowercase().trimEnd('.').removePrefix("www.")
                 d.isNotEmpty() && (normalizado == d || normalizado.endsWith(".$d"))
             }
-        }
     }
 
     private data class ConsultaDns(
@@ -184,12 +209,28 @@ class FiltroWebVpnService : VpnService() {
         val consulta = parsearConsulta(paquete.payload) ?: return
         val cfg = config
 
-        val respuestaDns = if (cfg.bloquea(consulta.nombre)) {
-            registrarBloqueo(consulta.nombre)
-            respuestaDns(paquete.payload, consulta, RCODE_NXDOMAIN)
-        } else {
-            reenviar(paquete.payload)
-                ?: respuestaDns(paquete.payload, consulta, RCODE_SERVFAIL)
+        val respuestaDns = when {
+            cfg.bloquea(consulta.nombre) -> {
+                registrarBloqueo(consulta.nombre)
+                respuestaDns(paquete.payload, consulta, RCODE_NXDOMAIN)
+            }
+            cfg.safeSearch && esBuscadorConSafeSearch(consulta.nombre) -> {
+                val ip = ipSafeSearch()
+                if (ip == null) {
+                    // Sin red todavía: se reenvía tal cual en vez de romper
+                    // la búsqueda. No se finge un SafeSearch que no hay.
+                    reenviar(paquete.payload)
+                        ?: respuestaDns(paquete.payload, consulta, RCODE_SERVFAIL)
+                } else {
+                    respuestaSafeSearch(paquete.payload, consulta, ip)
+                        ?: reenviar(paquete.payload)
+                        ?: respuestaDns(paquete.payload, consulta, RCODE_SERVFAIL)
+                }
+            }
+            else -> {
+                reenviar(paquete.payload)
+                    ?: respuestaDns(paquete.payload, consulta, RCODE_SERVFAIL)
+            }
         }
 
         val respuesta = construirRespuesta(paquete, respuestaDns)
@@ -204,7 +245,9 @@ class FiltroWebVpnService : VpnService() {
 
     // --- Reenvío al DNS real de la red -------------------------------
 
-    private fun reenviar(payload: ByteArray): ByteArray? {
+    private fun reenviar(payload: ByteArray): ByteArray? = enviarUpstream(payload)
+
+    private fun enviarUpstream(payload: ByteArray): ByteArray? {
         val servidores = upstreamDns
         if (servidores.isEmpty()) return null
 
@@ -241,6 +284,137 @@ class FiltroWebVpnService : VpnService() {
             }
         }
         return null
+    }
+
+    // --- SafeSearch forzado (3b.1) ------------------------------------
+
+    /**
+     * Responde las búsquedas de Google con la IP de
+     * `forcesafesearch.google.com`, que sirve el mismo sitio con SafeSearch
+     * obligatorio (es el método estándar de filtrado por DNS). El navegador
+     * pide `www.google.com` y el certificado de esa IP también es de Google,
+     * así que la página abre sin aviso.
+     *
+     * Solo Google: los demás buscadores no tienen IP propia equivalente y
+     * apuntarlos a la de Google rompería su certificado. Para los demás
+     * está la categoría «Buscadores».
+     */
+    private fun esBuscadorConSafeSearch(host: String): Boolean {
+        val normalizado = host.lowercase().trimEnd('.')
+        if (normalizado.isEmpty()) return false
+        return HOSTS_SAFE_SEARCH.any { base ->
+            normalizado == base || normalizado.endsWith(".$base")
+        }
+    }
+
+    @Volatile
+    private var ipSafeSearch: InetAddress? = null
+
+    private fun ipSafeSearch(): InetAddress? {
+        ipSafeSearch?.let { return it }
+        val ip = try {
+            consultarA(HOST_SAFE_SEARCH)
+        } catch (e: Exception) {
+            Log.w(TAG, "No se pudo resolver $HOST_SAFE_SEARCH", e)
+            null
+        }
+        if (ip != null) ipSafeSearch = ip
+        return ip
+    }
+
+    private fun consultarA(nombre: String): InetAddress? {
+        val respuesta = enviarUpstream(construirConsulta(nombre, TIPO_A))
+            ?: return null
+        return primeraA(respuesta)
+    }
+
+    private fun construirConsulta(nombre: String, tipo: Int): ByteArray {
+        val etiquetas = nombre.split('.').filter { it.isNotEmpty() }
+        var total = 12 + 4
+        for (etiqueta in etiquetas) total += etiqueta.length + 1
+        val datos = ByteArray(total)
+        putU16(datos, 0, 0x1234)
+        putU16(datos, 2, 0x0100) // solo consulta recursiva
+        putU16(datos, 4, 1) // una pregunta
+        var offset = 12
+        for (etiqueta in etiquetas) {
+            datos[offset] = etiqueta.length.toByte()
+            val bytes = etiqueta.toByteArray(Charsets.US_ASCII)
+            System.arraycopy(bytes, 0, datos, offset + 1, bytes.size)
+            offset += bytes.size + 1
+        }
+        putU16(datos, offset, tipo)
+        putU16(datos, offset + 2, 1) // clase IN
+        return datos
+    }
+
+    private fun primeraA(respuesta: ByteArray): InetAddress? {
+        if (respuesta.size < 12) return null
+        val respuestas = u16(respuesta, 6)
+        var offset = 12
+        for (i in 0 until u16(respuesta, 4)) offset = saltarNombre(respuesta, offset) + 4
+        for (i in 0 until respuestas) {
+            offset = saltarNombre(respuesta, offset)
+            if (offset + 10 > respuesta.size) return null
+            val tipo = u16(respuesta, offset)
+            val clase = u16(respuesta, offset + 2)
+            val longitud = u16(respuesta, offset + 8)
+            val inicioDatos = offset + 10
+            if (inicioDatos + longitud > respuesta.size) return null
+            if (tipo == TIPO_A && clase == 1 && longitud == 4) {
+                return InetAddress.getByAddress(
+                    respuesta.copyOfRange(inicioDatos, inicioDatos + 4),
+                )
+            }
+            offset = inicioDatos + longitud
+        }
+        return null
+    }
+
+    private fun saltarNombre(datos: ByteArray, inicio: Int): Int {
+        var offset = inicio
+        while (offset < datos.size) {
+            val longitud = datos[offset].toInt() and 0xFF
+            if (longitud == 0) return offset + 1
+            if (longitud and 0xC0 == 0xC0) return offset + 2
+            offset += longitud + 1
+        }
+        return datos.size
+    }
+
+    /** Respuesta DNS que apunta el nombre pedido a la IP de SafeSearch. */
+    private fun respuestaSafeSearch(
+        payload: ByteArray,
+        consulta: ConsultaDns,
+        ip: InetAddress,
+    ): ByteArray? {
+        val fin = consulta.finPregunta
+        if (fin < 12 || payload.size < fin) return null
+        // Solo A tiene datos: a AAAA se le contesta sin registros y el
+        // navegador usa la dirección IPv4 que sí llega.
+        val conIp = u16(payload, fin - 4) == TIPO_A
+        val salida = ByteArray(if (conIp) fin + 16 else fin)
+        System.arraycopy(payload, 0, salida, 0, fin)
+        val rd = u16(payload, 2) and 0x0100
+        putU16(salida, 2, 0x8180 or rd) // respuesta, recursiva disponible
+        putU16(salida, 4, 1) // la pregunta sigue ahí
+        putU16(salida, 6, if (conIp) 1 else 0)
+        putU16(salida, 8, 0)
+        putU16(salida, 10, 0)
+        if (!conIp) return salida
+        var offset = fin
+        putU16(salida, offset, 0xC00C) // nombre: puntero a la pregunta
+        offset += 2
+        putU16(salida, offset, TIPO_A)
+        offset += 2
+        putU16(salida, offset, 1) // clase IN
+        offset += 2
+        putU32(salida, offset, 60) // TTL: un minuto
+        offset += 4
+        putU16(salida, offset, 4)
+        offset += 2
+        System.arraycopy(ip.address, 0, salida, offset, 4)
+        return salida
     }
 
     private fun actualizarDns() {
@@ -635,6 +809,29 @@ class FiltroWebVpnService : VpnService() {
         private const val MAX_REGISTRO = 100
         private const val RCODE_SERVFAIL = 2
         private const val RCODE_NXDOMAIN = 3
+        private const val TIPO_A = 1
+
+        /** Punto de partida del SafeSearch forzado. */
+        private const val HOST_SAFE_SEARCH = "forcesafesearch.google.com"
+
+        /**
+         * Bases de Google cuyas búsquedas se contestan con la IP de
+         * SafeSearch. Los subdominios (imágenes, maps) también entran.
+         */
+        private val HOSTS_SAFE_SEARCH = listOf(
+            "google.com",
+            "google.com.mx",
+            "google.es",
+            "google.com.ar",
+            "google.com.co",
+            "google.com.pe",
+            "google.cl",
+        )
+
+        /** Quita tildes y eñes para comparar nombres de sitios y palabras. */
+        fun sinTildes(texto: String): String =
+            java.text.Normalizer.normalize(texto, java.text.Normalizer.Form.NFD)
+                .replace(Regex("\\p{M}"), "")
 
         const val ACTION_START = "com.limitcodev.bluetalk.FILTRO_WEB_START"
         const val ACTION_STOP = "com.limitcodev.bluetalk.FILTRO_WEB_STOP"
@@ -665,6 +862,16 @@ class FiltroWebVpnService : VpnService() {
         @Volatile
         private var instancia: FiltroWebVpnService? = null
 
+        private fun listaDe(objeto: JSONObject, clave: String): List<String> {
+            val arreglo = objeto.optJSONArray(clave) ?: return emptyList()
+            val salida = mutableListOf<String>()
+            for (i in 0 until arreglo.length()) {
+                val valor = arreglo.optString(i).trim()
+                if (valor.isNotEmpty()) salida.add(valor)
+            }
+            return salida
+        }
+
         fun prefs(context: Context) =
             context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -679,15 +886,15 @@ class FiltroWebVpnService : VpnService() {
             return try {
                 val objeto = JSONObject(crudo)
                 val activo = objeto.optBoolean("activo", false)
-                val arreglo = objeto.optJSONArray("dominios")
-                val dominios = mutableListOf<String>()
-                if (arreglo != null) {
-                    for (i in 0 until arreglo.length()) {
-                        val dominio = arreglo.optString(i).trim().lowercase()
-                        if (dominio.isNotEmpty()) dominios.add(dominio)
-                    }
-                }
-                Config(activo, dominios)
+                Config(
+                    activo = activo,
+                    dominios = listaDe(objeto, "dominios"),
+                    palabras = listaDe(objeto, "palabras"),
+                    permitidos = listaDe(objeto, "permitidos"),
+                    // Por defecto se fuerza: es lo más protector y el
+                    // adulto puede apagarlo.
+                    safeSearch = objeto.optBoolean("safeSearch", true),
+                )
             } catch (e: JSONException) {
                 Config(false, emptyList())
             }

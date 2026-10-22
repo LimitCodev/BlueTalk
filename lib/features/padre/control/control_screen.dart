@@ -13,10 +13,12 @@ import '../legal/legal_controller.dart';
 import '../monitoreo/uso_telefono_controller.dart';
 import '../monitoreo/uso_telefono_screen.dart';
 import '../padre_controller.dart';
+import '../perfil_edad.dart';
 import '../permisos/permisos_asistente_screen.dart';
 import '../proteccion/proteccion_tile.dart';
 import 'cambiar_codigo.dart';
 import 'control_parental.dart';
+import 'perfil_edad_dialogo.dart';
 import 'recuperacion_dialogo.dart';
 import 'voz_diagnostico.dart';
 
@@ -45,6 +47,7 @@ class ControlScreen extends ConsumerWidget {
     // enseña en pantalla para que un respaldo sin cifrar no pase
     // desapercibido (revisión de la fase 3a).
     final codigoCifrado = ref.watch(almacenPinProvider).cifrado;
+    final perfilEdad = ref.watch(perfilEdadProvider);
 
     return ListView(
       padding: const EdgeInsets.only(bottom: 32),
@@ -108,6 +111,23 @@ class ControlScreen extends ConsumerWidget {
           value: !bloqueos.entorno,
           onChanged: (valor) =>
               ref.read(bloqueosProvider.notifier).setEntorno(!valor),
+        ),
+        const SectionHeader('Perfil de edad del niño'),
+        ListTile(
+          leading: const Icon(Icons.child_care_outlined),
+          title: const Text('Perfil de edad'),
+          subtitle: Text(
+            perfilEdad == PerfilEdad.ninguno
+                ? 'Sin perfil: se ve todo. Elige la edad para ocultar '
+                    'categorías del comunicador que no son de esa edad.'
+                : '${perfilEdad.titulo}. Se ven las categorías de esa edad '
+                    'y el filtro de páginas usa los grupos que corresponden.',
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => showDialog<void>(
+            context: context,
+            builder: (_) => const PerfilEdadDialogo(),
+          ),
         ),
         const SectionHeader('Permisos del teléfono'),
         const ProteccionTile(),

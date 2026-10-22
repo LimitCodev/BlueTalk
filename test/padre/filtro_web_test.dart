@@ -76,13 +76,43 @@ ProviderContainer _contenedor(
 /// Baja la lista hasta que el campo de texto esté construido y visible.
 /// `scrollUntilVisible` no sirve aquí porque el campo aún no existe y hay
 /// más de un `Scrollable` (el del campo aparece al construirse).
+/// Campo de direcciones de la sección «Prohibir un sitio».
+final _campoDireccion = find.widgetWithText(
+  TextField,
+  'Pega la dirección del sitio',
+);
+
+/// Campo de palabras de la sección «Bloquear por palabras».
+final _campoPalabra = find.widgetWithText(
+  TextField,
+  'Palabra que no debe aparecer',
+);
+
 Future<void> _irAlFormulario(WidgetTester tester) async {
-  for (var i = 0; i < 6 && find.byType(TextField).evaluate().isEmpty; i++) {
+  for (var i = 0; i < 8 && _campoDireccion.evaluate().isEmpty; i++) {
     await tester.drag(find.byType(ListView), const Offset(0, -300));
     await tester.pumpAndSettle();
   }
-  final campo = find.byType(TextField);
-  await tester.ensureVisible(campo);
+  await tester.ensureVisible(_campoDireccion);
+  await tester.pumpAndSettle();
+}
+
+/// Baja hasta el interruptor de SafeSearch (queda bajo las categorías).
+Future<void> _irASafeSearch(WidgetTester tester) async {
+  final titulo = find.text('Google con SafeSearch obligatorio');
+  for (var i = 0; i < 10 && titulo.evaluate().isEmpty; i++) {
+    await tester.drag(find.byType(ListView), const Offset(0, -200));
+    await tester.pumpAndSettle();
+  }
+  expect(titulo, findsOneWidget);
+}
+
+Future<void> _irAPalabras(WidgetTester tester) async {
+  for (var i = 0; i < 10 && _campoPalabra.evaluate().isEmpty; i++) {
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
+  }
+  await tester.ensureVisible(_campoPalabra);
   await tester.pumpAndSettle();
 }
 
@@ -301,7 +331,7 @@ void main() {
 
       await _irAlFormulario(tester);
       await tester.enterText(
-        find.byType(TextField),
+        _campoDireccion,
         'https://www.ejemplo.com/ruta',
       );
       await _tocarProhibir(tester);
@@ -329,7 +359,8 @@ void main() {
       );
 
       await _irAlFormulario(tester);
-      await tester.enterText(find.byType(TextField), '192.168.1.1');
+      await _irAlFormulario(tester);
+      await tester.enterText(_campoDireccion, '192.168.1.1');
       await _tocarProhibir(tester);
 
       expect(
@@ -392,6 +423,180 @@ void main() {
 
       expect(gateway.activaciones, 1);
       expect(find.text('Filtro activo'), findsOneWidget);
+    });
+  });
+
+  group('SafeSearch y bloqueo por palabras (fase 3b)', () {
+    test('normalizarPalabra deja una palabra simple y sin tildes', () {
+      expect(normalizarPalabra(' Niño '), 'nino');
+      expect(normalizarPalabra('P0RNO'), 'p0rno');
+      expect(normalizarPalabra('dos palabras'), isNull);
+      expect(normalizarPalabra('   '), isNull);
+      expect(normalizarPalabra(''), isNull);
+    });
+
+    test('una palabra bloquea los sitios que la contengan', () {
+      const config = FiltroWebConfig(
+        activo: true,
+        bloquearAdultos: false,
+        bloquearApuestas: false,
+        bloquearRedes: false,
+        palabrasProhibidas: ['porno'],
+      );
+
+      expect(config.bloqueaPorPalabra('pornositio.com'), isTrue);
+      expect(config.bloqueaPorPalabra('sub.ejemplo-pornografia.net'), isTrue);
+      expect(config.bloqueaPorPalabra('juegoscasual.com'), isFalse);
+      expect(config.bloqueaPorPalabra(''), isFalse);
+      // Sin la palabra no se bloquea nada, aunque el filtro esté activo.
+      expect(const FiltroWebConfig(activo: true).bloqueaPorPalabra('x.com'), isFalse);
+    });
+
+    test('la lista permitida escapa del bloqueo por palabra', () {
+      const config = FiltroWebConfig(
+        activo: true,
+        bloquearAdultos: false,
+        bloquearApuestas: false,
+        bloquearRedes: false,
+        palabrasProhibidas: ['sexo'],
+        dominiosPermitidos: ['sexton.edu'],
+      );
+
+      expect(config.bloqueaPorPalabra('sexton.edu'), isFalse);
+      expect(config.bloqueaPorPalabra('www.sexton.edu'), isFalse);
+      expect(config.bloqueaPorPalabra('portal.sexton.edu'), isFalse);
+      expect(config.bloqueaPorPalabra('sexoxx.com'), isTrue);
+    });
+
+    test('el mapa que recibe el servicio lleva todo lo nuevo', () {
+      const config = FiltroWebConfig(
+        activo: true,
+        forzarSafeSearch: false,
+        palabrasProhibidas: ['pepe'],
+        dominiosPermitidos: ['ejemplo.com'],
+      );
+      final mapa = config.paraServicioNativo;
+
+      expect(mapa['activo'], true);
+      expect(mapa['safeSearch'], false);
+      expect(mapa['palabras'], ['pepe']);
+      expect(mapa['permitidos'], ['ejemplo.com']);
+      expect(mapa['dominios'], isA<List<Object?>>());
+    });
+
+    test('SafeSearch viene encendido y se puede apagar', () async {
+      final prefs = await prefsDePrueba();
+      expect(FiltroWebPrefs.leer(prefs).forzarSafeSearch, isTrue);
+
+      final gateway = _GatewayFalso();
+      final container = _contenedor(prefs, gateway);
+      final controller = container.read(filtroWebProvider.notifier);
+      await controller.setSafeSearch(false);
+
+      expect(container.read(filtroWebProvider).forzarSafeSearch, isFalse);
+      expect(prefs.getBool(FiltroWebPrefs.safeSearch), isFalse);
+      // Se relee igual tras un reinicio.
+      expect(FiltroWebPrefs.leer(prefs).forzarSafeSearch, isFalse);
+    });
+
+    test('agregar palabra y sitio permitido se guardan y llegan al servicio',
+        () async {
+      final prefs = await prefsDePrueba();
+      final gateway = _GatewayFalso()..activo = true;
+      final container = _contenedor(prefs, gateway);
+      final controller = container.read(filtroWebProvider.notifier);
+      await controller.setActivo(true);
+
+      final agregada = await controller.agregarPalabra('Niño');
+      expect(agregada.resultado, ResultadoAgregar.agregado);
+      expect(agregada.dominio, 'nino');
+      expect(container.read(filtroWebProvider).palabrasProhibidas, ['nino']);
+      expect(gateway.ultimaConfig?.palabrasProhibidas, ['nino']);
+
+      final repetida = await controller.agregarPalabra('nino');
+      expect(repetida.resultado, ResultadoAgregar.duplicado);
+
+      final invalida = await controller.agregarPalabra('dos palabras');
+      expect(invalida.resultado, ResultadoAgregar.invalido);
+
+      final permitido = await controller.agregarPermitido('https://sexton.edu');
+      expect(permitido.resultado, ResultadoAgregar.agregado);
+      expect(permitido.dominio, 'sexton.edu');
+      expect(gateway.ultimaConfig?.dominiosPermitidos, ['sexton.edu']);
+
+      // Tras un reinicio siguen ahí.
+      final releeido = FiltroWebPrefs.leer(prefs);
+      expect(releeido.palabrasProhibidas, ['nino']);
+      expect(releeido.dominiosPermitidos, ['sexton.edu']);
+
+      await controller.quitarPalabra('nino');
+      await controller.quitarPermitido('sexton.edu');
+      expect(container.read(filtroWebProvider).palabrasProhibidas, isEmpty);
+      expect(container.read(filtroWebProvider).dominiosPermitidos, isEmpty);
+      expect(gateway.ultimaConfig?.palabrasProhibidas, isEmpty);
+    });
+
+    testWidgets('la pantalla agrega una palabra y la lista la refleja',
+        (tester) async {
+      final prefs = await prefsDePrueba();
+      final gateway = _GatewayFalso();
+      final container = await pumpPadre(
+        tester,
+        home: const FiltroWebScreen(),
+        overrides: [
+          ...overridesDePadre(prefs),
+          filtroWebGatewayProvider.overrideWithValue(gateway),
+        ],
+      );
+      // Con el filtro encendido, cada cambio se empuja al servicio.
+      await container.read(filtroWebProvider.notifier).setActivo(true);
+
+      await _irAPalabras(tester);
+      await tester.enterText(_campoPalabra, 'Niño');
+      final boton = find.widgetWithText(FilledButton, 'Bloquear palabra');
+      await tester.ensureVisible(boton);
+      await tester.pumpAndSettle();
+      await tester.tap(boton);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Se bloqueará cualquier sitio cuyo nombre contenga «nino».'),
+        findsOneWidget,
+      );
+      expect(find.text('nino'), findsOneWidget);
+      expect(gateway.ultimaConfig?.palabrasProhibidas, contains('nino'));
+    });
+
+    testWidgets('el interruptor de SafeSearch se puede apagar', (tester) async {
+      final prefs = await prefsDePrueba();
+      final gateway = _GatewayFalso()..activo = true;
+      await pumpPadre(
+        tester,
+        home: const FiltroWebScreen(),
+        overrides: [
+          ...overridesDePadre(prefs),
+          filtroWebGatewayProvider.overrideWithValue(gateway),
+        ],
+      );
+
+      await _irASafeSearch(tester);
+      final interruptor = find.ancestor(
+        of: find.text('Google con SafeSearch obligatorio'),
+        matching: find.byType(SwitchListTile),
+      );
+      await tester.ensureVisible(interruptor);
+      await tester.pumpAndSettle();
+      expect(tester.widget<SwitchListTile>(interruptor).value, isTrue);
+
+      await tester.tap(interruptor);
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.widget<SwitchListTile>(interruptor).value,
+        isFalse,
+        reason: 'la pantalla refleja lo que decidió el adulto',
+      );
+      expect(prefs.getBool(FiltroWebPrefs.safeSearch), isFalse);
     });
   });
 }
