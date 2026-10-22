@@ -327,20 +327,80 @@ mueve y que el PIN en claro no aparece en ningún almacén).
 usan un keystore falso; en el emulador API 28 haría falta una pasada de
 verificación. Queda para la Fase 3c, que ya pide emulador.
 
-### 3a.2 Desinstalación bloqueada (pendiente)
+### 3a.2 Desinstalación bloqueada (hecho, `5bb784d`)
 
-`DeviceAdminReceiver` para que un niño no pueda desinstalar la app ni
-desactivar la protección sin el PIN del adulto.
+`ProteccionChannel.kt` + `ProteccionReceiver` + `res/xml/device_admin.xml`.
+El receiver **no pide ninguna política** (`<uses-policies />` vacío): es
+fricción, no un muro, y así está documentado en el propio XML. Tile
+«Protección contra desinstalación» en Control, con estado leído del sistema.
 
-### 3a.3 Asistente de permisos del padre (pendiente)
+**NO VERIFICADO:** la fricción real en un teléfono físico. Depende del
+fabricante y choca con un admin corporativo; no lo he podido ver.
 
-Pantalla que explica en lenguaje llano y pide cada permiso, comprueba si
-está concedido y no deja avanzar si falta alguno: `PACKAGE_USAGE_STATS`,
-servicio de accesibilidad, `VpnService`, `SYSTEM_ALERT_WINDOW`,
-`DeviceAdminReceiver`, `POST_NOTIFICATIONS` + servicio en primer plano y
-exención de optimización de batería.
+### 3a.3 Asistente de permisos del padre (hecho, `53c9350`)
 
-**Nota de alcance:** accesibilidad y `SYSTEM_ALERT_WINDOW` solo tienen
-sentido cuando exista el servicio de bloqueo que los usa. Si ese servicio
-va en la 3b, el asistente no puede exigirlos aún sin dejar la pantalla
-trabada. Se decidirá al montar el asistente y se anotará aquí.
+`PermisosChannel.kt` (avisos + batería) + `lib/features/padre/permisos/`
+(modelo, gateway, controlador, pantalla). Entra en `PadreScreen` como paso
+obligatorio antes del panel y sustituye el tile de VPN/uso en Control.
+
+- **Obligatorios:** avisos, acceso al uso y (solo con el filtro encendido)
+  VPN. **Opcionales:** batería y administrador.
+- **`desconocido` nunca bloquea:** si la comprobación falla, cerrar el paso
+  dejaría al adulto sin salida.
+- `flutter_secure_storage` (keystore) para la huella del PIN: `3a.1`.
+
+**Nota de alcance (cerrada):** accesibilidad y `SYSTEM_ALERT_WINDOW` **no se
+piden todavía**: aún no existe el servicio de bloqueo que los usa (va en la
+3b). Pedirlos ahora dejaría el asistente sin a qué llevarlos.
+
+### Defecto encontrado al ejecutarlo (arreglado)
+
+El panel servía el diagnóstico cacheado de la primera lectura: revocando
+`GET_USAGE_STATS` desde Android, el panel seguía apareciendo. Arreglo en
+`padre_screen.dart` (`WidgetsBindingObserver`): invalida `permisosProvider`
+al entrar en la zona y al volver de Android (`resumed`); el estado de carga
+sigue sin bloquear. Con `deny` entra el asistente, con `allow` y vuelta de
+Android vuelve el panel. Test de regresión que **falla sin el arreglo**.
+
+En `flutter test` el canal `bluetalk/permisos` no contesta: `harness.dart`
+aporta una doble inofensiva por defecto y el parámetro `permisos:`.
+
+**Verificado (tras la ronda de revisión):** `flutter analyze` 0 ·
+`flutter test` **329/329** ·
+`flutter build apk --debug` ✓ e instalado en el emulador `bluetalk_gama_baja`
+(API 28) · recorrido completo con capturas en
+`docs/informes/capturas/3a-*.png` · emulador cerrado y Gradle detenido al
+terminar · `uptime` tras la suite (1 min subió a 6,75 → esperado; 2,30 antes
+de compilar). Detalle en `docs/informes/3a-evidencia.md`.
+
+**NO VERIFICADO:** keystore real (doble en tests), fricción de desinstalación
+en teléfono físico, exención de batería (el dueño puede ignorarla; la app
+funciona sin ella).
+
+**Pendiente sin decidir:** `docs/plan/14-filtro-web.md` no existe y el código
+lo cita en comentarios: o se escribe o se quitan las citas.
+
+### Ronda de revisión (`revisor`) — cerrada
+
+El revisor encontró **1 grave y 4 medios** y mandó no commitear hasta
+corregirlos. Se corrigió todo en esta rama:
+
+- **Grave:** `BORRAR` no borraba las huellas del keystore (que desde la
+  3a.1 ya no viven en `SharedPreferences`), así que el gate volvía a pedir
+  el código que la persona acababa de decir que había olvidado. Ahora
+  `AlmacenPin.borrarSecretas()` borra del keystore **primero**; si ese
+  borrado falla no se toca nada más y se avisa en pantalla. Test de widget
+  ampliado: comprobado que **falla sin el arreglo**.
+- **Medios:** tri-estado real en uso/VPN/administrador (un canal caído ya
+  no se disfraza de «falta concederlo»), texto del informe corregido,
+  estado `cifrado` enseñado en pantalla (tile «Dónde se guarda tu código»)
+  y texto de los avisos que contradecía los recordatorios automáticos.
+- **Leves:** comentarios del harness, línea sobrante, `а` cirílica en
+  `device_admin.xml`, latido de `estado-vivo.log` reanudado y
+  contradicción con el plan 11 §1.5.7 (`flutter_secure_storage` prohíbe,
+  el dueño aprobó) anotada en el informe.
+
+Detalle y tabla en `docs/informes/3a-evidencia.md`.
+
+**FIN DE LA FASE 3a. Esperando confirmación para pasar a la 3b**
+(SafeSearch forzado, bloqueo por palabras, perfiles por edad).
