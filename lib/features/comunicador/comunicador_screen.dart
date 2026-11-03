@@ -369,6 +369,9 @@ class _CategoryView extends ConsumerWidget {
       AsyncData(:final value) => _PictoGrid(
           pictograms: value.pictogramsOf(categoryId),
           emptyText: 'Esta categoría todavía no tiene pictogramas.',
+          // La web tiñe los pictogramas con el tono de su categoría
+          // (docs/branding/WEB-EXTRACCION.md §2); la app hace lo mismo.
+          categoria: coloresCategorias[categoryId],
         ),
       AsyncError() => const _CatalogError(),
       _ => const Center(child: CircularProgressIndicator()),
@@ -401,44 +404,61 @@ class _CategoryGrid extends ConsumerWidget {
       itemBuilder: (context, index) {
         final category = categories[index];
         final iconAsset = catalog.iconAssetOf(category);
+        // Mismo lenguaje que la web (docs/branding/WEB-EXTRACCION.md §2):
+        // pastel en claro y regla de alpha sobre el tono en oscuro.
+        final paleta = context.colores;
+        final colores = coloresCategorias[category.id];
+        final fondo = colores?.relleno(paleta) ?? paleta.surface;
+        final borde = colores?.bordeSobre(paleta) ?? paleta.primary;
+        final tinta = colores?.texto(paleta) ?? paleta.primaryStrongText;
 
-        return InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: () => ref
-              .read(comunicadorProvider.notifier)
-              .openCategory(category.id),
-          child: Padding(
-            padding: const EdgeInsets.all(6),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 52,
-                  height: 52,
-                  child: iconAsset == null
-                      ? Icon(
-                          Icons.grid_view_rounded,
-                          size: 44,
-                          color: context.colores.primaryStrong,
-                        )
-                      : SvgPicture.asset(
-                          iconAsset,
-                          fit: BoxFit.contain,
-                          placeholderBuilder: (context) => const SizedBox(
-                            width: 52,
-                            height: 52,
+        return Material(
+          color: fondo,
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(color: borde, width: 1),
+          ),
+          child: InkWell(
+            onTap: () => ref
+                .read(comunicadorProvider.notifier)
+                .openCategory(category.id),
+            child: Padding(
+              padding: const EdgeInsets.all(6),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 52,
+                    height: 52,
+                    child: iconAsset == null
+                        ? Icon(
+                            Icons.grid_view_rounded,
+                            size: 44,
+                            color: tinta,
+                          )
+                        : SvgPicture.asset(
+                            iconAsset,
+                            fit: BoxFit.contain,
+                            placeholderBuilder: (context) => const SizedBox(
+                              width: 52,
+                              height: 52,
+                            ),
                           ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    category.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: tinta,
+                          fontWeight: FontWeight.w700,
                         ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  category.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -450,10 +470,18 @@ class _CategoryGrid extends ConsumerWidget {
 /// Rejilla de pictogramas; tocar agrega a la frase y habla (bajo tap),
 /// mantener presionado fija o desfija el picto en el inicio.
 class _PictoGrid extends ConsumerWidget {
-  const _PictoGrid({required this.pictograms, required this.emptyText});
+  const _PictoGrid({
+    required this.pictograms,
+    required this.emptyText,
+    this.categoria,
+  });
 
   final List<Pictogram> pictograms;
   final String emptyText;
+
+  /// Tono de la categoría cuando toda la rejilla es de una sola; en
+  /// Inicio o en la búsqueda las tarjetas quedan neutras.
+  final ColoresCategoria? categoria;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -479,6 +507,7 @@ class _PictoGrid extends ConsumerWidget {
         final picto = pictograms[index];
         return PictoTile(
           pictogram: picto,
+          categoria: categoria,
           favorited: favorites.contains(picto.id),
           onTap: () => _onPictoTap(context, ref, picto),
           onLongPress: () => _onPictoLongPress(context, ref, picto),

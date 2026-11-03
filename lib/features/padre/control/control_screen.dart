@@ -5,11 +5,20 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/calm_mode.dart';
 import '../../../core/widgets/section_header.dart';
 import '../dashboard/barras.dart';
+import '../filtro_web/filtro_web_controller.dart';
+import '../filtro_web/filtro_web_screen.dart';
 import '../gate/biometria.dart';
+import '../gate/gate_controller.dart';
 import '../legal/legal_controller.dart';
+import '../monitoreo/uso_telefono_controller.dart';
+import '../monitoreo/uso_telefono_screen.dart';
 import '../padre_controller.dart';
+import '../perfil_edad.dart';
+import '../permisos/permisos_asistente_screen.dart';
+import '../proteccion/proteccion_tile.dart';
 import 'cambiar_codigo.dart';
 import 'control_parental.dart';
+import 'perfil_edad_dialogo.dart';
 import 'recuperacion_dialogo.dart';
 import 'voz_diagnostico.dart';
 
@@ -31,6 +40,14 @@ class ControlScreen extends ConsumerWidget {
     final bloqueos = ref.watch(bloqueosProvider);
     final biometria = ref.watch(biometriaHabilitadaProvider);
     final aceptacion = ref.watch(legalProvider);
+    final filtro = ref.watch(filtroWebProvider);
+    final permisoUso = ref.watch(permisoUsoProvider).value;
+    final usoConcedido = permisoUso ?? false;
+    // Dónde viven las huellas del código (lo decide `AlmacenPin`): se
+    // enseña en pantalla para que un respaldo sin cifrar no pase
+    // desapercibido (revisión de la fase 3a).
+    final codigoCifrado = ref.watch(almacenPinProvider).cifrado;
+    final perfilEdad = ref.watch(perfilEdadProvider);
 
     return ListView(
       padding: const EdgeInsets.only(bottom: 32),
@@ -95,6 +112,64 @@ class ControlScreen extends ConsumerWidget {
           onChanged: (valor) =>
               ref.read(bloqueosProvider.notifier).setEntorno(!valor),
         ),
+        const SectionHeader('Perfil de edad del niño'),
+        ListTile(
+          leading: const Icon(Icons.child_care_outlined),
+          title: const Text('Perfil de edad'),
+          subtitle: Text(
+            perfilEdad == PerfilEdad.ninguno
+                ? 'Sin perfil: se ve todo. Elige la edad para ocultar '
+                    'categorías del comunicador que no son de esa edad.'
+                : '${perfilEdad.titulo}. Se ven las categorías de esa edad '
+                    'y el filtro de páginas usa los grupos que corresponden.',
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => showDialog<void>(
+            context: context,
+            builder: (_) => const PerfilEdadDialogo(),
+          ),
+        ),
+        const SectionHeader('Permisos del teléfono'),
+        const ProteccionTile(),
+        ListTile(
+          leading: const Icon(Icons.rule_outlined),
+          title: const Text('Revisar los permisos'),
+          subtitle: const Text(
+            'Qué pide BlueTalk, para qué sirve y qué no lee.',
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => Navigator.of(context).push<void>(
+            MaterialPageRoute(builder: (_) => const PermisosAsistenteScreen()),
+          ),
+        ),
+        const SectionHeader('Protección en internet'),
+        ListTile(
+          leading: const Icon(Icons.shield_outlined),
+          title: const Text('Filtro de páginas'),
+          subtitle: Text(
+            filtro.activo
+                ? 'Activo: bloquea los sitios elegidos.'
+                : 'Apagado: los sitios no se bloquean.',
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => Navigator.of(context).push<void>(
+            MaterialPageRoute(builder: (_) => const FiltroWebScreen()),
+          ),
+        ),
+        const SectionHeader('Diagnóstico de uso'),
+        ListTile(
+          leading: const Icon(Icons.insights_outlined),
+          title: const Text('Tiempo por app'),
+          subtitle: Text(
+            usoConcedido
+                ? 'Revisa cuánto tiempo estuvo abierta cada app.'
+                : 'Falta el permiso «Acceso al uso» de Android.',
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => Navigator.of(context).push<void>(
+            MaterialPageRoute(builder: (_) => const UsoTelefonoScreen()),
+          ),
+        ),
         const SectionHeader('Pantalla y voz'),
         const CalmModeToggle(),
         ListTile(
@@ -144,6 +219,19 @@ class ControlScreen extends ConsumerWidget {
           onTap: () => showDialog<void>(
             context: context,
             builder: (_) => const RecuperacionDialogo(),
+          ),
+        ),
+        ListTile(
+          leading: Icon(
+            codigoCifrado ? Icons.lock_outlined : Icons.lock_open_outlined,
+          ),
+          title: const Text('Dónde se guarda tu código'),
+          subtitle: Text(
+            codigoCifrado
+                ? 'Cifrado por este teléfono. Solo se guarda la huella, '
+                    'nunca el código.'
+                : 'Este teléfono no pudo cifrarlo: la huella se guarda sin '
+                    'cifrar, en los archivos de la app.',
           ),
         ),
         const SectionHeader('Documentos'),

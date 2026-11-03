@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:bluetalk/features/padre/gate/almacen_pin.dart';
+import 'package:bluetalk/features/padre/gate/gate_controller.dart';
 import 'package:bluetalk/features/padre/gate/gate_screen.dart';
 import 'package:bluetalk/features/padre/gate/pin_store.dart';
 
@@ -12,8 +14,9 @@ import 'harness.dart';
 /// Bombea el gate solo (ruta mínima al estilo de gate_test).
 Future<ProviderContainer> _pumpGate(
   WidgetTester tester,
-  SharedPreferences prefs,
-) async {
+  SharedPreferences prefs, {
+  List<Object> extra = const [],
+}) async {
   final rutas = GoRouter(
     initialLocation: '/gate',
     routes: [
@@ -26,7 +29,7 @@ Future<ProviderContainer> _pumpGate(
   addTearDown(rutas.dispose);
 
   final container = ProviderContainer(
-    overrides: overridesDePadre(prefs).cast(),
+    overrides: <Object>[...overridesDePadre(prefs), ...extra].cast(),
   );
   addTearDown(container.dispose);
   await tester.pumpWidget(
@@ -136,5 +139,120 @@ void main() {
       find.widgetWithText(FilledButton, 'Borrar todo y empezar de nuevo'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('si el keystore no deja borrar, BORRAR no borra nada y lo dice',
+      (tester) async {
+    final prefs = await prefsDePrueba(
+      iniciales: {
+        'padre_legal_aceptacion': aceptacionLegalDePrueba(),
+        'comunicador_favoritos': '["ayuda"]',
+      },
+    );
+    await crearPinDePrueba(prefs);
+    await sembrarRecuperacionDePrueba(prefs);
+    // La huella migra al keystore y después el keystore deja de borrar.
+    final keystore = KeystorePrueba();
+    final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+    await almacen.cargar();
+    keystore.borradoFallido = true;
+
+    await _pumpGate(
+      tester,
+      prefs,
+      extra: [almacenPinProvider.overrideWithValue(almacen)],
+    );
+
+    await tester.tap(find.widgetWithText(TextButton, '¿Olvidaste el código?'));
+    await tester.pumpAndSettle();
+
+    final campoBorrar = find.widgetWithText(
+      TextField,
+      'Escribe BORRAR con mayúsculas',
+    );
+    await tester.enterText(campoBorrar, 'BORRAR');
+    await tester.pump();
+    final borrar = find.widgetWithText(
+      FilledButton,
+      'Borrar todo y empezar de nuevo',
+    );
+    await tester.ensureVisible(borrar);
+    await tester.pumpAndSettle();
+    await tester.tap(borrar);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('No se borró nada'), findsOneWidget);
+    expect(
+      prefs.getString('comunicador_favoritos'),
+      '["ayuda"]',
+      reason: 'si el keystore no se pudo vaciar, no se toca nada',
+    );
+    expect(
+      prefs.getInt(PinStore.claveLongitud),
+      isNotNull,
+      reason: 'los ajustes del PIN siguen donde estaban',
+    );
+    expect(
+      keystore.datos[PinStore.claveHash],
+      isNotNull,
+      reason: 'la huella sigue en el keystore y por eso no se finge borrada',
+    );
+    expect(find.text('PANTALLA DE ONBOARDING'), findsNothing);
+  });
+
+  testWidgets('si el keystore no deja borrar, la recuperación lo dice',
+      (tester) async {
+    final prefs = await prefsDePrueba(
+      iniciales: {
+        'padre_legal_aceptacion': aceptacionLegalDePrueba(),
+        'comunicador_favoritos': '["ayuda"]',
+      },
+    );
+    await crearPinDePrueba(prefs);
+    await sembrarRecuperacionDePrueba(prefs);
+    final keystore = KeystorePrueba();
+    final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+    await almacen.cargar();
+    keystore.borradoFallido = true;
+
+    await _pumpGate(
+      tester,
+      prefs,
+      extra: [almacenPinProvider.overrideWithValue(almacen)],
+    );
+
+    await tester.tap(find.widgetWithText(TextButton, '¿Olvidaste el código?'));
+    await tester.pumpAndSettle();
+
+    final campoCodigo = find.widgetWithText(
+      TextField,
+      'Código de recuperación',
+    );
+    final recuperar = find.widgetWithText(
+      FilledButton,
+      'Recuperar sin borrar nada',
+    );
+    await tester.enterText(campoCodigo, 'abcd2345');
+    await tester.pump();
+    await tester.ensureVisible(recuperar);
+    await tester.pumpAndSettle();
+    await tester.tap(recuperar);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('no dejó borrar el código antiguo'), findsOneWidget);
+    expect(
+      find.text('Crea tu código de 6 dígitos'),
+      findsNothing,
+      reason: 'no se anuncia una creación con el PIN viejo aún ahí',
+    );
+    expect(
+      keystore.datos[PinStore.claveHash],
+      isNotNull,
+      reason: 'la huella vieja no se pudo borrar, se avisa en vez de fingirla',
+    );
+    // El código de recuperación no se gasta cuando el borrado no se pudo
+    // hacer: sigue en el keystore, listo para otro intento.
+    expect(keystore.datos[PinStore.claveRecupHash], isNotNull);
+    expect(prefs.getString('comunicador_favoritos'), '["ayuda"]');
   });
 }

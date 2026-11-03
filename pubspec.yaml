@@ -44,6 +44,7 @@ dependencies:
   local_auth: ^3.0.2
   cryptography: ^2.9.0
   flutter_timezone: ^5.1.1
+  flutter_secure_storage: ^11.2.0
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +80,21 @@ flutter:
   assets:
     - assets/seed/
     - assets/pictos/muestra/
+    - assets/brand/
+
+  fonts:
+    - family: Nunito
+      fonts:
+        # Fuente variable de la web oficial; se declaran los pesos que usa
+        # la app para que el motor elija el eje wght más cercano.
+        - asset: assets/fonts/Nunito-Variable.ttf
+          weight: 400
+        - asset: assets/fonts/Nunito-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/Nunito-Variable.ttf
+          weight: 700
+        - asset: assets/fonts/Nunito-Variable.ttf
+          weight: 800
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

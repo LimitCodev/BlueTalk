@@ -31,37 +31,40 @@ class _LegalScreenState extends ConsumerState<LegalScreen> {
     final aceptacion = ref.watch(legalProvider);
     final aceptado = aceptacion != null;
 
-    return ListView(
+    return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 32),
-      children: [
-        // Estado de la aceptación arriba: se ve sin desplazar nada.
-        if (aceptado) _Aceptado(aceptacion: aceptacion),
-        const SectionHeader('Términos y condiciones'),
-        _Documento(texto: terminosYCondiciones),
-        const SectionHeader('Política de privacidad'),
-        _Documento(texto: politicaDePrivacidad),
-        if (!aceptado)
-          _Pendiente(
-            consentimiento: _consentimiento,
-            onCambio: (value) => setState(() => _consentimiento = value),
-            onAceptar: () async {
-              await ref.read(legalProvider.notifier).aceptar();
-              // Al aceptar, `padreProvider` pasa solo a la pantalla del gate.
-            },
-            onRechazar: () async {
-              await ref.read(legalProvider.notifier).rechazar();
-              if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Sin aceptar los términos no puedes entrar al modo padre.',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Estado de la aceptación arriba: se ve sin desplazar nada.
+          if (aceptado) _Aceptado(aceptacion: aceptacion),
+          const SectionHeader('Términos y condiciones'),
+          _Documento(texto: terminosYCondiciones),
+          const SectionHeader('Política de privacidad'),
+          _Documento(texto: politicaDePrivacidad),
+          if (!aceptado)
+            _Pendiente(
+              consentimiento: _consentimiento,
+              onCambio: (value) => setState(() => _consentimiento = value),
+              onAceptar: () async {
+                await ref.read(legalProvider.notifier).aceptar();
+                // Al aceptar, `padreProvider` pasa solo a la pantalla del gate.
+              },
+              onRechazar: () async {
+                await ref.read(legalProvider.notifier).rechazar();
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Sin aceptar los términos no puedes entrar al modo padre.',
+                    ),
                   ),
-                ),
-              );
-            },
-            onSalir: widget.onSalir,
-          ),
-      ],
+                );
+              },
+              onSalir: widget.onSalir,
+            ),
+        ],
+      ),
     );
   }
 }

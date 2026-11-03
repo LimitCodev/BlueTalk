@@ -15,6 +15,7 @@ class PictoTile extends StatelessWidget {
     required this.onTap,
     this.onLongPress,
     this.favorited = false,
+    this.categoria,
   });
 
   final Pictogram pictogram;
@@ -24,54 +25,70 @@ class PictoTile extends StatelessWidget {
   final VoidCallback? onLongPress;
   final bool favorited;
 
+  /// Color de la categoría a la que pertenece. La web tiñe la tarjeta del
+  /// pictograma con el tono de su categoría; aquí se usa el mismo lenguaje
+  /// (ver [ColoresCategoria.relleno]). Sin categoría, tarjeta neutra.
+  final ColoresCategoria? categoria;
+
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Stack(
-          children: [
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    pictogram.asset,
-                    width: 52,
-                    height: 52,
-                    fit: BoxFit.contain,
-                    // Sin spinner animado: solo un espacio neutro al cargar.
-                    placeholderBuilder: (context) => const SizedBox(
+    final colores = context.colores;
+    final c = categoria;
+    return Material(
+      color: c?.relleno(colores) ?? colores.surface,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: c?.bordeSobre(colores) ?? colores.borde),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child: Stack(
+            children: [
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      pictogram.asset,
                       width: 52,
                       height: 52,
+                      fit: BoxFit.contain,
+                      // Sin spinner animado: solo un espacio neutro al cargar.
+                      placeholderBuilder: (context) => const SizedBox(
+                        width: 52,
+                        height: 52,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    pictogram.label,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
-              ),
-            ),
-            if (favorited)
-              Positioned(
-                top: 2,
-                right: 2,
-                child: Icon(
-                  Icons.star,
-                  size: 18,
-                  color: context.colores.primaryStrong,
-                  semanticLabel: 'Fijado en Inicio',
+                    const SizedBox(height: 4),
+                    Text(
+                      pictogram.label,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: c?.texto(colores),
+                          ),
+                    ),
+                  ],
                 ),
               ),
-          ],
+              if (favorited)
+                Positioned(
+                  top: 2,
+                  right: 2,
+                  child: Icon(
+                    Icons.star,
+                    size: 18,
+                    color: context.colores.primaryStrong,
+                    semanticLabel: 'Fijado en Inicio',
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

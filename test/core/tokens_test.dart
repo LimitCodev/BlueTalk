@@ -61,9 +61,19 @@ void main() {
       expect(_contrast(AppColors.onWarning, AppColors.warning), greaterThanOrEqualTo(4.5));
       expect(_contrast(AppColors.onError, AppColors.error), greaterThanOrEqualTo(4.5));
     });
+
+    test('texto de categorías >= 4.5:1 sobre su tarjeta', () {
+      for (final entry in coloresCategorias.entries) {
+        expect(
+          _contrast(entry.value.tinta, entry.value.fondo),
+          greaterThanOrEqualTo(4.5),
+          reason: entry.key,
+        );
+      }
+    });
   });
 
-  group('los 6 temas tienen contraste AA (plan 13 P4, aceptación)', () {
+  group('los 7 temas tienen contraste AA (plan 13 P4, aceptación)', () {
     for (final entry in AppColors.temas.entries) {
       test('tema «${entry.key}»: texto >= 4.5:1 e ink >= 4.5:1', () {
         final p = entry.value;
@@ -83,6 +93,8 @@ void main() {
         expect(_contrast(p.primaryStrong, p.surface),
             greaterThanOrEqualTo(3.0),
             reason: 'borde/icono sobre surface');
+        expect(_contrast(p.onHeader, p.header), greaterThanOrEqualTo(3.0),
+            reason: 'texto grande de la barra superior');
 
         // Tonos derivados que la UI real usa (interruptores, bordes de
         // OutlinedButton, contenedores M3): fijados a la paleta en
@@ -113,6 +125,84 @@ void main() {
       expect(AppColors.nombresTemas.keys, containsAll(AppColors.temas.keys));
       for (final nombre in AppColors.nombresTemas.values) {
         expect(nombre, isNotEmpty);
+      }
+    });
+  });
+
+  group('modo oscuro de la web (docs/branding/WEB-EXTRACCION.md §2)', () {
+    test('la paleta «oscuro» usa los valores del .dark del sitio', () {
+      final p = AppColors.oscuro;
+      expect(p.bg, const Color(0xFF171D26)); // --background 215 25% 12%
+      expect(p.surface, const Color(0xFF1F2733)); // --card 215 25% 16%
+      expect(p.primary, const Color(0xFF3095E8)); // --primary 207 80% 55%
+      expect(p.text, const Color(0xFFE7EBEF)); // --foreground 210 20% 92%
+      expect(p.borde, const Color(0xFF2D3643)); // --border 215 20% 22%
+      expect(p.brillo, Brightness.dark);
+    });
+
+    test('solo la paleta «oscuro» es oscura; el resto sigue en claro', () {
+      for (final entry in AppColors.temas.entries) {
+        expect(
+          entry.value.brillo,
+          entry.key == 'oscuro' ? Brightness.dark : Brightness.light,
+          reason: entry.key,
+        );
+      }
+    });
+
+    test('el tema Material hereda el brillo de la paleta', () {
+      expect(
+        buildBlueTalkTheme(AppColors.oscuro).brightness,
+        Brightness.dark,
+      );
+      expect(
+        buildBlueTalkTheme(AppColors.celeste).brightness,
+        Brightness.light,
+      );
+    });
+
+    test('la paleta oscura tiene borde propio, no el de las claras', () {
+      expect(AppColors.oscuro.borde, isNot(AppColors.bordeNeutro));
+      expect(AppColors.celeste.borde, AppColors.bordeNeutro);
+    });
+
+    test('el texto de cada categoría es legible en claro y en oscuro', () {
+      // El relleno en oscuro es translúcido (10 % del tono) y se compone
+      // sobre el fondo de la tarjeta: se verifica contra el color ya
+      // mezclado, no contra la capa suelta.
+      Color mezcla(Color capa, Color base) => Color.fromARGB(
+            255,
+            (255 * (capa.a * capa.r + (1 - capa.a) * base.r)).round(),
+            (255 * (capa.a * capa.g + (1 - capa.a) * base.g)).round(),
+            (255 * (capa.a * capa.b + (1 - capa.a) * base.b)).round(),
+          );
+
+      for (final entry in coloresCategorias.entries) {
+        expect(
+          _contrast(entry.value.texto(AppColors.celeste),
+              entry.value.relleno(AppColors.celeste)),
+          greaterThanOrEqualTo(4.5),
+          reason: '${entry.key} en claro',
+        );
+        final tarjetaOscura = mezcla(
+          entry.value.relleno(AppColors.oscuro),
+          AppColors.oscuro.bg,
+        );
+        expect(
+          _contrast(entry.value.texto(AppColors.oscuro), tarjetaOscura),
+          greaterThanOrEqualTo(4.5),
+          reason: '${entry.key} en oscuro',
+        );
+      }
+    });
+
+    test('en oscuro la tarjeta de categoría nunca usa el pastel claro', () {
+      for (final entry in coloresCategorias.entries) {
+        expect(
+          entry.value.relleno(AppColors.oscuro),
+          isNot(entry.value.fondo),
+          reason: entry.key,
+        );
       }
     });
   });

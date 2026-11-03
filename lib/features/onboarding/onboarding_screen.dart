@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/theme/app_colors.dart';
 import '../../core/widgets/logo_bluetalk.dart';
 import 'profile_controller.dart';
 
-/// Onboarding (plan 01 §7): "Tu voz, siempre contigo 💚" (el plan
-/// escribía 💙; el lema usa el verde del corazón de marca) → apodo local
-/// (sin PII, solo se guarda en el teléfono) → home.
+/// Onboarding (plan 01 §7): logotipo y lema de la web oficial
+/// («Tu voz, siempre contigo 💙») → apodo local (sin PII, solo se guarda en
+/// el teléfono) → home.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -64,19 +65,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Identidad oficial (plan 13 P3.5): logo del cartel.
-                  const LogoBluetalk(size: 84),
+                  // Identidad oficial de la web: logotipo completo.
+                  const Center(
+                    child: LogoBluetalkWordmark(height: 64),
+                  ),
                   const SizedBox(height: 12),
                   Text(
                     'BlueTalk',
                     textAlign: TextAlign.center,
                     style: textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
+                      color: context.colores.primaryStrongText,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Tu voz, siempre contigo 💚',
+                    'Tu voz, siempre contigo 💙',
                     textAlign: TextAlign.center,
                     style: textTheme.bodyLarge,
                   ),

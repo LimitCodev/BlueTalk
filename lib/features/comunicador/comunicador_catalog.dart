@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/di.dart';
 import '../../data/contracts/repos.dart';
 import '../../data/models/models.dart';
+import '../padre/perfil_edad.dart';
 
 /// Catálogo completo del comunicador: categorías + todos sus pictogramas.
 ///
@@ -40,6 +41,20 @@ class Catalog {
 }
 
 /// Categorías y pictogramas desde los seeds (offline, con caché).
-final catalogProvider = FutureProvider<Catalog>(
-  (ref) => Catalog.load(ref.watch(pictogramRepoProvider)),
-);
+///
+/// Si la persona adulta eligió un perfil de edad (fase 3b), se ocultan las
+/// categorías que no son de esa edad. Se **ocultan**, no se borran: los
+/// pictogramas guardados en una frase o en favoritos siguen resolviéndose
+/// con normalidad.
+final catalogProvider = FutureProvider<Catalog>((ref) async {
+  final catalogo = await Catalog.load(ref.watch(pictogramRepoProvider));
+  final perfil = ref.watch(perfilEdadProvider);
+  if (perfil.categorias.isEmpty) return catalogo;
+  return Catalog(
+    categories: [
+      for (final categoria in catalogo.categories)
+        if (perfil.seVe(categoria.id)) categoria,
+    ],
+    pictograms: catalogo.pictograms,
+  );
+});

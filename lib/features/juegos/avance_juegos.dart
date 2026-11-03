@@ -155,7 +155,9 @@ class BarraAvance extends StatelessWidget {
         height: 12,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: const Color(0xFFDCEEF7),
+          // Rastro de la barra: derivado de la paleta activa para que
+          // también siga al modo oscuro de la web.
+          color: context.colores.primary.withValues(alpha: 0.16),
           borderRadius: BorderRadius.circular(6),
         ),
         child: FractionallySizedBox(

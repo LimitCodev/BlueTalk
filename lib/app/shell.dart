@@ -72,9 +72,15 @@ class AppShell extends ConsumerWidget {
           title: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const LogoBluetalk(size: 28),
+              const LogoBluetalkWordmark(height: 23, pill: true),
               const SizedBox(width: 10),
-              Text(_tabs[index].label),
+              Flexible(
+                child: Text(
+                  _tabs[index].label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
           actions: [

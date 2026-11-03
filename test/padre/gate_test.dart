@@ -9,6 +9,7 @@ import 'package:bluetalk/features/rutinas/recordatorios/recordatorio_scheduler.d
 import 'package:bluetalk/features/rutinas/recordatorios/recordatorio_scheduler_real.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:bluetalk/features/padre/gate/almacen_pin.dart';
 import 'package:bluetalk/features/padre/gate/gate_controller.dart';
 import 'package:bluetalk/features/padre/gate/gate_screen.dart';
 import 'package:bluetalk/features/padre/gate/pin_store.dart';
@@ -344,6 +345,16 @@ void main() {
     await prefs.setString('comunicador_favoritos', '["ayuda"]');
     final reloj = RelojPrueba();
 
+    // La huella del PIN vive en el keystore desde la 3a.1: aquí se migra
+    // igual que en el arranque real, para comprobar que BORRAR la borra
+    // también (revisión de la fase 3a: `prefs.clear()` no la tocaba y el
+    // gate volvía a pedir el código olvidado).
+    final keystore = KeystorePrueba();
+    final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+    await almacen.cargar();
+    expect(keystore.datos[PinStore.claveHash], isNotNull,
+        reason: 'precondición: la huella ya vive en el keystore');
+
     // Rutas mínimas para comprobar que, tras el borrado, la app vuelve al
     // onboarding (en producción las aporta `lib/app/router.dart`).
     final rutas = GoRouter(
@@ -372,6 +383,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         ...overridesDePadre(prefs, reloj: reloj),
+        almacenPinProvider.overrideWithValue(almacen),
         recordatorioSchedulerProvider.overrideWithValue(schedulerPrueba),
       ].cast(),
     );
@@ -434,6 +446,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(prefs.getKeys(), isEmpty, reason: 'prefs.clear() lo borra todo');
+    for (final clave in AlmacenPin.clavesSecretas) {
+      expect(keystore.datos.containsKey(clave), isFalse,
+          reason: 'la huella del PIN también se fue: $clave');
+      expect(almacen.tiene(clave), isFalse, reason: clave);
+    }
+    expect(
+      almacen.tiene(PinStore.claveHash),
+      isFalse,
+      reason: 'si no, el gate pediría el PIN que la persona olvidó',
+    );
     expect(
       schedulerPrueba.cancelarTodosLlamado,
       greaterThanOrEqualTo(1),

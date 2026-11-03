@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/di.dart';
 import '../reloj.dart';
+import 'almacen_pin.dart';
 import 'biometria.dart';
 import 'pin_store.dart';
 
@@ -17,6 +18,17 @@ enum GateFase { crear, confirmar, pedir }
 /// plan 12 §0.2).
 final derivadorPinProvider = Provider<DerivadorPin>(
   (ref) => const DerivadorPinAislamiento(),
+);
+
+/// Almacén cifrado de las huellas del PIN (encargo §3.1).
+///
+/// El valor por defecto solo sirve para tests y arranques sin precargar:
+/// lee y escribe en las preferencias que ya estén cargadas y reporta
+/// `cifrado == false`. `main()` lo sobreescribe por el almacén que ya pasó
+/// por [AlmacenPin.cargar] y sí vive en el keystore; por eso la pantalla
+/// de estado del modo padre muestra si el PIN está cifrado o no.
+final almacenPinProvider = Provider<AlmacenPin>(
+  (ref) => AlmacenPin(prefs: ref.watch(sharedPreferencesProvider)),
 );
 
 class GateEstado {
@@ -71,6 +83,7 @@ class GateController extends Notifier<GateEstado> {
 
   PinStore _store() => PinStore(
         ref.read(sharedPreferencesProvider),
+        almacen: ref.read(almacenPinProvider),
         ahora: ref.read(relojProvider),
         derivador: ref.read(derivadorPinProvider),
       );
@@ -178,8 +191,17 @@ class GateController extends Notifier<GateEstado> {
     final resultado = await store.verificarRecuperacion(tecleado);
 
     if (resultado == VerificacionPin.correcto) {
-      await store.borrarSoloPin();
+      final borrado = await store.borrarSoloPin();
       _cancelarCuentaAtras();
+      if (!borrado) {
+        // El keystore no dejó borrar la huella vieja: no se anuncia un
+        // PIN borrado que seguiría valiendo.
+        state = _estadoPedir(
+          mensaje: 'El código es correcto, pero este teléfono no dejó '
+              'borrar el código antiguo. Inténtalo de nuevo.',
+        );
+        return false;
+      }
       state = const GateEstado(
         fase: GateFase.crear,
         mensaje: 'Código correcto. Crea un código nuevo.',

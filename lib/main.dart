@@ -8,6 +8,8 @@ import 'app/app.dart';
 import 'app/di.dart';
 import 'data/local/mock_repos.dart';
 import 'features/onboarding/profile_controller.dart';
+import 'features/padre/gate/almacen_pin.dart';
+import 'features/padre/gate/gate_controller.dart';
 
 /// RAM total del equipo en bytes vía `/proc/meminfo` (Android es Linux);
 /// `null` si no se puede leer, y entonces no se aplica ningún tope.
@@ -41,10 +43,17 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   final profile = await PrefsProfileRepo(prefs).currentProfile();
 
+  // Huella del PIN de los adultos en el keystore cifrado (encargo §3.1):
+  // se lee y se migra aquí, antes del primer frame, para que el gate pueda
+  // seguir consultando el almacén de forma síncrona.
+  final almacenPin = AlmacenPin(prefs: prefs);
+  await almacenPin.cargar();
+
   runApp(
     ProviderScope(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
+        almacenPinProvider.overrideWithValue(almacenPin),
         initialProfileProvider.overrideWithValue(profile),
       ],
       child: const BlueTalkApp(),

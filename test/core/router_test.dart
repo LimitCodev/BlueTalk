@@ -469,6 +469,10 @@ void main() {
     await tester.pumpAndSettle();
     final privacidad = find.text('Política de privacidad');
     await tester.scrollUntilVisible(privacidad, 300);
+    // La lista creció con la tipografía de la web: asegurar que la fila
+    // quede dentro del área visible antes de tocarla.
+    await tester.ensureVisible(privacidad);
+    await tester.pumpAndSettle();
     await tester.tap(privacidad);
     await tester.pumpAndSettle();
     expect(

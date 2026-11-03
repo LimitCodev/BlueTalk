@@ -10,14 +10,20 @@ import 'package:bluetalk/features/padre/padre_screen.dart';
 
 import 'harness.dart';
 
-/// Desplaza la lista hasta un widget (los documentos son largos).
+/// Desplaza la pantalla hasta un widget. Los documentos legales son largos;
+/// el contenido se construye completo (SingleChildScrollView), así que basta
+/// con asegurarlo en pantalla.
 Future<void> _hasta(WidgetTester tester, Finder finder) async {
-  await tester.scrollUntilVisible(
-    finder,
-    800,
-    scrollable: find.byType(Scrollable).first,
-    maxScrolls: 200,
-  );
+  for (var i = 0; i < 20 && finder.evaluate().isEmpty; i++) {
+    final scrollable = find.byType(Scrollable);
+    if (scrollable.evaluate().isEmpty) break;
+    await tester.drag(scrollable.first, const Offset(0, -600));
+    await tester.pumpAndSettle();
+  }
+  if (finder.evaluate().isNotEmpty) {
+    await tester.ensureVisible(finder.first);
+    await tester.pumpAndSettle();
+  }
 }
 
 void main() {
@@ -76,13 +82,13 @@ void main() {
 
     final aceptacion = container.read(legalProvider);
     expect(aceptacion, isNotNull);
-    expect(aceptacion!.version, '1.0.0');
+    expect(aceptacion!.version, '1.1.0');
     expect(aceptacion.consentimientoPadre, isTrue);
     expect(aceptacion.fecha, ahoraFija);
 
     // Registrada en preferencias con su versión.
     final guardado = prefs.getString('padre_legal_aceptacion');
-    expect(guardado, contains('"version":"1.0.0"'));
+    expect(guardado, contains('"version":"1.1.0"'));
 
     // Al aceptar, el modo padre pasa al gate (no al resumen sin PIN).
     expect(container.read(padreProvider), PadreVista.gate);
@@ -116,6 +122,11 @@ void main() {
       findsOneWidget,
     );
 
+    // El aviso flota sobre el final de la pantalla y taparía el botón de
+    // salida; se espera a que desaparezca.
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pumpAndSettle();
+
     // Navegar al resumen por la fuerza tampoco pasa.
     container.read(padreProvider.notifier).irA(PadreVista.resumen);
     await tester.pump();
@@ -145,9 +156,27 @@ void main() {
     container.read(padreProvider.notifier).irA(PadreVista.legal);
     await tester.pumpAndSettle();
 
-    expect(find.text('Aceptado el 13/10/2026 (versión 1.0.0).'),
+    expect(find.text('Aceptado el 13/10/2026 (versión 1.1.0).'),
         findsOneWidget);
     expect(find.text('Consentimiento parental registrado.'), findsOneWidget);
     expect(find.byType(CheckboxListTile), findsNothing);
+  });
+
+  testWidgets('una aceptación de una versión anterior se vuelve a pedir',
+      (tester) async {
+    final prefs = await prefsDePrueba(
+      iniciales: {
+        'padre_legal_aceptacion':
+            '{"version":"1.0.0","fecha":0,"consentimientoPadre":true}',
+      },
+    );
+    final container = await pumpPadre(
+      tester,
+      home: PadreScreen(onSalir: () {}),
+      overrides: overridesDePadre(prefs),
+    );
+
+    expect(container.read(legalProvider), isNull);
+    expect(container.read(padreProvider), PadreVista.legal);
   });
 }

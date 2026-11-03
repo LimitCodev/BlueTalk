@@ -1,7 +1,7 @@
 # Términos y condiciones de uso de BlueTalk
 
-**Fecha de entrada en vigencia:** 13 de octubre de 2026
-**Versión:** 1.0.0
+**Fecha de entrada en vigencia:** 20 de octubre de 2026
+**Versión:** 1.1.0
 
 ## 1. Identificación del servicio
 
@@ -24,6 +24,7 @@ BlueTalk se encuentra en una fase de versión preliminar (MVP) de prueba. Durant
 - Los pictogramas, cuentos, actividades de horario y ejemplos incluidos son contenido de demostración incluido con fines de prueba; no representan casos clínicos ni recomendaciones particulares.
 - No se ofrecen pagos, suscripciones ni funciones premium. Cualquier versión futura con pago se anunciará por separado y requerirá aceptación expresa de condiciones adicionales.
 - Ciertas métricas de la zona de adultos se etiquetan como «Datos de demostración» mientras no exista sincronización con un servicio en la nube.
+- El filtro de páginas es opcional y lo activa la persona adulta. Usa una VPN local de Android que solo intercepta consultas DNS; no envía datos a servidores del desarrollador.
 
 ## 4. Uso por menores de edad y consentimiento parental
 
@@ -34,6 +35,7 @@ La persona adulta responsable se compromete a:
 - Revisar y configurar la app antes de entregar el teléfono al menor, en especial el límite de tiempo de juegos y el acceso a la zona de adultos.
 - No compartir el código PIN de la zona de adultos con menores, ni dejarlo escrito en lugares visibles.
 - Supervisar el contenido que el menor crea o exporta desde la aplicación.
+- Configurar el filtro de páginas si lo usa, revisar los sitios añadidos y saber que no sustituye al filtrado del colegio.
 
 La aceptación de estos términos por parte de la persona adulta constituye el consentimiento parental exigible para el uso de la app por menores en este proyecto.
 
@@ -95,6 +97,7 @@ Para su trabajo, la app depende de funciones del propio sistema Android:
 - El sintetizador de voz del sistema para hablar pictogramas. Su calidad y disponibilidad dependen de las voces instaladas en el teléfono.
 - Notificaciones locales, si la persona usuaria las autoriza.
 - Almacenamiento local del dispositivo.
+- La VPN local del filtro de páginas, cuando la persona adulta lo activa, y el servidor DNS de la red (Wi-Fi o datos móviles), que puede ser del proveedor de internet o del colegio.
 
 No se incorporan SDK de publicidad, analítica o redes sociales en esta versión. Google Play Store actúa como canal de distribución y sus condiciones de compra y descarga se aplican a la descarga de la app.
 
@@ -115,6 +118,7 @@ En la máxima medida permitida por la ley aplicable, el desarrollador no respond
 - Daños derivados del uso de la app en lugar de buscar la evaluación profesional adecuada.
 - Pérdida de datos locales causada por fallos del dispositivo, restablecimiento de fábrica o desinstalación.
 - Incompatibilidad del teléfono con la app en dispositivos fuera del rango soportado.
+- Que el filtro de páginas no bloquee todo el contenido: es una ayuda y no sustituye la supervisión adulta ni el filtrado de la red escolar.
 
 Ninguna disposición de estos términos limita la responsabilidad que no pueda excluirse por ley.
 
@@ -125,4 +129,4 @@ Estos términos se rigen por la legislación del país donde se instale la app. 
 ## 17. Contacto
 
 Correo: demo@bluetalk.app (dirección de demostración de este proyecto).
-Última actualización de este documento: 13 de octubre de 2026, versión 1.0.0.
+Última actualización de este documento: 20 de octubre de 2026, versión 1.1.0.
