@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/services.dart';
+import '../../../core/plataforma/canal_nativo.dart';
 
 import 'filtro_web_model.dart';
 
@@ -85,87 +85,38 @@ abstract interface class FiltroWebGateway {
 class PlatformFiltroWebGateway implements FiltroWebGateway {
   const PlatformFiltroWebGateway();
 
-  static const _canal = MethodChannel('bluetalk/filtro_web');
+  static const _canal = CanalNativo('bluetalk/filtro_web');
 
   @override
   Future<FiltroWebEstado> estado() async {
-    try {
-      final mapa = await _canal.invokeMethod<Map<Object?, Object?>>('estado');
-      return mapa == null
-          ? FiltroWebEstado.sinComprobar
-          : FiltroWebEstado.fromMap(mapa);
-    } on MissingPluginException {
-      return FiltroWebEstado.sinComprobar;
-    } on PlatformException {
-      return FiltroWebEstado.sinComprobar;
-    }
+    final mapa = await _canal.mapa('estado');
+    return mapa == null
+        ? FiltroWebEstado.sinComprobar
+        : FiltroWebEstado.fromMap(mapa);
   }
 
   @override
-  Future<bool> activar() async {
-    try {
-      return await _canal.invokeMethod<bool>('activar') ?? false;
-    } on MissingPluginException {
-      return false;
-    } on PlatformException {
-      return false;
-    }
-  }
+  Future<bool> activar() => _canal.orden('activar');
+
+  /// El servicio pudo haberse detenido solo; la UI muestra el estado real.
+  @override
+  Future<void> desactivar() => _canal.pedir<void>('desactivar');
+
+  /// Sin canal la configuración queda guardada en el almacén local y se
+  /// reintenta al activar o al volver a abrir la pantalla.
+  @override
+  Future<void> actualizar(FiltroWebConfig config) => _canal.pedir<void>(
+        'actualizar',
+        {'config': jsonEncode(config.paraServicioNativo)},
+      );
+
+  /// El registro es informativo; no se bloquea la pantalla por esto.
+  @override
+  Future<void> limpiarRegistro() => _canal.pedir<void>('limpiarRegistro');
 
   @override
-  Future<void> desactivar() async {
-    try {
-      await _canal.invokeMethod<void>('desactivar');
-    } on MissingPluginException {
-      // Sin canal (tests/escritorio): no hay nada que detener.
-    } on PlatformException {
-      // El servicio pudo haberse detenido solo; la UI muestra el estado real.
-    }
-  }
+  Future<bool> abrirAjustesVpn() => _canal.orden('abrirAjustesVpn');
 
   @override
-  Future<void> actualizar(FiltroWebConfig config) async {
-    try {
-      await _canal.invokeMethod<void>('actualizar', {
-        'config': jsonEncode(config.paraServicioNativo),
-      });
-    } on MissingPluginException {
-      // Sin canal (tests/escritorio): la configuración queda en prefs.
-    } on PlatformException {
-      // Se reintenta al activar o al volver a abrir la pantalla.
-    }
-  }
-
-  @override
-  Future<void> limpiarRegistro() async {
-    try {
-      await _canal.invokeMethod<void>('limpiarRegistro');
-    } on MissingPluginException {
-      // Sin canal: no hay registro nativo que borrar.
-    } on PlatformException {
-      // El registro es informativo; no se bloquea la pantalla por esto.
-    }
-  }
-
-  @override
-  Future<bool> abrirAjustesVpn() async {
-    try {
-      return await _canal.invokeMethod<bool>('abrirAjustesVpn') ?? false;
-    } on MissingPluginException {
-      return false;
-    } on PlatformException {
-      return false;
-    }
-  }
-
-  @override
-  Future<bool> abrirAjustesDns() async {
-    try {
-      return await _canal.invokeMethod<bool>('abrirAjustesDns') ?? false;
-    } on MissingPluginException {
-      return false;
-    } on PlatformException {
-      return false;
-    }
-  }
+  Future<bool> abrirAjustesDns() => _canal.orden('abrirAjustesDns');
 }

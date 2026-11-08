@@ -1,4 +1,4 @@
-import 'package:flutter/services.dart';
+import '../../../core/plataforma/canal_nativo.dart';
 
 import 'permiso_model.dart';
 
@@ -28,7 +28,7 @@ abstract interface class PermisosGateway {
 class PlatformPermisosGateway implements PermisosGateway {
   const PlatformPermisosGateway();
 
-  static const _canal = MethodChannel('bluetalk/permisos');
+  static const _canal = CanalNativo('bluetalk/permisos');
 
   @override
   Future<EstadoPermiso> estadoAvisos() => _leer('avisos');
@@ -36,34 +36,12 @@ class PlatformPermisosGateway implements PermisosGateway {
   @override
   Future<EstadoPermiso> estadoBateria() => _leer('bateria');
 
-  Future<EstadoPermiso> _leer(String clave) async {
-    try {
-      final mapa = await _canal.invokeMethod<Map<Object?, Object?>>('estado');
-      final valor = mapa?[clave];
-      if (valor is bool) {
-        return valor ? EstadoPermiso.concedido : EstadoPermiso.pendiente;
-      }
-      return EstadoPermiso.desconocido;
-    } on MissingPluginException {
-      return EstadoPermiso.desconocido;
-    } on PlatformException {
-      return EstadoPermiso.desconocido;
-    }
-  }
+  Future<EstadoPermiso> _leer(String clave) async =>
+      estadoDesdeBool((await _canal.mapa('estado'))?[clave]);
 
   @override
-  Future<bool> pedirAvisos() => _llamar('pedirAvisos');
+  Future<bool> pedirAvisos() => _canal.orden('pedirAvisos');
 
   @override
-  Future<bool> pedirBateria() => _llamar('pedirBateria');
-
-  Future<bool> _llamar(String metodo) async {
-    try {
-      return await _canal.invokeMethod<bool>(metodo) ?? false;
-    } on MissingPluginException {
-      return false;
-    } on PlatformException {
-      return false;
-    }
-  }
+  Future<bool> pedirBateria() => _canal.orden('pedirBateria');
 }

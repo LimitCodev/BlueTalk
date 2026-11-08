@@ -32,6 +32,14 @@ enum EstadoPermiso {
   desconocido,
 }
 
+/// Traduce el `true`/`false` de un canal nativo. Cualquier otra respuesta
+/// (sin canal, nula, de otro tipo) es [EstadoPermiso.desconocido].
+EstadoPermiso estadoDesdeBool(Object? valor) => switch (valor) {
+      true => EstadoPermiso.concedido,
+      false => EstadoPermiso.pendiente,
+      _ => EstadoPermiso.desconocido,
+    };
+
 /// Un permiso explicado para el asistente del adulto.
 class PermisoPadre {
   const PermisoPadre({

@@ -31,4 +31,12 @@ void main() {
     );
     expect(fuera, isEmpty, reason: 'Usa almacenLocalProvider (core/almacen).');
   });
+
+  test('solo core/plataforma crea canales nativos', () {
+    final fuera = quienesUsan(
+      'MethodChannel(',
+      permitidos: ['lib/core/plataforma/'],
+    );
+    expect(fuera, isEmpty, reason: 'Usa CanalNativo (core/plataforma).');
+  });
 }

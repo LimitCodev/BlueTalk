@@ -1,4 +1,4 @@
-import 'package:flutter/services.dart';
+import '../../../core/plataforma/canal_nativo.dart';
 
 /// Estado real de la protección contra desinstalación.
 ///
@@ -39,40 +39,19 @@ abstract interface class ProteccionGateway {
 class PlatformProteccionGateway implements ProteccionGateway {
   const PlatformProteccionGateway();
 
-  static const _canal = MethodChannel('bluetalk/proteccion');
+  static const _canal = CanalNativo('bluetalk/proteccion');
 
   @override
   Future<ProteccionEstado> estado() async {
-    try {
-      final mapa = await _canal.invokeMethod<Map<Object?, Object?>>('activo');
-      if (mapa == null) return ProteccionEstado.sinComprobar;
-      return ProteccionEstado(activo: mapa['activo'] == true);
-    } on MissingPluginException {
-      return ProteccionEstado.sinComprobar;
-    } on PlatformException {
-      return ProteccionEstado.sinComprobar;
-    }
+    final mapa = await _canal.mapa('activo');
+    if (mapa == null) return ProteccionEstado.sinComprobar;
+    return ProteccionEstado(activo: mapa['activo'] == true);
   }
 
   @override
-  Future<bool> pedirActivacion() async {
-    try {
-      return await _canal.invokeMethod<bool>('pedirActivacion') ?? false;
-    } on MissingPluginException {
-      return false;
-    } on PlatformException {
-      return false;
-    }
-  }
+  Future<bool> pedirActivacion() => _canal.orden('pedirActivacion');
 
+  /// Sin canal no hay administrador que quitar; el estado se relee después.
   @override
-  Future<void> desactivar() async {
-    try {
-      await _canal.invokeMethod<void>('desactivar');
-    } on MissingPluginException {
-      // Sin canal (tests/escritorio) no hay administrador que quitar.
-    } on PlatformException {
-      // Nada que hacer: el estado se vuelve a leer después.
-    }
-  }
+  Future<void> desactivar() => _canal.pedir<void>('desactivar');
 }
