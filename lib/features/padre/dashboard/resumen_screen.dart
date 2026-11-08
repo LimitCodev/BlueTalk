@@ -10,6 +10,8 @@ import '../monitoreo/uso_telefono_controller.dart';
 import '../monitoreo/uso_telefono_model.dart';
 import '../monitoreo/uso_telefono_screen.dart';
 import '../reloj.dart';
+import '../informes/informes_screen.dart';
+import 'banner_demo.dart';
 import 'barras.dart';
 import 'metricas.dart';
 
@@ -25,7 +27,8 @@ class ResumenScreen extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.only(bottom: 32),
       children: [
-        const _BannerDemo(),
+        const BannerDemo(),
+        const AccesoInformes(),
         switch (metricas) {
           AsyncData(:final value) => _Cuerpo(metricas: value),
           AsyncError() => _SinDatos(
@@ -39,50 +42,6 @@ class ResumenScreen extends ConsumerWidget {
         const _UsoTelefonoResumen(),
         const ObservacionesSection(),
       ],
-    );
-  }
-}
-
-/// Banner obligatorio: hasta que haya sync real, todo aquí es demostración.
-class _BannerDemo extends StatelessWidget {
-  const _BannerDemo();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.warning,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: const Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.science_outlined, color: AppColors.onWarning, size: 20),
-          SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Datos de demostración',
-                  style: TextStyle(
-                    color: AppColors.onWarning,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Métricas calculadas localmente en este dispositivo. '
-                  'Todavía no hay sincronización con la nube.',
-                  style: TextStyle(color: AppColors.onWarning, fontSize: 13),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

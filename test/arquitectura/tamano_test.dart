@@ -33,7 +33,7 @@ const _deuda = <String, int>{
   'lib/features/padre/control/recuperacion_dialogo.dart': 156,
   'lib/features/padre/dashboard/barras.dart': 107,
   'lib/features/padre/dashboard/metricas.dart': 140,
-  'lib/features/padre/dashboard/resumen_screen.dart': 291,
+  'lib/features/padre/dashboard/resumen_screen.dart': 250,
   'lib/features/padre/diagnostico/observaciones.dart': 333,
   'lib/features/padre/filtro_web/filtro_web_controller.dart': 290,
   'lib/features/padre/filtro_web/filtro_web_gateway.dart': 122,
