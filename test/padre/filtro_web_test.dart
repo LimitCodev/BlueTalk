@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:bluetalk/core/almacen/almacen_local.dart';
 import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/features/padre/filtro_web/filtro_web_controller.dart';
 import 'package:bluetalk/features/padre/filtro_web/filtro_web_gateway.dart';
@@ -217,8 +218,8 @@ void main() {
         bloquearBuscadores: true,
         dominiosPersonalizados: ['ejemplo.com', 'otro.org'],
       );
-      await FiltroWebPrefs.guardar(prefs, config);
-      final leida = FiltroWebPrefs.leer(prefs);
+      await FiltroWebPrefs.guardar(AlmacenPrefs(prefs), config);
+      final leida = FiltroWebPrefs.leer(AlmacenPrefs(prefs));
       expect(leida.activo, isTrue);
       expect(leida.bloquearJuegos, isTrue);
       expect(leida.bloquearBuscadores, isTrue);
@@ -229,7 +230,7 @@ void main() {
       final prefs = await prefsDePrueba(
         iniciales: {FiltroWebPrefs.personalizados: 'no es json'},
       );
-      final leida = FiltroWebPrefs.leer(prefs);
+      final leida = FiltroWebPrefs.leer(AlmacenPrefs(prefs));
       expect(leida.dominiosPersonalizados, isEmpty);
     });
   });
@@ -486,7 +487,7 @@ void main() {
 
     test('SafeSearch viene encendido y se puede apagar', () async {
       final prefs = await prefsDePrueba();
-      expect(FiltroWebPrefs.leer(prefs).forzarSafeSearch, isTrue);
+      expect(FiltroWebPrefs.leer(AlmacenPrefs(prefs)).forzarSafeSearch, isTrue);
 
       final gateway = _GatewayFalso();
       final container = _contenedor(prefs, gateway);
@@ -496,7 +497,7 @@ void main() {
       expect(container.read(filtroWebProvider).forzarSafeSearch, isFalse);
       expect(prefs.getBool(FiltroWebPrefs.safeSearch), isFalse);
       // Se relee igual tras un reinicio.
-      expect(FiltroWebPrefs.leer(prefs).forzarSafeSearch, isFalse);
+      expect(FiltroWebPrefs.leer(AlmacenPrefs(prefs)).forzarSafeSearch, isFalse);
     });
 
     test('agregar palabra y sitio permitido se guardan y llegan al servicio',
@@ -525,7 +526,7 @@ void main() {
       expect(gateway.ultimaConfig?.dominiosPermitidos, ['sexton.edu']);
 
       // Tras un reinicio siguen ahí.
-      final releeido = FiltroWebPrefs.leer(prefs);
+      final releeido = FiltroWebPrefs.leer(AlmacenPrefs(prefs));
       expect(releeido.palabrasProhibidas, ['nino']);
       expect(releeido.dominiosPermitidos, ['sexton.edu']);
 

@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:bluetalk/core/almacen/almacen_local.dart';
 import 'package:bluetalk/features/padre/gate/almacen_pin.dart';
 import 'package:bluetalk/features/padre/gate/gate_controller.dart';
 import 'package:bluetalk/features/padre/gate/gate_screen.dart';
@@ -153,7 +154,7 @@ void main() {
     await sembrarRecuperacionDePrueba(prefs);
     // La huella migra al keystore y después el keystore deja de borrar.
     final keystore = KeystorePrueba();
-    final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+    final almacen = AlmacenPin(prefs: AlmacenPrefs(prefs), sistema: keystore);
     await almacen.cargar();
     keystore.borradoFallido = true;
 
@@ -211,7 +212,7 @@ void main() {
     await crearPinDePrueba(prefs);
     await sembrarRecuperacionDePrueba(prefs);
     final keystore = KeystorePrueba();
-    final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+    final almacen = AlmacenPin(prefs: AlmacenPrefs(prefs), sistema: keystore);
     await almacen.cargar();
     keystore.borradoFallido = true;
 

@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:bluetalk/core/almacen/almacen_local.dart';
 import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/data/local/mock_repos.dart';
 import 'package:bluetalk/data/local/seed_store.dart';
@@ -285,8 +286,8 @@ UsageEvent evento(
 Future<void> crearPinDePrueba(SharedPreferences prefs, {String pin = '1234'}) async {
   if (pin != '1234') {
     await PinStore(
-      prefs,
-      almacen: AlmacenPin(prefs: prefs),
+      AlmacenPrefs(prefs),
+      almacen: AlmacenPin(prefs: AlmacenPrefs(prefs)),
       ahora: () => ahoraFija,
       derivador: const DerivadorPinPrueba(),
     ).crear(pin);

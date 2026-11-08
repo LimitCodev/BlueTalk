@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:bluetalk/core/almacen/almacen_local.dart';
 import 'package:bluetalk/features/comunicador/comunicador_catalog.dart';
 import 'package:bluetalk/features/padre/control/control_screen.dart';
 import 'package:bluetalk/features/padre/filtro_web/filtro_web_controller.dart';
@@ -53,7 +54,7 @@ void main() {
       expect(filtro.forzarSafeSearch, isTrue);
 
       // Tras un reinicio se recuerda.
-      expect(PerfilEdad.desdePrefs(prefs), PerfilEdad.pequenas);
+      expect(PerfilEdad.desdePrefs(AlmacenPrefs(prefs)), PerfilEdad.pequenas);
     });
 
     test('el catálogo oculta las categorías que no tocan y conserva los pictos',

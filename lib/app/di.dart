@@ -2,6 +2,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/almacen/almacen_local.dart';
 import '../data/contracts/repos.dart';
 import '../data/local/mock_repos.dart';
 import '../data/local/seed_store.dart';
@@ -12,6 +13,11 @@ import '../data/local/seed_store.dart';
 /// y en tests con `SharedPreferences.setMockInitialValues`.
 final sharedPreferencesProvider = Provider<SharedPreferences>(
   (ref) => throw UnimplementedError('Se sobreescribe en main()'),
+);
+
+/// Puerta única al almacenamiento local para features y core.
+final almacenLocalProvider = Provider<AlmacenLocal>(
+  (ref) => AlmacenPrefs(ref.watch(sharedPreferencesProvider)),
 );
 
 /// Flag para enchufar Supabase (plan 01 §6): `false` = MVP 100% local.

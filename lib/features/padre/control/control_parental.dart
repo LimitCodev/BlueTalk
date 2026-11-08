@@ -45,13 +45,13 @@ class LimiteJuegosController extends AsyncNotifier<LimiteJuegos> {
   Future<LimiteJuegos> build() => _leer();
 
   Future<LimiteJuegos> _leer() async {
-    final prefs = ref.read(sharedPreferencesProvider);
+    final prefs = ref.read(almacenLocalProvider);
     final ahora = ref.read(relojProvider)();
-    final minutos = prefs.getInt(claveMinutos) ?? 30;
+    final minutos = prefs.entero(claveMinutos) ?? 30;
 
     var extension = 0;
-    if (prefs.getString(claveExtensionDia) == _dia(ahora)) {
-      extension = prefs.getInt(claveExtension) ?? 0;
+    if (prefs.texto(claveExtensionDia) == _dia(ahora)) {
+      extension = prefs.entero(claveExtension) ?? 0;
     }
 
     var segundos = 0;
@@ -71,13 +71,13 @@ class LimiteJuegosController extends AsyncNotifier<LimiteJuegos> {
 
   /// Enciende o apaga el límite sin perder el valor anterior.
   Future<void> setActivo(bool activo) async {
-    final prefs = ref.read(sharedPreferencesProvider);
+    final prefs = ref.read(almacenLocalProvider);
     if (activo) {
-      final previo = prefs.getInt(clavePrevia) ?? 30;
+      final previo = prefs.entero(clavePrevia) ?? 30;
       await _setMinutosPorDia(previo == 0 ? 30 : previo);
     } else {
-      final actual = prefs.getInt(claveMinutos) ?? 30;
-      if (actual != 0) await prefs.setInt(clavePrevia, actual);
+      final actual = prefs.entero(claveMinutos) ?? 30;
+      if (actual != 0) await prefs.guardarEntero(clavePrevia, actual);
       await _setMinutosPorDia(0);
     }
   }
@@ -86,20 +86,20 @@ class LimiteJuegosController extends AsyncNotifier<LimiteJuegos> {
       _setMinutosPorDia(minutos == 0 ? 0 : minutos.clamp(15, 240));
 
   Future<void> _setMinutosPorDia(int minutos) async {
-    await ref.read(sharedPreferencesProvider).setInt(claveMinutos, minutos);
+    await ref.read(almacenLocalProvider).guardarEntero(claveMinutos, minutos);
     state = AsyncData(await _leer());
   }
 
   /// Corte suave: 5 minutos más hoy, sin pantallazo rojo.
   Future<void> ampliar() async {
-    final prefs = ref.read(sharedPreferencesProvider);
+    final prefs = ref.read(almacenLocalProvider);
     final ahora = ref.read(relojProvider)();
     final actual =
-        prefs.getString(claveExtensionDia) == _dia(ahora)
-            ? (prefs.getInt(claveExtension) ?? 0)
+        prefs.texto(claveExtensionDia) == _dia(ahora)
+            ? (prefs.entero(claveExtension) ?? 0)
             : 0;
-    await prefs.setString(claveExtensionDia, _dia(ahora));
-    await prefs.setInt(
+    await prefs.guardarTexto(claveExtensionDia, _dia(ahora));
+    await prefs.guardarEntero(
       claveExtension,
       actual + LimiteJuegos.minutosDeExtension,
     );
@@ -136,21 +136,21 @@ class BloqueosController extends Notifier<Bloqueos> {
 
   @override
   Bloqueos build() {
-    final prefs = ref.read(sharedPreferencesProvider);
+    final prefs = ref.read(almacenLocalProvider);
     return Bloqueos(
-      juegos: prefs.getBool(claveJuegos) ?? false,
-      entorno: prefs.getBool(claveEntorno) ?? false,
+      juegos: prefs.booleano(claveJuegos) ?? false,
+      entorno: prefs.booleano(claveEntorno) ?? false,
     );
   }
 
   Future<void> setJuegos(bool value) async {
     state = Bloqueos(juegos: value, entorno: state.entorno);
-    await ref.read(sharedPreferencesProvider).setBool(claveJuegos, value);
+    await ref.read(almacenLocalProvider).guardarBooleano(claveJuegos, value);
   }
 
   Future<void> setEntorno(bool value) async {
     state = Bloqueos(juegos: state.juegos, entorno: value);
-    await ref.read(sharedPreferencesProvider).setBool(claveEntorno, value);
+    await ref.read(almacenLocalProvider).guardarBooleano(claveEntorno, value);
   }
 }
 

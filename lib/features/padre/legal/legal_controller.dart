@@ -45,7 +45,7 @@ class LegalController extends Notifier<AceptacionLegal?> {
 
   @override
   AceptacionLegal? build() {
-    final raw = ref.read(sharedPreferencesProvider).getString(prefKey);
+    final raw = ref.read(almacenLocalProvider).texto(prefKey);
     if (raw == null) return null;
     try {
       final decoded = jsonDecode(raw);
@@ -66,13 +66,13 @@ class LegalController extends Notifier<AceptacionLegal?> {
     );
     state = aceptacion;
     await ref
-        .read(sharedPreferencesProvider)
-        .setString(prefKey, jsonEncode(aceptacion.toMap()));
+        .read(almacenLocalProvider)
+        .guardarTexto(prefKey, jsonEncode(aceptacion.toMap()));
   }
 
   Future<void> rechazar() async {
     state = null;
-    await ref.read(sharedPreferencesProvider).remove(prefKey);
+    await ref.read(almacenLocalProvider).borrar(prefKey);
   }
 }
 

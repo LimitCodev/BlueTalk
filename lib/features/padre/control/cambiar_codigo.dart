@@ -59,7 +59,7 @@ class _CambiarCodigoDialogoState extends ConsumerState<CambiarCodigoDialogo> {
       return;
     }
     final store = PinStore(
-      ref.read(sharedPreferencesProvider),
+      ref.read(almacenLocalProvider),
       almacen: ref.read(almacenPinProvider),
       ahora: ref.read(relojProvider),
       derivador: ref.read(derivadorPinProvider),

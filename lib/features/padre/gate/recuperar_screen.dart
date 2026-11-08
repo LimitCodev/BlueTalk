@@ -126,7 +126,7 @@ class _RecuperarScreenState extends ConsumerState<RecuperarScreen> {
     await ref.read(recordatoriosProvider.notifier).cancelarTodoProgramado();
     // Se borra todo lo guardado en este dispositivo: PIN, progreso,
     // horario, ajustes y consentimientos.
-    await ref.read(sharedPreferencesProvider).clear();
+    await ref.read(almacenLocalProvider).borrarTodo();
     // Los providers memorizan datos que ya no existen: se recalculan.
     ref
       ..invalidate(gateProvider)

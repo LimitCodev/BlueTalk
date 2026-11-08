@@ -9,11 +9,11 @@ class SpeakOnTapController extends Notifier<bool> {
   static const prefKey = 'bluetalk_speak_on_tap';
 
   @override
-  bool build() => ref.read(sharedPreferencesProvider).getBool(prefKey) ?? true;
+  bool build() => ref.read(almacenLocalProvider).booleano(prefKey) ?? true;
 
   Future<void> set(bool value) async {
     state = value;
-    await ref.read(sharedPreferencesProvider).setBool(prefKey, value);
+    await ref.read(almacenLocalProvider).guardarBooleano(prefKey, value);
   }
 }
 
@@ -28,7 +28,7 @@ class FavoritesController extends Notifier<Set<String>> {
 
   @override
   Set<String> build() {
-    final raw = ref.read(sharedPreferencesProvider).getStringList(prefKey);
+    final raw = ref.read(almacenLocalProvider).lista(prefKey);
     return raw?.toSet() ?? const <String>{};
   }
 
@@ -39,8 +39,8 @@ class FavoritesController extends Notifier<Set<String>> {
     if (!next.remove(pictoId)) next.add(pictoId);
     state = next;
     await ref
-        .read(sharedPreferencesProvider)
-        .setStringList(prefKey, next.toList());
+        .read(almacenLocalProvider)
+        .guardarLista(prefKey, next.toList());
   }
 }
 

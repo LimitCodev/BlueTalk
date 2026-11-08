@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bluetalk/core/almacen/almacen_local.dart';
 
 import '../../../app/di.dart';
 import 'filtro_web_gateway.dart';
@@ -20,8 +20,8 @@ class FiltroWebPrefs {
   static const palabras = 'padre_filtro_web_palabras';
   static const permitidos = 'padre_filtro_web_permitidos';
 
-  static FiltroWebConfig leer(SharedPreferences prefs) {
-    final crudos = prefs.getString(personalizados);
+  static FiltroWebConfig leer(AlmacenLocal prefs) {
+    final crudos = prefs.texto(personalizados);
     final dominios = <String>[];
     if (crudos != null) {
       try {
@@ -41,15 +41,15 @@ class FiltroWebPrefs {
       }
     }
     return FiltroWebConfig(
-      activo: prefs.getBool(activo) ?? false,
-      bloquearAdultos: prefs.getBool(adultos) ?? true,
-      bloquearApuestas: prefs.getBool(apuestas) ?? true,
-      bloquearRedes: prefs.getBool(redes) ?? true,
-      bloquearJuegos: prefs.getBool(juegos) ?? false,
-      bloquearBuscadores: prefs.getBool(buscadores) ?? false,
+      activo: prefs.booleano(activo) ?? false,
+      bloquearAdultos: prefs.booleano(adultos) ?? true,
+      bloquearApuestas: prefs.booleano(apuestas) ?? true,
+      bloquearRedes: prefs.booleano(redes) ?? true,
+      bloquearJuegos: prefs.booleano(juegos) ?? false,
+      bloquearBuscadores: prefs.booleano(buscadores) ?? false,
       dominiosPersonalizados: List.unmodifiable(dominios),
       // Encendido por defecto: es lo protector, y el adulto puede apagarlo.
-      forzarSafeSearch: prefs.getBool(safeSearch) ?? true,
+      forzarSafeSearch: prefs.booleano(safeSearch) ?? true,
       palabrasProhibidas: _listaDeTexto(prefs, palabras, normalizarPalabra),
       dominiosPermitidos: _listaDeTexto(prefs, permitidos, normalizarDominio),
     );
@@ -57,11 +57,11 @@ class FiltroWebPrefs {
 
   /// Lee una lista de texto guardada como JSON, normalizando cada entrada.
   static List<String> _listaDeTexto(
-    SharedPreferences prefs,
+    AlmacenLocal prefs,
     String clave,
     String? Function(String) normalizar,
   ) {
-    final crudos = prefs.getString(clave);
+    final crudos = prefs.texto(clave);
     if (crudos == null) return const [];
     final salida = <String>[];
     try {
@@ -83,22 +83,22 @@ class FiltroWebPrefs {
   }
 
   static Future<void> guardar(
-    SharedPreferences prefs,
+    AlmacenLocal prefs,
     FiltroWebConfig config,
   ) async {
-    await prefs.setBool(activo, config.activo);
-    await prefs.setBool(adultos, config.bloquearAdultos);
-    await prefs.setBool(apuestas, config.bloquearApuestas);
-    await prefs.setBool(redes, config.bloquearRedes);
-    await prefs.setBool(juegos, config.bloquearJuegos);
-    await prefs.setBool(buscadores, config.bloquearBuscadores);
-    await prefs.setString(
+    await prefs.guardarBooleano(activo, config.activo);
+    await prefs.guardarBooleano(adultos, config.bloquearAdultos);
+    await prefs.guardarBooleano(apuestas, config.bloquearApuestas);
+    await prefs.guardarBooleano(redes, config.bloquearRedes);
+    await prefs.guardarBooleano(juegos, config.bloquearJuegos);
+    await prefs.guardarBooleano(buscadores, config.bloquearBuscadores);
+    await prefs.guardarTexto(
       personalizados,
       jsonEncode(config.dominiosPersonalizados),
     );
-    await prefs.setBool(safeSearch, config.forzarSafeSearch);
-    await prefs.setString(palabras, jsonEncode(config.palabrasProhibidas));
-    await prefs.setString(permitidos, jsonEncode(config.dominiosPermitidos));
+    await prefs.guardarBooleano(safeSearch, config.forzarSafeSearch);
+    await prefs.guardarTexto(palabras, jsonEncode(config.palabrasProhibidas));
+    await prefs.guardarTexto(permitidos, jsonEncode(config.dominiosPermitidos));
   }
 }
 
@@ -111,12 +111,12 @@ typedef ResultadoDominio = ({ResultadoAgregar resultado, String? dominio});
 class FiltroWebController extends Notifier<FiltroWebConfig> {
   @override
   FiltroWebConfig build() =>
-      FiltroWebPrefs.leer(ref.read(sharedPreferencesProvider));
+      FiltroWebPrefs.leer(ref.read(almacenLocalProvider));
 
   Future<void> _guardar(FiltroWebConfig next) async {
     state = next;
     await FiltroWebPrefs.guardar(
-      ref.read(sharedPreferencesProvider),
+      ref.read(almacenLocalProvider),
       next,
     );
   }

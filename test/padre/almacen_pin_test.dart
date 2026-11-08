@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:bluetalk/core/almacen/almacen_local.dart';
 import 'package:bluetalk/features/padre/gate/almacen_pin.dart';
 import 'package:bluetalk/features/padre/gate/pin_store.dart';
 
@@ -20,7 +21,7 @@ void main() {
     await prefs.setInt(PinStore.claveLongitud, 4);
     await prefs.setInt(PinStore.claveIteraciones, 10000);
     final keystore = KeystorePrueba();
-    return (prefs, keystore, AlmacenPin(prefs: prefs, sistema: keystore));
+    return (prefs, keystore, AlmacenPin(prefs: AlmacenPrefs(prefs), sistema: keystore));
   }
 
   group('migración al keystore cifrado (encargo §3.1)', () {
@@ -58,7 +59,7 @@ void main() {
       final (prefs, _, almacen) = await conHuellaVieja();
       await almacen.cargar();
       final store = PinStore(
-        prefs,
+        AlmacenPrefs(prefs),
         almacen: almacen,
         ahora: () => ahoraFija,
         derivador: const DerivadorPinPrueba(),
@@ -77,7 +78,7 @@ void main() {
       await prefs.setInt(PinStore.claveLongitud, 4);
       await prefs.setInt(PinStore.claveIteraciones, 10000);
       final almacen = AlmacenPin(
-        prefs: prefs,
+        prefs: AlmacenPrefs(prefs),
         sistema: KeystorePrueba(conKeystore: false),
       );
 
@@ -89,7 +90,7 @@ void main() {
       expect(almacen.tiene(PinStore.claveHash), isTrue);
 
       final store = PinStore(
-        prefs,
+        AlmacenPrefs(prefs),
         almacen: almacen,
         ahora: () => ahoraFija,
         derivador: const DerivadorPinPrueba(),
@@ -100,10 +101,10 @@ void main() {
     test('una huella nueva se escribe cifrada y sale de preferencias', () async {
       final prefs = await prefsDePrueba();
       final keystore = KeystorePrueba();
-      final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+      final almacen = AlmacenPin(prefs: AlmacenPrefs(prefs), sistema: keystore);
       await almacen.cargar();
       final store = PinStore(
-        prefs,
+        AlmacenPrefs(prefs),
         almacen: almacen,
         ahora: () => ahoraFija,
         derivador: const DerivadorPinPrueba(),
@@ -121,10 +122,10 @@ void main() {
     test('el PIN en claro no aparece en ningún almacén', () async {
       final prefs = await prefsDePrueba();
       final keystore = KeystorePrueba();
-      final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+      final almacen = AlmacenPin(prefs: AlmacenPrefs(prefs), sistema: keystore);
       await almacen.cargar();
       final store = PinStore(
-        prefs,
+        AlmacenPrefs(prefs),
         almacen: almacen,
         ahora: () => ahoraFija,
         derivador: const DerivadorPinPrueba(),
@@ -186,7 +187,7 @@ void main() {
       await prefs.setString(PinStore.claveSalt, '4c2c421d3df371b269aa7772ee5336d3');
       await prefs.setString(PinStore.claveHash, '6ef6f3446c');
       final almacen = AlmacenPin(
-        prefs: prefs,
+        prefs: AlmacenPrefs(prefs),
         sistema: KeystorePrueba(conKeystore: false),
       );
 
@@ -206,7 +207,7 @@ void main() {
       await keystore.write(key: PinStore.claveHash, value: 'huella-vieja');
       keystore.escrituraFallida = true;
 
-      final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+      final almacen = AlmacenPin(prefs: AlmacenPrefs(prefs), sistema: keystore);
       await almacen.cargar();
 
       expect(almacen.leer(PinStore.claveHash), isNull,
@@ -222,7 +223,7 @@ void main() {
       await keystore.write(key: PinStore.claveHash, value: 'huella-vieja');
       keystore.escrituraFallida = true;
 
-      final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+      final almacen = AlmacenPin(prefs: AlmacenPrefs(prefs), sistema: keystore);
       await almacen.cargar();
 
       // Si el borrado del keystore funciona, la huella vieja sale de ahí.
@@ -235,7 +236,7 @@ void main() {
       await keystore.write(key: PinStore.claveHash, value: 'otra-vieja');
       keystore.escrituraFallida = true;
       keystore.borradoFallido = true;
-      final segunda = AlmacenPin(prefs: prefs, sistema: keystore);
+      final segunda = AlmacenPin(prefs: AlmacenPrefs(prefs), sistema: keystore);
       await segunda.cargar();
 
       expect(await segunda.borrarSecretas(), isFalse);
@@ -250,7 +251,7 @@ void main() {
       await prefs.setString(PinStore.claveHash, '6ef6f3446c');
       final keystore = KeystorePrueba();
       await keystore.write(key: PinStore.claveHash, value: 'huella-en-keystore');
-      final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+      final almacen = AlmacenPin(prefs: AlmacenPrefs(prefs), sistema: keystore);
       await almacen.cargar();
       keystore.borradoFallido = true;
 

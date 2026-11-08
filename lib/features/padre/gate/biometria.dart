@@ -49,11 +49,11 @@ class BiometriaController extends Notifier<bool> {
   static const prefKey = 'padre_biometria';
 
   @override
-  bool build() => ref.read(sharedPreferencesProvider).getBool(prefKey) ?? false;
+  bool build() => ref.read(almacenLocalProvider).booleano(prefKey) ?? false;
 
   Future<void> set(bool value) async {
     state = value;
-    await ref.read(sharedPreferencesProvider).setBool(prefKey, value);
+    await ref.read(almacenLocalProvider).guardarBooleano(prefKey, value);
   }
 }
 
