@@ -41,11 +41,9 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
   EstadoPermiso? estadoVpn;
   if (filtroActivo) {
     final vpn = await vpnP;
-    estadoVpn = !vpn.comprobado
-        ? EstadoPermiso.desconocido
-        : vpn.consentimiento
-            ? EstadoPermiso.concedido
-            : EstadoPermiso.pendiente;
+    estadoVpn = vpn.comprobado
+        ? estadoDesdeBool(vpn.consentimiento)
+        : EstadoPermiso.desconocido;
   }
 
   final lista = <PermisoPadre>[
@@ -63,7 +61,8 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
     PermisoPadre(
       id: PermisoId.uso,
       titulo: 'Acceso al uso de las apps',
-      paraQueSirve: 'Para enseñar en cuánto tiempo se abre cada app.',
+      paraQueSirve: 'Para el tiempo por app en el Resumen y en los informes '
+          'semanal y mensual. Se guarda solo en este teléfono.',
       queNoLee:
           'Solo se leen el nombre de la app y el tiempo en primer plano. '
           'No se leen mensajes, fotos, historiales ni nada escrito.',

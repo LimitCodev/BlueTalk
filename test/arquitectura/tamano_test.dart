@@ -51,7 +51,7 @@ const _deuda = <String, int>{
   'lib/features/padre/perfil_edad.dart': 134,
   'lib/features/padre/permisos/permiso_model.dart': 108,
   'lib/features/padre/permisos/permisos_asistente_screen.dart': 182,
-  'lib/features/padre/permisos/permisos_controller.dart': 127,
+  'lib/features/padre/permisos/permisos_controller.dart': 126,
   'lib/features/padre/salud_padre/salud_screen.dart': 230,
   'lib/features/rutinas/actividad_tile.dart': 147,
   'lib/features/rutinas/editor_horario_view.dart': 378,

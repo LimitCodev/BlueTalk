@@ -287,14 +287,20 @@ void main() {
       expect(find.text('Permisos del teléfono'), findsOneWidget);
       expect(find.text('Avisos del teléfono'), findsOneWidget);
       expect(find.text('Acceso al uso de las apps'), findsOneWidget);
-      expect(find.text('Batería sin ahorro para BlueTalk'), findsOneWidget);
-      expect(find.textContaining('No lee:'), findsWidgets);
-      expect(find.textContaining('necesario'), findsWidgets);
       expect(
         find.textContaining('Todavía no se puede avanzar'),
         findsOneWidget,
         reason: 'faltan los avisos, que son obligatorios',
       );
+      expect(find.textContaining('informes semanal y mensual'), findsOneWidget);
+      // La lista es perezosa: la tarjeta de batería queda más abajo.
+      await tester.scrollUntilVisible(
+        find.text('Batería sin ahorro para BlueTalk'),
+        200,
+      );
+      expect(find.text('Batería sin ahorro para BlueTalk'), findsOneWidget);
+      expect(find.textContaining('No lee:'), findsWidgets);
+      expect(find.textContaining('necesario'), findsWidgets);
     });
 
     testWidgets('tocar un permiso pendiente pide el permiso al sistema',
