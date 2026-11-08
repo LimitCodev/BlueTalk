@@ -168,7 +168,7 @@ void main() {
       expect(marcado('Azul BlueTalk (por defecto)'), isFalse);
     });
 
-    testWidgets('el enlace legal abre el placeholder', (tester) async {
+    testWidgets('el enlace legal abre la política real, sin PIN', (tester) async {
       await pumpAjustes(tester);
 
       await tester.scrollUntilVisible(
@@ -180,7 +180,8 @@ void main() {
       await tester.tap(find.text('Política de privacidad'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Cerrar'), findsOneWidget);
+      expect(find.text('1. Responsable del tratamiento'), findsOneWidget);
+      expect(find.textContaining('versión futura'), findsNothing);
     });
 
     testWidgets('si los ajustes fallan, los sliders de voz quedan inactivos',

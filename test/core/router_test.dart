@@ -475,18 +475,15 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(privacidad);
     await tester.pumpAndSettle();
-    expect(
-      find.text('Este contenido estará disponible en una versión futura.'),
-      findsOneWidget,
-    );
+    expect(find.text('1. Responsable del tratamiento'), findsOneWidget);
 
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
 
     expect(
-      find.text('Este contenido estará disponible en una versión futura.'),
+      find.text('1. Responsable del tratamiento'),
       findsNothing,
-      reason: 'el diálogo se cierra',
+      reason: 'Atrás cierra la política',
     );
     expect(
       find.text('Zona de adultos'),

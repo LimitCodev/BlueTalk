@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/section_header.dart';
+import 'documento_legal.dart';
 import 'legal_controller.dart';
 import 'textos_legales.dart';
 
@@ -39,9 +39,9 @@ class _LegalScreenState extends ConsumerState<LegalScreen> {
           // Estado de la aceptación arriba: se ve sin desplazar nada.
           if (aceptado) _Aceptado(aceptacion: aceptacion),
           const SectionHeader('Términos y condiciones'),
-          _Documento(texto: terminosYCondiciones),
+          DocumentoLegal(texto: terminosYCondiciones),
           const SectionHeader('Política de privacidad'),
-          _Documento(texto: politicaDePrivacidad),
+          DocumentoLegal(texto: politicaDePrivacidad),
           if (!aceptado)
             _Pendiente(
               consentimiento: _consentimiento,
@@ -63,48 +63,6 @@ class _LegalScreenState extends ConsumerState<LegalScreen> {
               },
               onSalir: widget.onSalir,
             ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Documento completo: secciones y párrafos, con scroll (lazy).
-class _Documento extends StatelessWidget {
-  const _Documento({required this.texto});
-
-  final String texto;
-
-  @override
-  Widget build(BuildContext context) {
-    final lineas = parsearLineas(texto);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final linea in lineas)
-            if (linea.tipo == LineaLegalTipo.encabezado)
-              Padding(
-                padding: const EdgeInsets.only(top: 16, bottom: 4),
-                child: Text(
-                  linea.texto,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: context.colores.primaryStrongText,
-                        fontWeight: FontWeight.w700,
-                      ),
-                ),
-              )
-            else if (linea.tipo == LineaLegalTipo.vineta)
-              Padding(
-                padding: const EdgeInsets.only(left: 16, top: 4),
-                child: Text('• ${linea.texto}'),
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(linea.texto),
-              ),
         ],
       ),
     );

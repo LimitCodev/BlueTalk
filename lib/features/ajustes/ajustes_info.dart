@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../padre/legal/documento_legal.dart';
+import '../padre/legal/textos_legales.dart';
+
 import '../../core/widgets/section_header.dart';
 
 /// Acceso discreto a la zona de adultos: el PIN lo pide el gate, no aquí.
@@ -38,35 +41,30 @@ class LegalSection extends StatelessWidget {
           leading: const Icon(Icons.description_outlined),
           title: const Text('Términos y condiciones'),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => _showPlaceholder(context, 'Términos y condiciones'),
+          onTap: () => _abrir(
+            context,
+            'Términos y condiciones',
+            terminosYCondiciones,
+          ),
         ),
         ListTile(
           leading: const Icon(Icons.privacy_tip_outlined),
           title: const Text('Política de privacidad'),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => _showPlaceholder(context, 'Política de privacidad'),
+          onTap: () => _abrir(
+            context,
+            'Política de privacidad',
+            politicaDePrivacidad,
+          ),
         ),
       ],
     );
   }
 
-  void _showPlaceholder(BuildContext context, String title) {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: const Text(
-          'Este contenido estará disponible en una versión futura.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cerrar'),
-          ),
-        ],
-      ),
-    );
-  }
+  void _abrir(BuildContext context, String titulo, String texto) =>
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => LecturaLegalScreen(titulo: titulo, texto: texto),
+      ));
 }
 
 /// Créditos de los pictogramas (licencia obligatoria).
