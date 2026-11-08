@@ -6,6 +6,8 @@ import '../core/almacen/almacen_local.dart';
 import '../data/contracts/repos.dart';
 import '../data/local/mock_repos.dart';
 import '../data/local/seed_store.dart';
+import '../features/padre/informes/resumenes_repo.dart';
+import '../features/padre/informes/usage_repo_con_resumen.dart';
 
 /// Instancia de preferencias de la app.
 ///
@@ -58,8 +60,17 @@ final wellbeingRepoProvider = Provider<WellbeingRepo>(
   (ref) => PrefsWellbeingRepo(ref.watch(sharedPreferencesProvider)),
 );
 
+/// Resúmenes diarios para los informes (`features/padre/informes/`).
+final resumenesRepoProvider = Provider<ResumenesRepo>(
+  (ref) => ResumenesRepo(ref.watch(almacenLocalProvider)),
+);
+
+/// Cada evento también suma a su resumen diario (decorador).
 final usageRepoProvider = Provider<UsageRepo>(
-  (ref) => PrefsUsageRepo(ref.watch(sharedPreferencesProvider)),
+  (ref) => UsageRepoConResumen(
+    PrefsUsageRepo(ref.watch(sharedPreferencesProvider)),
+    ref.watch(resumenesRepoProvider),
+  ),
 );
 
 final settingsRepoProvider = Provider<SettingsRepo>(
