@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:bluetalk/data/models/models.dart';
@@ -135,5 +136,26 @@ void main() {
       findsOneWidget,
     );
     expect(find.text(disclaimerObservaciones), findsOneWidget);
+  });
+
+  test('desmarcar una actividad la quita de «hechas hoy»', () async {
+    final prefs = await prefsDePrueba();
+    UsageEvent marca(String id, String tipo) => UsageEvent(
+          id: '$tipo$id',
+          type: tipo,
+          createdAt: ahoraFija,
+          data: {'entradaId': id},
+        );
+    await sembrarEventos(prefs, [
+      marca('a', 'actividad_hecha'),
+      marca('b', 'actividad_hecha'),
+      marca('a', 'actividad_pendiente'),
+    ]);
+    final container = ProviderContainer(
+      overrides: overridesDePadre(prefs, reloj: RelojPrueba()).cast(),
+    );
+    addTearDown(container.dispose);
+    final metricas = await container.read(metricasProvider.future);
+    expect(metricas.actividadesHechasHoy, 1);
   });
 }
