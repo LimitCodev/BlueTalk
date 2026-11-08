@@ -16,7 +16,6 @@ const _deuda = <String, int>{
   'lib/core/theme/app_theme.dart': 213,
   'lib/core/widgets/logo_bluetalk.dart': 136,
   'lib/features/ajustes/ajustes_screen.dart': 589,
-  'lib/features/comunicador/comunicador_screen.dart': 602,
   'lib/features/comunicador/phrase_bar.dart': 203,
   'lib/features/comunicador/tts_service.dart': 138,
   'lib/features/entorno/entorno_screen.dart': 183,
