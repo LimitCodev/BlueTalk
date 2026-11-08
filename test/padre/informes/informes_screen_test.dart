@@ -64,6 +64,14 @@ void main() {
     await tester.tap(find.text('Mensual'));
     await tester.pumpAndSettle();
     expect(find.textContaining('de 30 días'), findsWidgets);
+    await tester.scrollUntilVisible(
+      find.text('Por semana'),
+      300,
+      scrollable: find
+          .descendant(of: find.byType(ListView).last, matching: find.byType(Scrollable))
+          .first,
+    );
+    expect(find.text('Por semana'), findsOneWidget);
     semantica.dispose();
   });
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'informe_modelo.dart';
 import 'informe_secciones.dart';
+import 'informe_semanas.dart';
 import 'informe_texto.dart';
 import 'informe_uso_telefono.dart';
 import 'informes_providers.dart';
@@ -24,6 +25,7 @@ class InformeVista extends ConsumerWidget {
             SeccionComunicacion(informe: value),
             SeccionJuegoYAnimo(informe: value),
             SeccionUsoTelefono(informe: value),
+            if (periodo == Periodo.mes) SeccionPorSemana(informe: value),
             _BotonCopiar(informe: value),
           ],
         ),
