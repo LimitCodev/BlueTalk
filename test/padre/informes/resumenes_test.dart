@@ -101,4 +101,44 @@ void main() {
     expect(await usage.events(), hasLength(1));
     expect(repo.dia('2026-11-02')!.pictos, 1);
   });
+
+  test('un toque escribe solo su mes; el índice, una vez por mes', () async {
+    final (prefs, _) = await nuevo();
+    final contador = _AlmacenQueCuenta(AlmacenPrefs(prefs));
+    final repo = ResumenesRepo(contador);
+    for (var i = 0; i < 5; i++) {
+      await repo.sumar(ev('picto_tap', lunes.add(Duration(minutes: i))));
+    }
+    expect(contador.escrituras, {'bluetalk_resumen_2026-11': 5, 'bluetalk_resumen_meses': 1});
+  });
+}
+
+class _AlmacenQueCuenta implements AlmacenLocal {
+  _AlmacenQueCuenta(this._base);
+  final AlmacenLocal _base;
+  final escrituras = <String, int>{};
+  void _contar(String c) => escrituras.update(c, (n) => n + 1, ifAbsent: () => 1);
+
+  @override
+  String? texto(String c) => _base.texto(c);
+  @override
+  bool? booleano(String c) => _base.booleano(c);
+  @override
+  int? entero(String c) => _base.entero(c);
+  @override
+  List<String>? lista(String c) => _base.lista(c);
+  @override
+  bool contiene(String c) => _base.contiene(c);
+  @override
+  Future<void> guardarTexto(String c, String v) { _contar(c); return _base.guardarTexto(c, v); }
+  @override
+  Future<void> guardarBooleano(String c, bool v) { _contar(c); return _base.guardarBooleano(c, v); }
+  @override
+  Future<void> guardarEntero(String c, int v) { _contar(c); return _base.guardarEntero(c, v); }
+  @override
+  Future<void> guardarLista(String c, List<String> v) { _contar(c); return _base.guardarLista(c, v); }
+  @override
+  Future<void> borrar(String c) => _base.borrar(c);
+  @override
+  Future<void> borrarTodo() => _base.borrarTodo();
 }

@@ -50,9 +50,12 @@ class ResumenesRepo {
   Future<void> guardar(ResumenDia r) async {
     final mes = r.dia.substring(0, 7);
     final dias = _mes(mes)..[r.dia] = r;
-    final indice = {...?_almacen.lista(_indice), mes}.toList()..sort();
     await _almacen.guardarTexto('bluetalk_resumen_$mes',
         jsonEncode({for (final e in dias.entries) e.key: e.value.toMap()}));
+    final previo = _almacen.lista(_indice) ?? const [];
+    // El índice solo cambia con un mes nuevo: no se reescribe en cada toque.
+    if (previo.contains(mes)) return;
+    final indice = [...previo, mes]..sort();
     while (indice.length > mesesGuardados) {
       final viejo = indice.removeAt(0);
       _cache.remove(viejo);
