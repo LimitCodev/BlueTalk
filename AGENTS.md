@@ -40,18 +40,27 @@ Nadie te va a revisar sobre la marcha. **Tu informe de evidencia es la única pr
 - Antes de cada commit: `flutter analyze` (0 problemas) y `flutter test` (todo verde).
 - Commits: `TIPO: descripción en español` (≤70 caracteres; `FEAT FIX PERF TEST DOCS REFACTOR CHORE`). Sin texto de IA ni `Co-Authored-By`. Un cambio coherente por commit. Rutas concretas en `git add`, nunca `git add -A`.
 - **Nunca `git push`**, nunca publicar, nunca crear cuentas ni claves. Ni inventar contraseñas, datos personales, nombres o datos de menores.
-- Sin red, sin analítica, sin anuncios, sin cuentas. Sin ARASAAC (licencia no comercial); pictogramas: Mulberry (CC BY-SA 4.0).
+- Sin red, sin analítica, sin anuncios, sin cuentas. **AWS solo fuera de la app** (Polly antes de compilar, S3 + CloudFront para la web legal; decisión del dueño, 2026-11-07): `docs/infra/aws-freemium.md`. Sin ARASAAC (licencia no comercial); pictogramas: Mulberry (CC BY-SA 4.0).
 - Sin dependencias nuevas que el plan no justifique.
 - Si el código contradice un plan: detente, anótalo en `docs/informes/faseN-notas.md` y propone el cambio mínimo.
 - Si una decisión es del usuario (modelo de negocio, `applicationId`, keystore, públicos objetivo, publicar la política de privacidad): **no decidas**; deja la pregunta escrita en `docs/informes/decisiones-pendientes.md` y continúa con lo que no dependa de ella.
 
 ## Principios de producto (no negociables, es un público vulnerable)
 
+- **Freemium: comunicar nunca es premium.** Los extras se preguntan con `puedeUsarProvider` (`lib/core/premium/`).
+
 - Lenguaje literal, sin metáforas; navegación fija y predecible.
 - **Ningún sonido ni voz automática**: la voz solo suena bajo toque.
 - Objetivos táctiles ≥48 dp, contraste AA, modo calma (grises + sin animaciones) siempre respetado.
 - El vocabulario nuclear va **siempre en la misma posición**; nunca se reordena.
 - Datos del menor solo en el dispositivo. Observaciones siempre con "orientativa, no es diagnóstico".
+
+## Capas: cada cosa pide a su puerta del core
+
+- Almacenamiento: `almacenLocalProvider` (`lib/core/almacen/`). Nadie más importa `shared_preferences` (salvo `lib/data/local/` y la raíz de composición).
+- Android: `CanalNativo` (`lib/core/plataforma/`). Nadie más crea `MethodChannel`.
+- Plan y compras: `lib/core/premium/`.
+- `test/arquitectura/` lo hace cumplir. Si una regla falla, mueve el acceso a su puerta; no relajes la regla.
 
 ## Mapa del repositorio
 

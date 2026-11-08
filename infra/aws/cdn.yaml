@@ -1,0 +1,142 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  BlueTalk - CDN estatico minimo (pagina legal y paquetes premium).
+  Sin servidores, sin base de datos, sin registros de IP de usuarios.
+  Coste esperado: 0 USD dentro del nivel gratuito permanente de CloudFront.
+
+Parameters:
+  CorreoAlertas:
+    Type: String
+    Default: ''
+    Description: Correo para la alarma de gasto. Vacio = sin alarma.
+  LimiteMensualUsd:
+    Type: Number
+    Default: 5
+    Description: Gasto mensual que dispara el aviso (80 % real y 100 % previsto).
+
+Conditions:
+  HayCorreo: !Not [!Equals [!Ref CorreoAlertas, '']]
+
+Resources:
+  # Un solo bucket privado: /index.html, /privacidad.html, /terminos.html
+  # y /paquetes/<voz>/... Solo CloudFront puede leerlo (OAC).
+  Contenido:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules: [{ ObjectOwnership: BucketOwnerEnforced }]
+      # Versiones para deshacer una publicacion; se borran a los 30 dias.
+      VersioningConfiguration: { Status: Enabled }
+      LifecycleConfiguration:
+        Rules:
+          - Id: versiones-viejas
+            Status: Enabled
+            NoncurrentVersionExpiration: { NoncurrentDays: 30 }
+
+  ControlOrigen:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub '${AWS::StackName}-oac'
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  Distribucion:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: BlueTalk contenido estatico
+        DefaultRootObject: index.html
+        HttpVersion: http2and3
+        # Solo America y Europa: el mas barato y cubre Latinoamerica y Espana.
+        PriceClass: PriceClass_100
+        # Sin Logging a proposito: no se guardan IP (Data safety mas simple).
+        Origins:
+          - Id: s3
+            DomainName: !GetAtt Contenido.RegionalDomainName
+            OriginAccessControlId: !GetAtt ControlOrigen.Id
+            S3OriginConfig: { OriginAccessIdentity: '' }
+        DefaultCacheBehavior:
+          TargetOriginId: s3
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD]
+          CachedMethods: [GET, HEAD]
+          Compress: true
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # Managed-CachingOptimized
+          ResponseHeadersPolicyId: 67f7725c-6f97-4210-82d7-5512b31e9d03 # Managed-SecurityHeadersPolicy
+
+  PoliticaContenido:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Contenido
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: SoloCloudFront
+            Effect: Allow
+            Principal: { Service: cloudfront.amazonaws.com }
+            Action: s3:GetObject
+            Resource: !Sub '${Contenido.Arn}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribucion}'
+
+  # Minimo privilegio para los scripts de scripts/aws/. Se asigna a mano
+  # al usuario o rol que publica; nunca a la app.
+  PermisosPublicar:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: BlueTalk - publicar sitio legal, paquetes y generar voces
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: [s3:ListBucket]
+            Resource: !GetAtt Contenido.Arn
+          - Effect: Allow
+            Action: [s3:PutObject, s3:DeleteObject]
+            Resource: !Sub '${Contenido.Arn}/*'
+          - Effect: Allow
+            Action: [cloudfront:CreateInvalidation]
+            Resource: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribucion}'
+          - Effect: Allow
+            Action: [polly:SynthesizeSpeech]
+            Resource: '*'
+
+  AlarmaGasto:
+    Type: AWS::Budgets::Budget
+    Condition: HayCorreo
+    Properties:
+      Budget:
+        BudgetName: !Sub '${AWS::StackName}-mensual'
+        BudgetType: COST
+        TimeUnit: MONTHLY
+        BudgetLimit: { Amount: !Ref LimiteMensualUsd, Unit: USD }
+      NotificationsWithSubscribers:
+        - Notification: { NotificationType: ACTUAL, ComparisonOperator: GREATER_THAN, Threshold: 80 }
+          Subscribers: [{ SubscriptionType: EMAIL, Address: !Ref CorreoAlertas }]
+        - Notification: { NotificationType: FORECASTED, ComparisonOperator: GREATER_THAN, Threshold: 100 }
+          Subscribers: [{ SubscriptionType: EMAIL, Address: !Ref CorreoAlertas }]
+
+Outputs:
+  Bucket:
+    Value: !Ref Contenido
+  DistribucionId:
+    Value: !Ref Distribucion
+  UrlBase:
+    Description: Base para la URL de la politica de privacidad en Play Console.
+    Value: !Sub 'https://${Distribucion.DomainName}'
+  PoliticaPublicar:
+    Value: !Ref PermisosPublicar

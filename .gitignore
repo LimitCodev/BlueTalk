@@ -57,3 +57,5 @@ estado-vivo.log
 # APK de reparto generado por scripts/build-apk.sh
 dist/
 
+# Python
+__pycache__/

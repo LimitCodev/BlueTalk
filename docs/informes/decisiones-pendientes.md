@@ -127,3 +127,22 @@ anotadas aquí como constancia.
   real: **no se inventa ninguno**.
 - Pregunta: ¿qué correo de soporte quiere publicar (y crearlo si no
   existe)? La pantalla de FAQ queda pendiente de esa respuesta.
+
+## Freemium y AWS (abierto el 2026-11-07)
+
+Decidido por el dueño: modelo freemium; AWS solo fuera de la app
+(opciones 1–3 de `docs/infra/aws-freemium.md`); la app sigue sin red en la v1.
+
+Falta decidir:
+
+- **Producto de Play:** compra única (recomendado) o suscripción, y precio.
+- **Dependencia `in_app_purchase`** para conectar Play Billing (§5 del doc).
+- **Reproductor de MP3:** canal nativo propio (sin dependencia, recomendado)
+  o `audioplayers`.
+- **Voz premium de la v1:** escuchar Lupe, Pedro, Mia, Andrés, Lucia y
+  Sergio, y elegir una para incluirla en el APK.
+- **Cuenta de AWS:** quién la crea, con MFA, y qué correo recibe la alarma
+  de gasto.
+- **Correo e identidad legal reales:** `scripts/aws/publicar_legal.sh` se
+  niega a publicar mientras quede `demo@bluetalk.app`.
+
