@@ -2,9 +2,12 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/almacen/almacen_local.dart';
 import '../data/contracts/repos.dart';
 import '../data/local/mock_repos.dart';
 import '../data/local/seed_store.dart';
+import '../features/padre/informes/resumenes_repo.dart';
+import '../features/padre/informes/usage_repo_con_resumen.dart';
 
 /// Instancia de preferencias de la app.
 ///
@@ -12,6 +15,11 @@ import '../data/local/seed_store.dart';
 /// y en tests con `SharedPreferences.setMockInitialValues`.
 final sharedPreferencesProvider = Provider<SharedPreferences>(
   (ref) => throw UnimplementedError('Se sobreescribe en main()'),
+);
+
+/// Puerta única al almacenamiento local para features y core.
+final almacenLocalProvider = Provider<AlmacenLocal>(
+  (ref) => AlmacenPrefs(ref.watch(sharedPreferencesProvider)),
 );
 
 /// Flag para enchufar Supabase (plan 01 §6): `false` = MVP 100% local.
@@ -52,8 +60,17 @@ final wellbeingRepoProvider = Provider<WellbeingRepo>(
   (ref) => PrefsWellbeingRepo(ref.watch(sharedPreferencesProvider)),
 );
 
+/// Resúmenes diarios para los informes (`features/padre/informes/`).
+final resumenesRepoProvider = Provider<ResumenesRepo>(
+  (ref) => ResumenesRepo(ref.watch(almacenLocalProvider)),
+);
+
+/// Cada evento también suma a su resumen diario (decorador).
 final usageRepoProvider = Provider<UsageRepo>(
-  (ref) => PrefsUsageRepo(ref.watch(sharedPreferencesProvider)),
+  (ref) => UsageRepoConResumen(
+    PrefsUsageRepo(ref.watch(sharedPreferencesProvider)),
+    ref.watch(resumenesRepoProvider),
+  ),
 );
 
 final settingsRepoProvider = Provider<SettingsRepo>(

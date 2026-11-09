@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <!-- Gráfico destacado de Play 1024×500: símbolo, nombre y frase corta. -->
+  <rect width="1024" height="500" fill="#70D0F8"/>
+  <circle cx="930" cy="70" r="150" fill="#8ADCFB" opacity="0.55"/>
+  <circle cx="1010" cy="430" r="190" fill="#5CC3F1" opacity="0.45"/>
+  <circle cx="120" cy="470" r="110" fill="#8ADCFB" opacity="0.35"/>
+
+  <g transform="translate(70,127) scale(3.2)">
+    <path d="M31 64 Q21 78 14 88 Q30 83 40 71 Z" fill="#238EE7"/>
+    <circle cx="46" cy="43" r="32" fill="#238EE7"/>
+    <circle cx="46" cy="43" r="25" fill="#FFFFFF"/>
+    <circle cx="37" cy="37" r="3.4" fill="#238EE7"/>
+    <circle cx="57" cy="37" r="3.4" fill="#238EE7"/>
+    <path d="M36 49 Q47 59 58 49" fill="none" stroke="#238EE7"
+          stroke-width="4.2" stroke-linecap="round"/>
+    <circle cx="71.28" cy="63.6" r="7.52" fill="#2FBFA3"/>
+    <circle cx="84.72" cy="63.6" r="7.52" fill="#2FBFA3"/>
+    <path d="M64.4 67.44 L91.6 67.44 L78 85.04 Z" fill="#2FBFA3"/>
+  </g>
+
+  <text x="400" y="238" font-family="Noto Sans" font-weight="bold"
+        font-size="96" fill="#263442">BlueTalk</text>
+  <text x="404" y="300" font-family="Noto Sans" font-weight="bold"
+        font-size="32" fill="#0F5E9C">Comunicar, un toque a la vez.</text>
+  <text x="404" y="352" font-family="Noto Sans" font-weight="regular"
+        font-size="22" fill="#263442">Comunicador AAC sin conexión</text>
+</svg>

@@ -51,6 +51,7 @@ Future<void> expectSinProblemasDeAccesibilidad(
   WidgetTester tester, {
   required List<Object> overrides,
   required Widget home,
+  ThemeData? theme,
 }) async {
   final issues = await problemasDeAccesibilidad(
     tester,
@@ -59,6 +60,7 @@ Future<void> expectSinProblemasDeAccesibilidad(
       // cast() lo deduce del parámetro de ProviderScope.
       overrides: overrides.cast(),
       child: MaterialApp(
+        theme: theme,
         builder: (context, child) => AccessibilityTools(child: child!),
         home: home,
       ),

@@ -14,9 +14,6 @@ enum PermisoId {
 
   /// Consentimiento de VPN del filtro de páginas (`VpnService`).
   vpn,
-
-  /// Administrador del dispositivo, contra la desinstalación.
-  administrador,
 }
 
 /// Cómo está un permiso según Android.
@@ -31,6 +28,14 @@ enum EstadoPermiso {
   /// respuesta defectuosa del sistema.
   desconocido,
 }
+
+/// Traduce el `true`/`false` de un canal nativo. Cualquier otra respuesta
+/// (sin canal, nula, de otro tipo) es [EstadoPermiso.desconocido].
+EstadoPermiso estadoDesdeBool(Object? valor) => switch (valor) {
+      true => EstadoPermiso.concedido,
+      false => EstadoPermiso.pendiente,
+      _ => EstadoPermiso.desconocido,
+    };
 
 /// Un permiso explicado para el asistente del adulto.
 class PermisoPadre {
@@ -56,8 +61,8 @@ class PermisoPadre {
 
   final EstadoPermiso estado;
 
-  /// `true` = sin él la app no cumple su función y el asistente no deja
-  /// avanzar. `false` = se recomienda pero se puede seguir sin él.
+  /// `true` = sin él la app no cumple su función. Hoy ninguno se marca así
+  /// (P0-4 de Play): todos son opcionales y el panel se abre igual.
   final bool requerido;
 
   PermisoPadre copiarCon(EstadoPermiso nuevo) => PermisoPadre(
@@ -78,12 +83,11 @@ class PermisosEstado {
 
   static const completo = PermisosEstado([]);
 
-  /// ¿Falta algún permiso que **sí** es necesario y que Android confirmó
-  /// que no está concedido?
-  ///
-  /// Los `desconocido` **no** bloquean: impedir el modo padre porque una
-  /// comprobación falló dejaría al adulto sin forma de arreglarlo. Se
-  /// enseñan igualmente como «no se pudo comprobar».
+  /// ¿Falta algún permiso marcado como necesario y que Android confirmó
+  /// que no está concedido? Hoy la lista de producción no marca ninguno
+  /// (P0-4 de Play), así que siempre es `false`; se conserva para permisos
+  /// futuros. Los `desconocido` tampoco cuentan: impedir el modo padre
+  /// porque una comprobación falló dejaría al adulto sin salida.
   bool get faltanRequeridos => permisos.any(
         (p) => p.requerido && p.estado == EstadoPermiso.pendiente,
       );

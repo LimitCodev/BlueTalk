@@ -7,14 +7,14 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-flutter build apk --release --split-per-abi
+flutter build apk --release --split-per-abi --flavor directa
 
 APK_DIR="build/app/outputs/flutter-apk"
 
 # Nombre de reparto (docs/play/instalar-apk.md): el arm64-v8a es el de
 # casi todos los móviles actuales y se publica como BlueTalk.apk.
 mkdir -p dist
-cp "$APK_DIR/app-arm64-v8a-release.apk" dist/BlueTalk.apk
+cp "$APK_DIR/app-arm64-v8a-directa-release.apk" dist/BlueTalk.apk
 
 echo
 echo "APKs de release (un APK por arquitectura):"
@@ -31,4 +31,4 @@ echo "sha256 junto al enlace, tal como explica docs/play/instalar-apk.md:"
 sha256sum dist/BlueTalk.apk | sed 's/^/  /'
 echo
 echo "Para instalar en un móvil con cable:"
-echo "  adb install -r $APK_DIR/app-arm64-v8a-release.apk"
+echo "  adb install -r $APK_DIR/app-arm64-v8a-directa-release.apk"

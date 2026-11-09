@@ -44,7 +44,7 @@ class HabitoDia {
 /// Semilla de hábitos: agua, descanso visual, movimiento y descanso.
 const semillaHabitos = <HabitoDia>[
   HabitoDia(id: 'agua', title: 'Tomar agua', pictoId: 'water'),
-  HabitoDia(id: 'vista', title: 'Descansar la vista'),
+  HabitoDia(id: 'vista', title: 'Descansar la vista', pictoId: 'eye'),
   HabitoDia(id: 'movimiento', title: 'Moverme un rato', pictoId: 'run_,_to'),
   HabitoDia(id: 'descanso', title: 'Descansar', pictoId: 'sleep_male_,_to'),
 ];

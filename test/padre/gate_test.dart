@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:bluetalk/core/almacen/almacen_local.dart';
 import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/rutinas/recordatorios/recordatorio_scheduler.dart';
 import 'package:bluetalk/features/rutinas/recordatorios/recordatorio_scheduler_real.dart';
@@ -350,7 +351,7 @@ void main() {
     // también (revisión de la fase 3a: `prefs.clear()` no la tocaba y el
     // gate volvía a pedir el código olvidado).
     final keystore = KeystorePrueba();
-    final almacen = AlmacenPin(prefs: prefs, sistema: keystore);
+    final almacen = AlmacenPin(prefs: AlmacenPrefs(prefs), sistema: keystore);
     await almacen.cargar();
     expect(keystore.datos[PinStore.claveHash], isNotNull,
         reason: 'precondición: la huella ya vive en el keystore');

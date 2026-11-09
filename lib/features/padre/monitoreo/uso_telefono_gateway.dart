@@ -1,4 +1,4 @@
-import 'package:flutter/services.dart';
+import '../../../core/plataforma/canal_nativo.dart';
 
 import '../permisos/permiso_model.dart';
 import 'uso_telefono_model.dart';
@@ -23,57 +23,27 @@ abstract interface class UsoTelefonoGateway {
 class PlatformUsoTelefonoGateway implements UsoTelefonoGateway {
   const PlatformUsoTelefonoGateway();
 
-  static const _canal = MethodChannel('bluetalk/uso_telefono');
+  static const _canal = CanalNativo('bluetalk/uso_telefono');
 
   @override
-  Future<EstadoPermiso> estadoPermiso() async {
-    try {
-      final mapa = await _canal.invokeMethod<Map<Object?, Object?>>('estado');
-      final valor = mapa?['permiso'];
-      if (valor is bool) {
-        return valor ? EstadoPermiso.concedido : EstadoPermiso.pendiente;
-      }
-      return EstadoPermiso.desconocido;
-    } on MissingPluginException {
-      return EstadoPermiso.desconocido;
-    } on PlatformException {
-      return EstadoPermiso.desconocido;
-    }
-  }
+  Future<EstadoPermiso> estadoPermiso() async =>
+      estadoDesdeBool((await _canal.mapa('estado'))?['permiso']);
 
   @override
   Future<bool> estaPermitido() async =>
       (await estadoPermiso()) == EstadoPermiso.concedido;
 
   @override
-  Future<bool> abrirAjustes() async {
-    try {
-      return await _canal.invokeMethod<bool>('abrirAjustes') ?? false;
-    } on MissingPluginException {
-      return false;
-    } on PlatformException {
-      return false;
-    }
-  }
+  Future<bool> abrirAjustes() => _canal.orden('abrirAjustes');
 
   @override
   Future<ResumenUso> resumen(DateTime desde, DateTime hasta) async {
-    try {
-      final mapa = await _canal.invokeMethod<Map<Object?, Object?>>(
-        'resumen',
-        {
-          'desde': desde.millisecondsSinceEpoch,
-          'hasta': hasta.millisecondsSinceEpoch,
-        },
-      );
-      if (mapa == null) {
-        return ResumenUso.sinPermiso(desde, hasta);
-      }
-      return ResumenUso.fromMap(mapa);
-    } on MissingPluginException {
-      return ResumenUso.sinPermiso(desde, hasta);
-    } on PlatformException {
-      return ResumenUso.sinPermiso(desde, hasta);
-    }
+    final mapa = await _canal.mapa('resumen', {
+      'desde': desde.millisecondsSinceEpoch,
+      'hasta': hasta.millisecondsSinceEpoch,
+    });
+    return mapa == null
+        ? ResumenUso.sinPermiso(desde, hasta)
+        : ResumenUso.fromMap(mapa);
   }
 }

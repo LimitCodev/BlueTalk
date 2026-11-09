@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:bluetalk/data/models/models.dart';
@@ -20,7 +21,7 @@ Future<void> _hasta(WidgetTester tester, Finder finder) async {
 
 void main() {
   testWidgets(
-      'el resumen muestra el banner de demostración y sus métricas locales',
+      'el resumen muestra sus métricas locales sin banner de demostración',
       (tester) async {
     final prefs = await prefsDePrueba();
     final reloj = RelojPrueba();
@@ -66,7 +67,7 @@ void main() {
       overrides: overridesDePadre(prefs, reloj: reloj),
     );
 
-    expect(find.text('Datos de demostración'), findsOneWidget);
+    expect(find.text('Datos de demostración'), findsNothing);
     expect(find.text('Pictogramas tocados hoy'), findsOneWidget);
     expect(find.text('Tiempo de juego hoy'), findsOneWidget);
     expect(find.text('5 min'), findsOneWidget);
@@ -125,7 +126,7 @@ void main() {
       overrides: overridesDePadre(prefs),
     );
 
-    expect(find.text('Datos de demostración'), findsOneWidget);
+    expect(find.text('Datos de demostración'), findsNothing);
     await _hasta(tester, find.text(disclaimerObservaciones));
     expect(
       find.text(
@@ -135,5 +136,26 @@ void main() {
       findsOneWidget,
     );
     expect(find.text(disclaimerObservaciones), findsOneWidget);
+  });
+
+  test('desmarcar una actividad la quita de «hechas hoy»', () async {
+    final prefs = await prefsDePrueba();
+    UsageEvent marca(String id, String tipo) => UsageEvent(
+          id: '$tipo$id',
+          type: tipo,
+          createdAt: ahoraFija,
+          data: {'entradaId': id},
+        );
+    await sembrarEventos(prefs, [
+      marca('a', 'actividad_hecha'),
+      marca('b', 'actividad_hecha'),
+      marca('a', 'actividad_pendiente'),
+    ]);
+    final container = ProviderContainer(
+      overrides: overridesDePadre(prefs, reloj: RelojPrueba()).cast(),
+    );
+    addTearDown(container.dispose);
+    final metricas = await container.read(metricasProvider.future);
+    expect(metricas.actividadesHechasHoy, 1);
   });
 }

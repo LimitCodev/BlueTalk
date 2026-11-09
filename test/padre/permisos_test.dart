@@ -4,6 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:bluetalk/app/di.dart';
+import 'package:bluetalk/core/plataforma/edicion.dart';
+import 'package:bluetalk/core/theme/app_colors.dart';
+import 'package:bluetalk/core/theme/app_theme.dart';
 import 'package:bluetalk/features/padre/monitoreo/uso_telefono_controller.dart';
 import 'package:bluetalk/features/padre/monitoreo/uso_telefono_model.dart';
 import 'package:bluetalk/features/padre/monitoreo/uso_telefono_gateway.dart';
@@ -15,8 +18,6 @@ import 'package:bluetalk/features/padre/filtro_web/filtro_web_controller.dart';
 import 'package:bluetalk/features/padre/filtro_web/filtro_web_gateway.dart';
 import 'package:bluetalk/features/padre/filtro_web/filtro_web_model.dart';
 import 'package:bluetalk/features/padre/padre_screen.dart';
-import 'package:bluetalk/features/padre/proteccion/proteccion_controller.dart';
-import 'package:bluetalk/features/padre/proteccion/proteccion_gateway.dart';
 
 import '../core/accessibility_helper.dart';
 import 'harness.dart';
@@ -83,42 +84,17 @@ class _UsoFalso implements UsoTelefonoGateway {
       ResumenUso.sinPermiso(desde, hasta);
 }
 
-/// Administrador del dispositivo con el estado fijado por el test.
-class _AdminFalso implements ProteccionGateway {
-  _AdminFalso(this.activo);
-
-  bool activo;
-  int activaciones = 0;
-
-  @override
-  Future<ProteccionEstado> estado() async => ProteccionEstado(activo: activo);
-
-  @override
-  Future<bool> pedirActivacion() async {
-    activaciones++;
-    activo = true;
-    return true;
-  }
-
-  @override
-  Future<void> desactivar() async {
-    activo = false;
-  }
-}
-
 /// Los gateways del asistente que no son de permisos, decididos por el test.
 /// El de permisos vive en [overridesDePadre] (o en [_fuentes]) para no
 /// declarar la misma doble dos veces en el mismo contenedor.
 List<Object> _gateways({
   bool usoConcedido = true,
   EstadoPermiso? usoEstado,
-  bool adminActivo = true,
 }) =>
     [
       usoTelefonoGatewayProvider.overrideWithValue(
         _UsoFalso(usoConcedido, estado: usoEstado),
       ),
-      proteccionGatewayProvider.overrideWithValue(_AdminFalso(adminActivo)),
     ];
 
 /// [_gateways] más las preferencias y el canal de permisos: sin ellas
@@ -129,16 +105,12 @@ List<Object> _fuentes(
   PermisosGateway? permisos,
   bool usoConcedido = true,
   EstadoPermiso? usoEstado,
-  bool adminActivo = true,
 }) =>
     [
+      edicionDirectaProvider.overrideWithValue(true),
       sharedPreferencesProvider.overrideWithValue(prefs),
       permisosGatewayProvider.overrideWithValue(permisos ?? _PermisosFalsos()),
-      ..._gateways(
-        usoConcedido: usoConcedido,
-        usoEstado: usoEstado,
-        adminActivo: adminActivo,
-      ),
+      ..._gateways(usoConcedido: usoConcedido, usoEstado: usoEstado),
     ];
 
 /// Filtro con el estado que fije el test: sirve para emular el canal
@@ -178,6 +150,7 @@ Future<PermisosEstado> _diagnostico({required FiltroWebEstado filtro}) async {
   );
   final container = ProviderContainer(
     overrides: [
+      edicionDirectaProvider.overrideWithValue(true),
       sharedPreferencesProvider.overrideWithValue(prefs),
       permisosGatewayProvider.overrideWithValue(
         _PermisosFalsos(
@@ -186,7 +159,6 @@ Future<PermisosEstado> _diagnostico({required FiltroWebEstado filtro}) async {
         ),
       ),
       usoTelefonoGatewayProvider.overrideWithValue(_UsoFalso(true)),
-      proteccionGatewayProvider.overrideWithValue(_AdminFalso(true)),
       filtroWebGatewayProvider.overrideWithValue(_FiltroFalso(filtro)),
     ],
   );
@@ -212,8 +184,8 @@ void main() {
 
       const soloOpcional = PermisosEstado([
         PermisoPadre(
-          id: PermisoId.administrador,
-          titulo: 'Admin',
+          id: PermisoId.bateria,
+          titulo: 'Batería',
           paraQueSirve: 'x',
           queNoLee: 'y',
           estado: EstadoPermiso.pendiente,
@@ -261,7 +233,6 @@ void main() {
       PermisosGateway? permisos,
       bool usoConcedido = true,
       EstadoPermiso? usoEstado,
-      bool adminActivo = true,
     }) async {
       final prefs = await prefsDePrueba();
       await tester.pumpWidget(
@@ -271,30 +242,41 @@ void main() {
             permisos: permisos,
             usoConcedido: usoConcedido,
             usoEstado: usoEstado,
-            adminActivo: adminActivo,
           ).cast(),
           child: const MaterialApp(
-            home: Scaffold(body: PermisosAsistenteScreen()),
+            home: PermisosAsistenteScreen(),
           ),
         ),
       );
       await tester.pumpAndSettle();
     }
 
-    testWidgets('explica qué se pide y qué no se lee', (tester) async {
+    testWidgets('explica qué se pide, qué no se lee y que es opcional',
+        (tester) async {
       await bombear(tester);
 
       expect(find.text('Permisos del teléfono'), findsOneWidget);
       expect(find.text('Avisos del teléfono'), findsOneWidget);
       expect(find.text('Acceso al uso de las apps'), findsOneWidget);
+      expect(
+        find.textContaining('Ninguno de estos permisos es obligatorio'),
+        findsOneWidget,
+      );
+      expect(
+        find.widgetWithText(FilledButton, 'Continuar sin estos permisos'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
+      expect(find.textContaining('informes semanal y mensual'), findsOneWidget);
+      // La lista es perezosa: la tarjeta de batería queda más abajo.
+      await tester.scrollUntilVisible(
+        find.text('Batería sin ahorro para BlueTalk'),
+        200,
+      );
       expect(find.text('Batería sin ahorro para BlueTalk'), findsOneWidget);
       expect(find.textContaining('No lee:'), findsWidgets);
-      expect(find.textContaining('necesario'), findsWidgets);
-      expect(
-        find.textContaining('Todavía no se puede avanzar'),
-        findsOneWidget,
-        reason: 'faltan los avisos, que son obligatorios',
-      );
+      expect(find.textContaining('opcional'), findsWidgets);
+      expect(find.textContaining('necesario'), findsNothing);
     });
 
     testWidgets('tocar un permiso pendiente pide el permiso al sistema',
@@ -311,31 +293,64 @@ void main() {
     });
 
     testWidgets('con todo concedido ya no se pide nada', (tester) async {
-      await bombear(
-        tester,
-        permisos: _PermisosFalsos(
-          avisos: EstadoPermiso.concedido,
-          bateria: EstadoPermiso.concedido,
-        ),
+      final falso = _PermisosFalsos(
+        avisos: EstadoPermiso.concedido,
+        bateria: EstadoPermiso.concedido,
       );
+      await bombear(tester, permisos: falso);
 
+      expect(falso.peticiones, 0);
       expect(find.textContaining('Concedido'), findsWidgets);
       expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
     });
 
-    testWidgets('solo lo opcional pendiente no bloquea el avance',
+    testWidgets('cualquier permiso pendiente es opcional y no bloquea',
         (tester) async {
       await bombear(
         tester,
         permisos: _PermisosFalsos(
-          avisos: EstadoPermiso.concedido,
-          bateria: EstadoPermiso.pendiente,
+          avisos: EstadoPermiso.pendiente,
+          bateria: EstadoPermiso.concedido,
         ),
-        adminActivo: false,
       );
 
       expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
       expect(find.textContaining('Falta concederlo'), findsWidgets);
+    });
+
+    testWidgets('«Continuar sin estos permisos» cierra el asistente',
+        (tester) async {
+      final prefs = await prefsDePrueba();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: _fuentes(prefs).cast(),
+          child: MaterialApp(
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: Center(
+                  child: FilledButton(
+                    onPressed: () => Navigator.of(context).push<void>(
+                      MaterialPageRoute(
+                        builder: (_) => const PermisosAsistenteScreen(),
+                      ),
+                    ),
+                    child: const Text('Abrir permisos'),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Abrir permisos'));
+      await tester.pumpAndSettle();
+      expect(find.text('Continuar sin estos permisos'), findsOneWidget);
+
+      await tester.tap(find.text('Continuar sin estos permisos'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Abrir permisos'), findsOneWidget);
+      expect(find.text('Continuar sin estos permisos'), findsNothing);
     });
 
     testWidgets(
@@ -354,17 +369,18 @@ void main() {
       expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
     });
 
-    testWidgets('el asistente es accesible', (tester) async {
+    testWidgets('el asistente es accesible con el tema real', (tester) async {
       final prefs = await prefsDePrueba();
       await expectSinProblemasDeAccesibilidad(
         tester,
         overrides: _fuentes(prefs),
-        home: const Scaffold(body: PermisosAsistenteScreen()),
+        home: const PermisosAsistenteScreen(),
+        theme: buildBlueTalkTheme(AppColors.celeste),
       );
     });
   });
 
-  group('paso obligatorio antes del panel', () {
+  group('el panel no depende de los permisos (P0-4 de Play)', () {
     /// Preferencias con la legal aceptada y el PIN «1234» ya creado.
     Future<SharedPreferences> prefsDeSesion() async {
       final prefs = await prefsDePrueba(
@@ -381,7 +397,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('mientras falte un permiso obligatorio no aparece el panel',
+    testWidgets('con todos los permisos denegados el panel se abre igual',
         (tester) async {
       final prefs = await prefsDeSesion();
       await pumpPadre(
@@ -389,7 +405,7 @@ void main() {
         home: PadreScreen(onSalir: () {}),
         overrides: [
           ...overridesDePadre(prefs, permisos: _PermisosFalsos()),
-          ..._gateways(),
+          ..._gateways(usoConcedido: false),
         ],
       );
 
@@ -397,18 +413,45 @@ void main() {
 
       await entrar(tester);
 
-      expect(find.byType(NavigationBar), findsNothing,
-          reason: 'no se puede avanzar sin los permisos obligatorios');
-      expect(find.text('Uso del día'), findsNothing);
-      // En modo paso manda la cabecera de PadreScreen («Modo padre»), no
-      // la del asistente empujado desde Control.
-      expect(find.text('Modo padre'), findsOneWidget);
-      expect(find.textContaining('Todavía no se puede avanzar'), findsOneWidget);
+      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(find.text('Uso del día'), findsOneWidget);
+      expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
       // La salida siempre está, para no dejar al adulto encerrado.
       expect(find.byTooltip('Salir del modo padre'), findsOneWidget);
     });
 
-    testWidgets('con todo concedido el panel se enseña y no estorba',
+    testWidgets(
+        'con el filtro activo y la VPN denegada el panel también se abre',
+        (tester) async {
+      final prefs = await prefsDePrueba(
+        iniciales: {
+          'padre_legal_aceptacion': aceptacionLegalDePrueba(),
+          'padre_filtro_web_activo': true,
+        },
+      );
+      await crearPinDePrueba(prefs);
+      await pumpPadre(
+        tester,
+        home: PadreScreen(onSalir: () {}),
+        overrides: [
+          ...overridesDePadre(prefs, permisos: _PermisosFalsos()),
+          ..._gateways(usoConcedido: false),
+          filtroWebGatewayProvider.overrideWithValue(
+            _FiltroFalso(
+              const FiltroWebEstado(activo: true, comprobado: true),
+            ),
+          ),
+        ],
+      );
+
+      await entrar(tester);
+
+      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(find.text('Uso del día'), findsOneWidget);
+      expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
+    });
+
+    testWidgets('con todo concedido el panel también se enseña',
         (tester) async {
       final prefs = await prefsDeSesion();
       await pumpPadre(
@@ -434,8 +477,8 @@ void main() {
     });
 
     testWidgets(
-        'si el adulto revoca un permiso fuera de la app, al volver se '
-        'vuelve a comprobar', (tester) async {
+        'si el adulto revoca un permiso fuera de la app, el panel sigue '
+        'abierto', (tester) async {
       final prefs = await prefsDeSesion();
       final avisos = _PermisosFalsos(
         avisos: EstadoPermiso.concedido,
@@ -461,10 +504,10 @@ void main() {
           .handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       await tester.pumpAndSettle();
 
-      expect(find.byType(NavigationBar), findsNothing,
-          reason: 'una caché vieja no puede dejar pasar el panel');
-      expect(find.textContaining('Todavía no se puede avanzar'), findsOneWidget);
-      expect(find.text('Uso del día'), findsNothing);
+      expect(find.byType(NavigationBar), findsOneWidget,
+          reason: 'un permiso opcional no puede cerrar el panel');
+      expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
+      expect(find.text('Uso del día'), findsOneWidget);
     });
   });
 
@@ -479,13 +522,43 @@ void main() {
           reason: 'un canal caído no puede encerrar al adulto');
     });
 
-    test('con el canal vivo y la VPN sin conceder sí bloquea', () async {
+    test('con el canal vivo y la VPN sin conceder tampoco bloquea', () async {
       final estado = await _diagnostico(
         filtro: const FiltroWebEstado(activo: true, comprobado: true),
       );
 
       expect(estado.de(PermisoId.vpn)?.estado, EstadoPermiso.pendiente);
-      expect(estado.faltanRequeridos, isTrue);
+      expect(estado.faltanRequeridos, isFalse,
+          reason: 'P0-4: la VPN es opcional y el panel no se cierra');
+    });
+  });
+
+  group('P0-4: ningún permiso de producción es obligatorio', () {
+    test('con todo denegado y el filtro activo, la lista no exige nada',
+        () async {
+      final prefs = await prefsDePrueba(
+        iniciales: {'padre_filtro_web_activo': true},
+      );
+      final container = ProviderContainer(
+        overrides: [
+          edicionDirectaProvider.overrideWithValue(true),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          permisosGatewayProvider.overrideWithValue(_PermisosFalsos()),
+          usoTelefonoGatewayProvider.overrideWithValue(_UsoFalso(false)),
+          filtroWebGatewayProvider.overrideWithValue(
+            _FiltroFalso(
+              const FiltroWebEstado(activo: true, comprobado: true),
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final estado = await container.read(permisosProvider.future);
+
+      expect(estado.de(PermisoId.vpn)?.estado, EstadoPermiso.pendiente);
+      expect(estado.permisos.where((p) => p.requerido), isEmpty);
+      expect(estado.faltanRequeridos, isFalse);
     });
   });
 }

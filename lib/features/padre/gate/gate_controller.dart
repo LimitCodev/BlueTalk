@@ -28,7 +28,7 @@ final derivadorPinProvider = Provider<DerivadorPin>(
 /// por [AlmacenPin.cargar] y sí vive en el keystore; por eso la pantalla
 /// de estado del modo padre muestra si el PIN está cifrado o no.
 final almacenPinProvider = Provider<AlmacenPin>(
-  (ref) => AlmacenPin(prefs: ref.watch(sharedPreferencesProvider)),
+  (ref) => AlmacenPin(prefs: ref.watch(almacenLocalProvider)),
 );
 
 class GateEstado {
@@ -82,7 +82,7 @@ class GateController extends Notifier<GateEstado> {
   }
 
   PinStore _store() => PinStore(
-        ref.read(sharedPreferencesProvider),
+        ref.read(almacenLocalProvider),
         almacen: ref.read(almacenPinProvider),
         ahora: ref.read(relojProvider),
         derivador: ref.read(derivadorPinProvider),

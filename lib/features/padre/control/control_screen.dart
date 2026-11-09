@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../core/theme/calm_mode.dart';
+import '../../../core/plataforma/edicion.dart';
 import '../../../core/widgets/section_header.dart';
 import '../dashboard/barras.dart';
-import '../filtro_web/filtro_web_controller.dart';
-import '../filtro_web/filtro_web_screen.dart';
 import '../gate/biometria.dart';
 import '../gate/gate_controller.dart';
 import '../legal/legal_controller.dart';
-import '../monitoreo/uso_telefono_controller.dart';
-import '../monitoreo/uso_telefono_screen.dart';
 import '../padre_controller.dart';
 import '../perfil_edad.dart';
 import '../permisos/permisos_asistente_screen.dart';
-import '../proteccion/proteccion_tile.dart';
 import 'cambiar_codigo.dart';
+import 'control_dispositivo.dart';
 import 'control_parental.dart';
+import 'control_rutina_voz.dart';
 import 'perfil_edad_dialogo.dart';
 import 'recuperacion_dialogo.dart';
-import 'voz_diagnostico.dart';
 
 /// Control parental (plan 05 §4): tiempo de juegos, secciones, pantalla y
 /// voz (enlaces a Ajustes, sin duplicar lógica), desbloqueo y documentos.
@@ -40,9 +35,7 @@ class ControlScreen extends ConsumerWidget {
     final bloqueos = ref.watch(bloqueosProvider);
     final biometria = ref.watch(biometriaHabilitadaProvider);
     final aceptacion = ref.watch(legalProvider);
-    final filtro = ref.watch(filtroWebProvider);
-    final permisoUso = ref.watch(permisoUsoProvider).value;
-    final usoConcedido = permisoUso ?? false;
+    final directa = ref.watch(edicionDirectaProvider);
     // Dónde viven las huellas del código (lo decide `AlmacenPin`): se
     // enseña en pantalla para que un respaldo sin cifrar no pase
     // desapercibido (revisión de la fase 3a).
@@ -120,8 +113,8 @@ class ControlScreen extends ConsumerWidget {
             perfilEdad == PerfilEdad.ninguno
                 ? 'Sin perfil: se ve todo. Elige la edad para ocultar '
                     'categorías del comunicador que no son de esa edad.'
-                : '${perfilEdad.titulo}. Se ven las categorías de esa edad '
-                    'y el filtro de páginas usa los grupos que corresponden.',
+                : '${perfilEdad.titulo}. Se ven las categorías de esa edad'
+                    '${directa ? ' y el filtro de páginas usa los grupos que corresponden' : ''}.',
           ),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => showDialog<void>(
@@ -130,65 +123,19 @@ class ControlScreen extends ConsumerWidget {
           ),
         ),
         const SectionHeader('Permisos del teléfono'),
-        const ProteccionTile(),
         ListTile(
           leading: const Icon(Icons.rule_outlined),
           title: const Text('Revisar los permisos'),
           subtitle: const Text(
-            'Qué pide BlueTalk, para qué sirve y qué no lee.',
+            'Qué pide y qué no lee. Puedes continuar sin concederlos.',
           ),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => Navigator.of(context).push<void>(
             MaterialPageRoute(builder: (_) => const PermisosAsistenteScreen()),
           ),
         ),
-        const SectionHeader('Protección en internet'),
-        ListTile(
-          leading: const Icon(Icons.shield_outlined),
-          title: const Text('Filtro de páginas'),
-          subtitle: Text(
-            filtro.activo
-                ? 'Activo: bloquea los sitios elegidos.'
-                : 'Apagado: los sitios no se bloquean.',
-          ),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => Navigator.of(context).push<void>(
-            MaterialPageRoute(builder: (_) => const FiltroWebScreen()),
-          ),
-        ),
-        const SectionHeader('Diagnóstico de uso'),
-        ListTile(
-          leading: const Icon(Icons.insights_outlined),
-          title: const Text('Tiempo por app'),
-          subtitle: Text(
-            usoConcedido
-                ? 'Revisa cuánto tiempo estuvo abierta cada app.'
-                : 'Falta el permiso «Acceso al uso» de Android.',
-          ),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => Navigator.of(context).push<void>(
-            MaterialPageRoute(builder: (_) => const UsoTelefonoScreen()),
-          ),
-        ),
-        const SectionHeader('Pantalla y voz'),
-        const CalmModeToggle(),
-        ListTile(
-          leading: const Icon(Icons.text_fields_outlined),
-          title: const Text('Tamaño de texto y velocidad de voz'),
-          subtitle: const Text('Se cambian en la pestaña Ajustes.'),
-          trailing: const Icon(Icons.chevron_right),
-          // Enlace real a Ajustes: la app no duplica esa lógica aquí.
-          onTap: () => GoRouter.maybeOf(context)?.go('/home/ajustes'),
-        ),
-        ListTile(
-          leading: const Icon(Icons.record_voice_over_outlined),
-          title: const Text('Probar la voz'),
-          subtitle: const Text('¿No se oye? Comprueba el sonido aquí.'),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => Navigator.of(context).push<void>(
-            MaterialPageRoute(builder: (_) => const VozDiagnosticoScreen()),
-          ),
-        ),
+        const SeccionesDispositivo(),
+        const SeccionesRutinaYVoz(),
         const SectionHeader('Desbloqueo'),
         SwitchListTile(
           title: const Text('Huella o rostro'),

@@ -44,7 +44,7 @@ class SavedMessagesController extends Notifier<List<SavedMessage>> {
 
   @override
   List<SavedMessage> build() {
-    final raw = ref.read(sharedPreferencesProvider).getString(prefKey);
+    final raw = ref.read(almacenLocalProvider).texto(prefKey);
     if (raw == null) return const [];
     try {
       final decoded = jsonDecode(raw);
@@ -85,7 +85,7 @@ class SavedMessagesController extends Notifier<List<SavedMessage>> {
 
   Future<void> _persist() async {
     final encoded = jsonEncode([for (final message in state) message.toMap()]);
-    await ref.read(sharedPreferencesProvider).setString(prefKey, encoded);
+    await ref.read(almacenLocalProvider).guardarTexto(prefKey, encoded);
   }
 }
 

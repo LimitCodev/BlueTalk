@@ -6,8 +6,7 @@ import '../reloj.dart';
 /// Métricas locales de uso para el dashboard del padre (plan 05 §2).
 ///
 /// Se calculan sobre `UsageRepo` (cap 200 eventos), `GameProgressRepo`,
-/// `ScheduleRepo` y `WellbeingRepo`: todo local, sin red. Se muestran con el
-/// banner «Datos de demostración» hasta que exista sync real con Supabase.
+/// `ScheduleRepo` y `WellbeingRepo`: todo local, sin red.
 class Metricas {
   const Metricas({
     required this.pictosHoy,
@@ -73,7 +72,7 @@ final metricasProvider = FutureProvider<Metricas>((ref) async {
   var segundosJuego = 0;
   final cuentos = <String>{};
   var dibujos = 0;
-  var actividadesHechas = 0;
+  final actividadesHechas = <String>{};
 
   for (final evento in eventos) {
     switch (evento.type) {
@@ -97,13 +96,11 @@ final metricasProvider = FutureProvider<Metricas>((ref) async {
         if (cuento is String) cuentos.add(cuento);
       case 'dibujo_guardado':
         dibujos++;
-      default:
-        // Marca de «hecha» del horario: el agente de rutinas aún no fija
-        // el tipo exacto, se acepta cualquier `actividad_*`.
-        if (evento.type.startsWith('actividad') &&
-            mismoDia(evento.createdAt, ahora)) {
-          actividadesHechas++;
-        }
+      // Horario: desmarcar (`actividad_pendiente`) quita la marca de hecha.
+      case 'actividad_hecha' when mismoDia(evento.createdAt, ahora):
+        actividadesHechas.add('${evento.data['entradaId']}');
+      case 'actividad_pendiente' when mismoDia(evento.createdAt, ahora):
+        actividadesHechas.remove('${evento.data['entradaId']}');
     }
   }
 
@@ -137,6 +134,6 @@ final metricasProvider = FutureProvider<Metricas>((ref) async {
     dibujosGuardados: dibujos,
     nivelMemoria: memoria?.level,
     actividadesHorario: horario.length,
-    actividadesHechasHoy: actividadesHechas,
+    actividadesHechasHoy: actividadesHechas.length,
   );
 });

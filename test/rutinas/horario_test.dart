@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:bluetalk/features/rutinas/rutinas_providers.dart';
@@ -5,6 +6,15 @@ import 'package:bluetalk/features/rutinas/rutinas_providers.dart';
 import 'harness.dart';
 
 void main() {
+  testWidgets('el niño no ve el botón para editar el horario', (tester) async {
+    await pumpRutinas(tester);
+    await tester.tap(find.text('Mi horario'));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.edit_outlined), findsNothing);
+    expect(find.text('Editar horario'), findsNothing);
+  });
+
   testWidgets('el horario lista las actividades del semilla por hora',
       (tester) async {
     await pumpRutinas(tester);

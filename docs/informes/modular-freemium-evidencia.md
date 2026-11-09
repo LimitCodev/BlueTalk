@@ -1,0 +1,33 @@
+# Modularización, freemium e infraestructura AWS — evidencia (2026-11-07)
+
+Rama `feat/modular-freemium-aws`, desde `main` en `4be9f4d`. Sin push ni merge.
+
+| Commit | Qué | Verificado |
+|---|---|---|
+| `d3ae76a` | `.gitignore` con fotos, audios y vídeos personales | `git status` ya no los lista |
+| `07102ec` | `AlmacenLocal`: 15 archivos de features/core dejan de usar `SharedPreferences`; las claves no cambian | analyze 0 · test 348/348 |
+| `31bd088` | `CanalNativo`: 4 gateways sin `try/catch` repetido (−37 líneas) | analyze 0 · test 349 + 3 nuevos |
+| `25b6f7b` | Núcleo freemium (`Plan`, `Funcion`, `FuenteDerechos`, `TiendaCompras`) sin conectar | 5 tests nuevos |
+| `8613325` | CloudFormation (S3 + CloudFront + IAM + alarma), página legal y Polly, **solo simulación** | 5 + 4 tests de Python sin red; publicar en modo real sale con 1 si queda `demo@bluetalk.app` |
+| `4dd5293` | Trinquete de 100 líneas (58 archivos en deuda) | test verde |
+| `3d922aa` `ed990c0` `1a8acd4` `8b482a2` `e95d7f6` | Partidos: repos locales, comunicador, ajustes, cuentos, artista | analyze 0 · test 359/359 tras cada uno |
+
+Deuda que queda: **53 archivos** por encima de 100 líneas (lista en
+`test/arquitectura/tamano_test.dart`). No se tocó el filtro web, el monitoreo
+ni la protección: la auditoría de Play recomienda sacarlos de la v1, y
+partirlos ahora podría ser trabajo perdido.
+
+> **Actualización 2026-11-08:** la protección contra desinstalación
+> (administrador de dispositivo) ya se retiró por P0-3 de
+> `requisitosPlayStore.md`; ver `docs/informes/p0-3-admin-fuera.md`. El
+> filtro web y el monitoreo siguen esperando la decisión de la ruta A/B de
+> P0-2.
+
+**NO VERIFICADO:**
+
+- Ningún comando real de AWS; la plantilla no pasó `cfn-lint` ni
+  `aws cloudformation validate-template` (no instalados o con red).
+- Ningún build de Android ni prueba en teléfono (la máquina estaba cargada).
+- La redistribución de audio de Polly según los AWS Service Terms.
+- `8b482a2` por sí solo deja `tamano_test` en rojo (la entrada de
+  `cuentos_screen` se borra en el commit siguiente). Afecta solo a un `git bisect`.

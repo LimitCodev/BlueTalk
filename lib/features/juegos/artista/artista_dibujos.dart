@@ -67,7 +67,7 @@ class Dibujo {
 }
 
 /// Galería local de dibujos: la lista de trazos se persiste como JSON en
-/// SharedPreferences (misma decisión que "mis mensajes" del comunicador;
+/// AlmacenLocal (misma decisión que "mis mensajes" del comunicador;
 /// migrar a Drift cuando `lib/data/local` lo soporte, plan 03 §4).
 ///
 /// La escritura es un solo string JSON con la lista entera; cabe en
@@ -85,7 +85,7 @@ class GaleriaController extends Notifier<List<Dibujo>> {
 
   @override
   List<Dibujo> build() {
-    final raw = ref.read(sharedPreferencesProvider).getString(_clave);
+    final raw = ref.read(almacenLocalProvider).texto(_clave);
     if (raw == null) return const [];
     try {
       final decoded = jsonDecode(raw);
@@ -123,7 +123,7 @@ class GaleriaController extends Notifier<List<Dibujo>> {
   }
 
   Future<void> _persistir() async {
-    await ref.read(sharedPreferencesProvider).setString(
+    await ref.read(almacenLocalProvider).guardarTexto(
           _clave,
           jsonEncode([for (final d in state) d.toMap()]),
         );

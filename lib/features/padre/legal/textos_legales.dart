@@ -5,6 +5,7 @@
 // no puede declararse como asset, la app lleva aquí el mismo texto para
 // renderizarlo sin red ni carga de assets. Si el pubspec se desbloquea, el
 // pendiente es leer los .md desde `rootBundle` y borrar este espejo.
+import '../../../core/plataforma/edicion.dart';
 
 /// Parser de los .md: `## ` → encabezado, `- ` → vineta, resto → párrafo.
 /// Los `**` de énfasis se quitan al render (la app no necesita negritas).
@@ -33,17 +34,16 @@ class LineaLegal {
 
 enum LineaLegalTipo { encabezado, vineta, parrafo }
 
-String _limpiar(String texto) => texto.replaceAll('**', '');
-
-const versionLegal = '1.1.0';
-const fechaEfectivaLegal = '20 de octubre de 2026';
+String _limpiar(String texto) => lineasDeEdicion(texto).replaceAll('**', '');
+const versionLegal = '1.2.0';
+const fechaEfectivaLegal = '8 de noviembre de 2026';
 const correoContactoLegal = 'demo@bluetalk.app';
 
 final String terminosYCondiciones = _limpiar(r'''
 # Términos y condiciones de uso de BlueTalk
 
-**Fecha de entrada en vigencia:** 20 de octubre de 2026
-**Versión:** 1.1.0
+**Fecha de entrada en vigencia:** 8 de noviembre de 2026
+**Versión:** 1.2.0
 
 ## 1. Identificación del servicio
 
@@ -65,7 +65,6 @@ BlueTalk se encuentra en una fase de versión preliminar (MVP) de prueba. Durant
 - Todos los datos que produce la app se guardan en el almacenamiento local del teléfono y no se envían a servidores del desarrollador.
 - Los pictogramas, cuentos, actividades de horario y ejemplos incluidos son contenido de demostración incluido con fines de prueba; no representan casos clínicos ni recomendaciones particulares.
 - No se ofrecen pagos, suscripciones ni funciones premium. Cualquier versión futura con pago se anunciará por separado y requerirá aceptación expresa de condiciones adicionales.
-- Ciertas métricas de la zona de adultos se etiquetan como «Datos de demostración» mientras no exista sincronización con un servicio en la nube.
 - El filtro de páginas es opcional y lo activa la persona adulta. Usa una VPN local de Android que solo intercepta consultas DNS; no envía datos a servidores del desarrollador.
 
 ## 4. Uso por menores de edad y consentimiento parental
@@ -171,13 +170,13 @@ Estos términos se rigen por la legislación del país donde se instale la app. 
 ## 17. Contacto
 
 Correo: demo@bluetalk.app (dirección de demostración de este proyecto).
-Última actualización de este documento: 20 de octubre de 2026, versión 1.1.0.''');
+Última actualización de este documento: 8 de noviembre de 2026, versión 1.2.0.''');
 
 final String politicaDePrivacidad = _limpiar(r'''
 # Política de privacidad de BlueTalk
 
-**Fecha de entrada en vigencia:** 20 de octubre de 2026
-**Versión:** 1.1.0
+**Fecha de entrada en vigencia:** 8 de noviembre de 2026
+**Versión:** 1.2.0
 
 ## 1. Responsable del tratamiento
 
@@ -258,7 +257,7 @@ Los datos se conservan mientras la app esté instalada. Para eliminarlos:
 - Borrar solo el perfil o el historial desde la propia app, cuando esa opción esté disponible, elimina los bloques correspondientes sin tocar el resto.
 - Borrar el registro de intentos bloqueados desde la pantalla del filtro elimina solo ese registro.
 
-Restaurar una copia del teléfono desde el sistema Android puede restaurar también los datos de la app; eso depende de las copias de seguridad configuradas en el dispositivo, no de BlueTalk.
+BlueTalk desactiva las copias de seguridad automáticas de Android: ni una copia del teléfono ni el paso a otro dispositivo restauran estos datos.
 
 ## 10. Derechos de las personas
 
@@ -288,4 +287,4 @@ Cada versión de la política lleva número y fecha. Los cambios sustanciales ex
 ## 14. Contacto
 
 Correo: demo@bluetalk.app (dirección de demostración de este proyecto).
-Última actualización: 20 de octubre de 2026, versión 1.1.0.''');
+Última actualización: 8 de noviembre de 2026, versión 1.2.0.''');

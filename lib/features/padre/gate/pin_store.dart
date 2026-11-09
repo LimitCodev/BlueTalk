@@ -2,7 +2,7 @@ import 'dart:isolate';
 import 'dart:math';
 
 import 'package:cryptography/cryptography.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bluetalk/core/almacen/almacen_local.dart';
 
 import 'almacen_pin.dart';
 
@@ -137,7 +137,7 @@ class PinStore {
 
   static final Random _aleatorio = Random.secure();
 
-  final SharedPreferences _prefs;
+  final AlmacenLocal _prefs;
 
   /// Reloj inyectable: el bloqueo se calcula contra este reloj.
   final DateTime Function() ahora;
@@ -153,16 +153,16 @@ class PinStore {
       almacen.tiene(claveRecupHash) && almacen.tiene(claveRecupSalt);
 
   /// Intentos fallidos acumulados en este ciclo (persistidos).
-  int get intentosFallidos => _prefs.getInt(claveIntentos) ?? 0;
+  int get intentosFallidos => _prefs.entero(claveIntentos) ?? 0;
 
   /// Nivel actual del bloqueo escalonado (0 = sin bloqueos todavía).
-  int get nivelBloqueo => _prefs.getInt(claveNivel) ?? 0;
+  int get nivelBloqueo => _prefs.entero(claveNivel) ?? 0;
 
   /// Longitud del PIN guardado para la interfaz: 4 si el PIN es de una
   /// versión anterior; un valor persistido corrupto se muestra como 6
   /// (igual no dejará pasar a nadie: [verificar] lo rechaza).
   int get longitudGuardada {
-    final guardado = _prefs.getInt(claveLongitud);
+    final guardado = _prefs.entero(claveLongitud);
     if (guardado == null) return longitudAntigua;
     if (guardado == longitudAntigua || guardado == longitudNueva) {
       return guardado;
@@ -173,7 +173,7 @@ class PinStore {
   /// Iteraciones con las que está hasheado el PIN guardado. Ausente = 10.000
   /// (esquema antiguo, plan 11 §1.2).
   int get iteracionesGuardadas =>
-      _prefs.getInt(claveIteraciones) ?? iteracionesAntiguas;
+      _prefs.entero(claveIteraciones) ?? iteracionesAntiguas;
 
   /// Espera que impone el bloqueo de un ciclo concreto.
   static Duration esperaDelNivel(int nivel) {
@@ -189,11 +189,11 @@ class PinStore {
   /// completa original: atrasar el reloj no acorta ni suspende el bloqueo
   /// (plan 11 §1.2).
   Duration bloqueoRestante() {
-    final hasta = _prefs.getInt(claveBloqueo);
+    final hasta = _prefs.entero(claveBloqueo);
     if (hasta == null) return Duration.zero;
     final instante = DateTime.fromMillisecondsSinceEpoch(hasta);
 
-    final desde = _prefs.getInt(claveBloqueoDesde);
+    final desde = _prefs.entero(claveBloqueoDesde);
     if (desde != null) {
       final inicio = DateTime.fromMillisecondsSinceEpoch(desde);
       if (ahora().isBefore(inicio)) {
@@ -227,7 +227,7 @@ class PinStore {
     final hash = await derivador.derivar(codigo, salt, iteracionesActuales);
     await almacen.guardar(claveRecupSalt, _aHex(salt));
     await almacen.guardar(claveRecupHash, _aHex(hash));
-    await _prefs.setInt(claveRecupIter, iteracionesActuales);
+    await _prefs.guardarEntero(claveRecupIter, iteracionesActuales);
     return '${codigo.substring(0, 4)}-${codigo.substring(4)}';
   }
 
@@ -256,7 +256,7 @@ class PinStore {
       }
       guardado = _deHex(hashGuardado);
       salt = _deHex(salGuardada);
-      final leidas = _prefs.getInt(claveRecupIter) ?? iteracionesActuales;
+      final leidas = _prefs.entero(claveRecupIter) ?? iteracionesActuales;
       if (leidas < 1 || leidas > 1000000) {
         return VerificacionPin.incorrecto;
       }
@@ -289,8 +289,8 @@ class PinStore {
     final hash = await almacen.borrar(claveHash);
     final sal = await almacen.borrar(claveSalt);
     if (!hash || !sal) return false;
-    await _prefs.remove(claveLongitud);
-    await _prefs.remove(claveIteraciones);
+    await _prefs.borrar(claveLongitud);
+    await _prefs.borrar(claveIteraciones);
     await _limpiarLockout();
     return true;
   }
@@ -304,7 +304,7 @@ class PinStore {
 
     // Longitud almacenada: 4 para los PIN antiguos. Un valor corrupto no
     // admite ningún código.
-    final longitudCruda = _prefs.getInt(claveLongitud);
+    final longitudCruda = _prefs.entero(claveLongitud);
     final longitud = longitudCruda ?? longitudAntigua;
     if (longitud != longitudAntigua && longitud != longitudNueva) {
       return VerificacionPin.incorrecto;
@@ -368,9 +368,9 @@ class PinStore {
     await _limpiarLockout();
     // Migración de longitud: los PIN antiguos siguen pidiendo sus 4
     // dígitos; ahora queda registrado junto a la huella.
-    await _prefs.setInt(claveLongitud, longitud);
+    await _prefs.guardarEntero(claveLongitud, longitud);
 
-    final esquemaAntiguo = !_prefs.containsKey(claveIteraciones) ||
+    final esquemaAntiguo = !_prefs.contiene(claveIteraciones) ||
         iteracionesLeidas != iteracionesActuales;
     if (!esquemaAntiguo) return;
     await _guardarHuella(pin, longitud: longitud);
@@ -381,21 +381,21 @@ class PinStore {
   Future<void> _registrarFallo() async {
     final intentos = intentosFallidos + 1;
     if (intentos < intentosMaximos) {
-      await _prefs.setInt(claveIntentos, intentos);
+      await _prefs.guardarEntero(claveIntentos, intentos);
       return;
     }
 
     final nivel = nivelBloqueo + 1;
     final desde = ahora();
-    await _prefs.setInt(claveNivel, nivel);
-    await _prefs.setInt(claveBloqueoDesde, desde.millisecondsSinceEpoch);
-    await _prefs.setInt(
+    await _prefs.guardarEntero(claveNivel, nivel);
+    await _prefs.guardarEntero(claveBloqueoDesde, desde.millisecondsSinceEpoch);
+    await _prefs.guardarEntero(
       claveBloqueo,
       desde.add(esperaDelNivel(nivel)).millisecondsSinceEpoch,
     );
     // El contador se reinicia: cuando pase la espera vuelve a haber
     // 5 intentos. Si no se reiniciara, un solo fallo re-bloquearía.
-    await _prefs.setInt(claveIntentos, 0);
+    await _prefs.guardarEntero(claveIntentos, 0);
   }
 
   /// Deriva y persiste la huella de [pin] con los parámetros actuales y la
@@ -406,15 +406,15 @@ class PinStore {
     final hash = await derivador.derivar(pin, salt, iteracionesActuales);
     await almacen.guardar(claveSalt, _aHex(salt));
     await almacen.guardar(claveHash, _aHex(hash));
-    await _prefs.setInt(claveLongitud, longitud);
-    await _prefs.setInt(claveIteraciones, iteracionesActuales);
+    await _prefs.guardarEntero(claveLongitud, longitud);
+    await _prefs.guardarEntero(claveIteraciones, iteracionesActuales);
   }
 
   Future<void> _limpiarLockout() async {
-    await _prefs.remove(claveIntentos);
-    await _prefs.remove(claveBloqueo);
-    await _prefs.remove(claveBloqueoDesde);
-    await _prefs.remove(claveNivel);
+    await _prefs.borrar(claveIntentos);
+    await _prefs.borrar(claveBloqueo);
+    await _prefs.borrar(claveBloqueoDesde);
+    await _prefs.borrar(claveNivel);
   }
 
   static bool _esFormato(String pin, int longitud) =>

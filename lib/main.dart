@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/app.dart';
 import 'app/di.dart';
+import 'core/almacen/almacen_local.dart';
 import 'data/local/mock_repos.dart';
 import 'features/onboarding/profile_controller.dart';
 import 'features/padre/gate/almacen_pin.dart';
@@ -46,7 +47,7 @@ Future<void> main() async {
   // Huella del PIN de los adultos en el keystore cifrado (encargo §3.1):
   // se lee y se migra aquí, antes del primer frame, para que el gate pueda
   // seguir consultando el almacén de forma síncrona.
-  final almacenPin = AlmacenPin(prefs: prefs);
+  final almacenPin = AlmacenPin(prefs: AlmacenPrefs(prefs));
   await almacenPin.cargar();
 
   runApp(

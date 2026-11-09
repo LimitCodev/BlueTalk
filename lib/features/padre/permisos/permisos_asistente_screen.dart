@@ -4,21 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/section_header.dart';
 import '../filtro_web/filtro_web_controller.dart';
 import '../monitoreo/uso_telefono_controller.dart';
-import '../proteccion/proteccion_controller.dart';
 import 'permiso_model.dart';
 import 'permisos_controller.dart';
 
-/// Asistente de permisos del adulto (encargo §3.2).
+/// Asistente de permisos del adulto (P0-4 de Play).
 ///
-/// Explica cada permiso en lenguaje llano, con lo que **no** lee la app,
-/// comprueba su estado real en Android y no deja avanzar mientras falte
-/// alguno de los que son obligatorios.
+/// Explica cada permiso en lenguaje llano y con lo que **no** lee la app.
+/// Ninguno es obligatorio: el comunicador y el panel funcionan sin ellos,
+/// y el botón «Continuar sin estos permisos» siempre está disponible.
 class PermisosAsistenteScreen extends ConsumerStatefulWidget {
-  const PermisosAsistenteScreen({super.key, this.comoPaso = false});
-
-  /// `true` cuando se muestra como paso obligatorio antes del panel, en vez
-  /// de abrirse empujada desde el Control.
-  final bool comoPaso;
+  const PermisosAsistenteScreen({super.key});
 
   @override
   ConsumerState<PermisosAsistenteScreen> createState() =>
@@ -58,21 +53,29 @@ class _PermisosAsistenteScreenState
         await ref.read(usoTelefonoGatewayProvider).abrirAjustes();
       case PermisoId.vpn:
         await ref.read(filtroWebGatewayProvider).abrirAjustesVpn();
-      case PermisoId.administrador:
-        await ref.read(proteccionGatewayProvider).pedirActivacion();
     }
     ref.invalidate(permisosProvider);
   }
 
   @override
   Widget build(BuildContext context) {
-    // En modo paso el Scaffold y la cabecera ya los pone PadreScreen, para
-    // no meter una pantalla dentro de otra con dos barras.
-    if (widget.comoPaso) return _cuerpo();
-
+    final estado = ref.watch(permisosProvider).value;
+    final hayPendientes = estado?.pendientes.isNotEmpty ?? false;
     return Scaffold(
       appBar: AppBar(title: const Text('Permisos del teléfono')),
       body: _cuerpo(),
+      // La salida no depende de conceder nada: siempre está a la vista.
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        child: FilledButton(
+          onPressed: () => Navigator.of(context).maybePop(),
+          child: Text(
+            hayPendientes
+                ? 'Continuar sin estos permisos'
+                : 'Volver al panel',
+          ),
+        ),
+      ),
     );
   }
 
@@ -84,41 +87,33 @@ class _PermisosAsistenteScreenState
       return const Center(child: CircularProgressIndicator());
     }
 
-    final faltan = estado.faltanRequeridos;
-    final nombres = estado.pendientes
-        .where((p) => p.requerido)
-        .map((p) => p.titulo)
-        .join(', ');
-
     return ListView(
       padding: const EdgeInsets.only(bottom: 24),
       children: [
         const Padding(
           padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
           child: Text(
-            'BlueTalk funciona casi entero sin esto. Estos permisos son '
-            'para el horario, el tiempo por pantalla y el filtro de '
-            'páginas. Cada uno dice qué lee y qué no.',
+            'BlueTalk funciona sin conceder ninguno de estos permisos. '
+            'Cada uno dice para qué sirve, qué lee y qué no.',
           ),
         ),
-        // El bloqueo: mientras esto se muestre, PadreScreen no enseña el
-        // panel. Solo se bloquea con un «pendiente» que Android confirmó,
-        // nunca con un «no se pudo comprobar».
-        if (faltan)
-          Container(
-            margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: tema.colorScheme.error,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              'Todavía no se puede avanzar. Falta conceder: $nombres.',
-              style: tema.textTheme.bodyMedium?.copyWith(
-                color: tema.colorScheme.onError,
-              ),
-            ),
+        // P0-4 de Play: ningún permiso es obligatorio. La tarjeta lo dice
+        // sin rojo ni lenguaje de bloqueo.
+        Container(
+          margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: tema.colorScheme.surface,
+            border: Border.all(color: tema.colorScheme.outlineVariant),
+            borderRadius: BorderRadius.circular(12),
           ),
+          child: Text(
+            'Ninguno de estos permisos es obligatorio. El comunicador y el '
+            'panel del adulto funcionan sin concederlos; actívalos solo si '
+            'quieres la función que explica cada uno.',
+            style: tema.textTheme.bodyMedium,
+          ),
+        ),
         const SectionHeader('Permisos'),
         for (final permiso in estado.permisos) _fila(permiso),
         if (estado.permisos.isEmpty)
@@ -135,7 +130,7 @@ class _PermisosAsistenteScreenState
     final pendiente = permiso.estado == EstadoPermiso.pendiente;
     final icono = switch (permiso.estado) {
       EstadoPermiso.concedido => Icons.check_circle_outline,
-      EstadoPermiso.pendiente => Icons.error_outline,
+      EstadoPermiso.pendiente => Icons.info_outline,
       EstadoPermiso.desconocido => Icons.help_outline,
     };
 
@@ -158,18 +153,16 @@ class _PermisosAsistenteScreenState
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: pendiente
                   ? BoxDecoration(
-                      color: tema.colorScheme.error,
+                      border: Border.all(
+                        color: tema.colorScheme.outlineVariant,
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     )
                   : null,
               child: Text(
                 '${estadoPermisoEnLlano(permiso.estado)}'
                 '${permiso.requerido ? ' · necesario' : ' · opcional'}',
-                style: tema.textTheme.bodySmall?.copyWith(
-                  color: pendiente
-                      ? tema.colorScheme.onError
-                      : tema.textTheme.bodySmall?.color,
-                ),
+                style: tema.textTheme.bodySmall,
               ),
             ),
           ],

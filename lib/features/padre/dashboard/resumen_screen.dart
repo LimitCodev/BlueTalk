@@ -3,17 +3,16 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/theme/app_colors.dart';
+import '../../../core/plataforma/edicion.dart';
 import '../../../core/widgets/section_header.dart';
 import '../diagnostico/observaciones.dart';
-import '../monitoreo/uso_telefono_controller.dart';
-import '../monitoreo/uso_telefono_model.dart';
-import '../monitoreo/uso_telefono_screen.dart';
 import '../reloj.dart';
+import '../informes/informes_screen.dart';
 import 'barras.dart';
 import 'metricas.dart';
+import 'uso_telefono_resumen.dart';
 
-/// Resumen del padre: banner de demostración, métricas locales y
+/// Resumen del padre: métricas locales y
 /// observaciones con disclaimer (plan 05 §2–§3).
 class ResumenScreen extends ConsumerWidget {
   const ResumenScreen({super.key});
@@ -25,7 +24,7 @@ class ResumenScreen extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.only(bottom: 32),
       children: [
-        const _BannerDemo(),
+        const AccesoInformes(),
         switch (metricas) {
           AsyncData(:final value) => _Cuerpo(metricas: value),
           AsyncError() => _SinDatos(
@@ -36,53 +35,9 @@ class ResumenScreen extends ConsumerWidget {
               child: Center(child: CircularProgressIndicator()),
             ),
         },
-        const _UsoTelefonoResumen(),
+        if (ref.watch(edicionDirectaProvider)) const UsoTelefonoResumen(),
         const ObservacionesSection(),
       ],
-    );
-  }
-}
-
-/// Banner obligatorio: hasta que haya sync real, todo aquí es demostración.
-class _BannerDemo extends StatelessWidget {
-  const _BannerDemo();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.warning,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: const Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.science_outlined, color: AppColors.onWarning, size: 20),
-          SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Datos de demostración',
-                  style: TextStyle(
-                    color: AppColors.onWarning,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Métricas calculadas localmente en este dispositivo. '
-                  'Todavía no hay sincronización con la nube.',
-                  style: TextStyle(color: AppColors.onWarning, fontSize: 13),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -199,90 +154,8 @@ class _Cuerpo extends StatelessWidget {
         const Padding(
           padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
           child: Text(
-            'Los datos se guardan solo en este teléfono y se muestran como '
-            'demostración mientras no haya sincronización real.',
+            'Los datos se guardan solo en este teléfono.',
             style: TextStyle(fontSize: 13),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Tarjeta compacta del diagnóstico de uso para el resumen del adulto.
-class _UsoTelefonoResumen extends ConsumerWidget {
-  const _UsoTelefonoResumen();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final permiso = ref.watch(permisoUsoProvider);
-    final resumen = ref.watch(resumenUsoProvider);
-    final periodo = ref.watch(periodoUsoProvider);
-
-    void abrir() => Navigator.of(context).push<void>(
-          MaterialPageRoute(builder: (_) => const UsoTelefonoScreen()),
-        );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SectionHeader('Uso del teléfono'),
-        Card(
-          margin: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: abrir,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.insights_outlined,
-                    color: context.colores.primaryStrongText,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: switch ((permiso.value, resumen.value)) {
-                      (false, _) || (null, _) => const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Activar diagnóstico de uso',
-                              style: TextStyle(fontWeight: FontWeight.w700),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              'Falta el permiso «Acceso al uso» de Android.',
-                            ),
-                          ],
-                        ),
-                      (true, final ResumenUso valor) => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${periodo.titulo}: '
-                              '${formatearDuracion(valor.totalSegundos)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              valor.appPrincipal == null
-                                  ? 'Sin uso registrado en el periodo.'
-                                  : 'Más tiempo: '
-                                      '${valor.appPrincipal!.nombre} '
-                                      '(${formatearDuracion(valor.appPrincipal!.segundos)})',
-                            ),
-                          ],
-                        ),
-                      _ => const Text('Leyendo el uso del teléfono…'),
-                    },
-                  ),
-                  const Icon(Icons.chevron_right),
-                ],
-              ),
-            ),
           ),
         ),
       ],

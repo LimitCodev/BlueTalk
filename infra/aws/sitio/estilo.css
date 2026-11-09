@@ -1,0 +1,11 @@
+:root { --fondo: #ffffff; --texto: #1b1f24; --enlace: #1f5fbf; }
+@media (prefers-color-scheme: dark) {
+  :root { --fondo: #111418; --texto: #e8eaed; --enlace: #8ab4f8; }
+}
+body {
+  max-width: 46rem; margin: 0 auto; padding: 16px; background: var(--fondo); color: var(--texto);
+  font: 18px/1.6 system-ui, sans-serif;
+}
+a { color: var(--enlace); }
+table { border-collapse: collapse; width: 100%; overflow-x: auto; display: block; }
+th, td { border: 1px solid currentColor; padding: 4px 8px; text-align: left; }

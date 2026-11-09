@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart' show MissingPluginException;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bluetalk/core/almacen/almacen_local.dart';
 
 /// Almacenamiento de las **huellas** del PIN (encargo §3.1).
 ///
@@ -22,12 +22,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// nada: si el keystore falla, no se migra y no se pierde acceso al PIN.
 class AlmacenPin {
   AlmacenPin({
-    required SharedPreferences prefs,
+    required AlmacenLocal prefs,
     FlutterSecureStorage? sistema,
   })  : _preferencias = prefs,
         _sistema = sistema ?? const FlutterSecureStorage();
 
-  final SharedPreferences _preferencias;
+  final AlmacenLocal _preferencias;
   final FlutterSecureStorage _sistema;
 
   final Map<String, String> _cache = {};
@@ -127,7 +127,7 @@ class AlmacenPin {
 
     for (final clave in clavesSecretas) {
       if (_cache.containsKey(clave)) continue;
-      final antigua = _preferencias.getString(clave);
+      final antigua = _preferencias.texto(clave);
       if (antigua == null) continue;
       try {
         await _sistema.write(key: clave, value: antigua);
@@ -138,7 +138,7 @@ class AlmacenPin {
         return;
       }
       _cache[clave] = antigua;
-      await _preferencias.remove(clave);
+      await _preferencias.borrar(clave);
       _cifrado = true;
       _huellasEnSistema = true;
     }
@@ -146,14 +146,14 @@ class AlmacenPin {
     // Si ya había huellas en el keystore, está cifrado. Si hay alguna en
     // preferencias (migración a medias), no.
     if (_cache.isNotEmpty && _keystoreListo) {
-      _cifrado = !clavesSecretas.any(_preferencias.containsKey);
+      _cifrado = !clavesSecretas.any(_preferencias.contiene);
     }
   }
 
   /// Lectura síncrona: caché primero, preferencias después.
-  String? leer(String clave) => _cache[clave] ?? _preferencias.getString(clave);
+  String? leer(String clave) => _cache[clave] ?? _preferencias.texto(clave);
 
-  bool tiene(String clave) => _cache.containsKey(clave) || _preferencias.containsKey(clave);
+  bool tiene(String clave) => _cache.containsKey(clave) || _preferencias.contiene(clave);
 
   Future<void> guardar(String clave, String valor) async {
     if (!_keystoreListo) {
@@ -167,7 +167,7 @@ class AlmacenPin {
       _cache[clave] = valor;
       _cifrado = true;
       // Fuera del archivo en claro en cuanto ya está en el keystore.
-      await _preferencias.remove(clave);
+      await _preferencias.borrar(clave);
     } on MissingPluginException {
       await _soloPrefs(clave, valor);
     } on Exception {
@@ -179,7 +179,7 @@ class AlmacenPin {
 
   Future<void> _soloPrefs(String clave, String valor) async {
     _cifrado = false;
-    await _preferencias.setString(clave, valor);
+    await _preferencias.guardarTexto(clave, valor);
     // La caché se vacía de esa clave: si no, [leer] seguiría devolviendo la
     // huella vieja del keystore y el PIN recién creado no abriría hasta el
     // próximo arranque. La preferencia recién escrita es la que manda.
@@ -204,7 +204,7 @@ class AlmacenPin {
       }
     }
     _cache.remove(clave);
-    await _preferencias.remove(clave);
+    await _preferencias.borrar(clave);
     return true;
   }
 
@@ -237,7 +237,7 @@ class AlmacenPin {
     }
     _huellasEnSistema = false;
     for (final clave in clavesSecretas) {
-      await _preferencias.remove(clave);
+      await _preferencias.borrar(clave);
     }
     _cache.clear();
     return true;

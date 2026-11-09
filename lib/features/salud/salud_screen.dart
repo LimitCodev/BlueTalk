@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/calm_mode.dart';
+import '../../core/widgets/etiqueta_ajustada.dart';
 import '../../core/widgets/section_header.dart';
 import '../../data/models/models.dart';
 import '../ajustes/settings_controller.dart';
@@ -34,7 +35,7 @@ class SaludScreen extends ConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.only(bottom: 24),
             children: [
-              _DisclaimerBanner(textStyle: t.textTheme.bodySmall),
+              DisclaimerSaludBanner(textStyle: t.textTheme.bodySmall),
               const SectionHeader('¿Cómo te sientes hoy?'),
               const _CheckInEmocional(),
               const SectionHeader('Mis hábitos de hoy'),
@@ -100,8 +101,11 @@ class DisclaimerSaludBanner extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.health_and_safety_outlined,
-              color: AppColors.onWarning, size: 20),
+          const Icon(
+            Icons.health_and_safety_outlined,
+            color: AppColors.onWarning,
+            size: 20,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -113,16 +117,6 @@ class DisclaimerSaludBanner extends StatelessWidget {
       ),
     );
   }
-}
-
-class _DisclaimerBanner extends StatelessWidget {
-  const _DisclaimerBanner({required this.textStyle});
-
-  final TextStyle? textStyle;
-
-  @override
-  Widget build(BuildContext context) =>
-      DisclaimerSaludBanner(textStyle: textStyle);
 }
 
 /// Rejilla de emociones: tocar registra el check-in del día.
@@ -194,8 +188,9 @@ class _EmocionTile extends ConsumerWidget {
                 ? context.colores.primary.withValues(alpha: 0.35)
                 : Colors.transparent,
             border: Border.all(
-              color:
-                  seleccionada ? context.colores.primaryStrong : Colors.transparent,
+              color: seleccionada
+                  ? context.colores.primaryStrong
+                  : Colors.transparent,
               width: 2,
             ),
             borderRadius: BorderRadius.circular(16),
@@ -205,11 +200,7 @@ class _EmocionTile extends ConsumerWidget {
             children: [
               PictoMini(opcion.pictoId, size: 44),
               const SizedBox(height: 4),
-              Text(
-                opcion.label,
-                style: Theme.of(context).textTheme.bodySmall,
-                textAlign: TextAlign.center,
-              ),
+              EtiquetaAjustada(opcion.label),
             ],
           ),
         ),

@@ -8,7 +8,6 @@ import 'gate/gate_screen.dart';
 import 'legal/legal_controller.dart';
 import 'legal/legal_screen.dart';
 import 'padre_controller.dart';
-import 'permisos/permisos_asistente_screen.dart';
 import 'permisos/permisos_controller.dart';
 import 'salud_padre/salud_screen.dart';
 
@@ -61,9 +60,9 @@ class _PadreScreenState extends ConsumerState<PadreScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // Caché de permisos: si no se refresca, el panel admitiría un estado
-    // antiguo (visto en el emulador: revocar un permiso desde Android no
-    // desbloqueaba el paso). Se lee al entrar en la zona cada vez.
+    // Caché de permisos: el panel ya no depende de ellos, pero el
+    // asistente debe enseñar el estado real al abrirse. Se relee al entrar
+    // en la zona y al volver de una pantalla de Android.
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => mounted ? ref.invalidate(permisosProvider) : null,
     );
@@ -101,12 +100,9 @@ class _PadreScreenState extends ConsumerState<PadreScreen>
     final enSesion = aceptado && vista != PadreVista.gate;
     final indice = _destinos.indexWhere((destino) => destino.vista == vista);
 
-    // Asistente de permisos (encargo §3.2): mientras falte alguno de los
-    // que son obligatorios, el panel no se enseña. Un «no se pudo
-    // comprobar» no bloquea, para no dejar al adulto sin salida.
-    final faltanPermisos =
-        enSesion && (ref.watch(permisosProvider).value?.faltanRequeridos ??
-            false);
+    // P0-4 de Play: ningún permiso es obligatorio. Tras aceptar la legal,
+    // el panel se enseña siempre; los permisos se explican en Control y se
+    // conceden solo si el adulto quiere.
 
     // Fila 4 del plan 13 P1 (corregido tras la revisión de la etapa A): el
     // Atrás nunca mata el modo padre. Con una subpantalla empujada (p. ej.
@@ -144,16 +140,14 @@ class _PadreScreenState extends ConsumerState<PadreScreen>
             ),
           ],
         ),
-        body: faltanPermisos
-            ? const PermisosAsistenteScreen(comoPaso: true)
-            : switch (vista) {
-                PadreVista.legal => LegalScreen(onSalir: _salir),
-                PadreVista.gate => const GateScreen(),
-                PadreVista.resumen => const ResumenScreen(),
-                PadreVista.control => const ControlScreen(),
-                PadreVista.salud => const SaludPadreScreen(),
-              },
-        bottomNavigationBar: enSesion && !faltanPermisos
+        body: switch (vista) {
+          PadreVista.legal => LegalScreen(onSalir: _salir),
+          PadreVista.gate => const GateScreen(),
+          PadreVista.resumen => const ResumenScreen(),
+          PadreVista.control => const ControlScreen(),
+          PadreVista.salud => const SaludPadreScreen(),
+        },
+        bottomNavigationBar: enSesion
             ? NavigationBar(
                 selectedIndex: indice < 0 ? 0 : indice,
                 onDestinationSelected: (i) =>

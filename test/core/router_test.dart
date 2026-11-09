@@ -11,11 +11,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bluetalk/app/app.dart';
 import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/app/router.dart';
+import 'package:bluetalk/app/atras_shell.dart';
 import 'package:bluetalk/app/shell.dart';
 import 'package:bluetalk/core/theme/calm_mode.dart';
 import 'package:bluetalk/data/local/mock_repos.dart';
 import 'package:bluetalk/data/local/seed_store.dart';
 import 'package:bluetalk/data/models/models.dart';
+import 'package:bluetalk/features/comunicador/comunicador_controller.dart';
 import 'package:bluetalk/features/comunicador/comunicador_screen.dart';
 import 'package:bluetalk/features/comunicador/tts_service.dart';
 import 'package:bluetalk/features/juegos/artista/artista_screen.dart';
@@ -380,6 +382,41 @@ void main() {
     );
   });
 
+  testWidgets('Atrás dentro de una categoría vuelve al tablero y no sale', (
+    tester,
+  ) async {
+    final prefs = await _givenPrefs();
+    final container = await _pumpApp(
+      tester,
+      prefs,
+      profile: const ChildProfile(id: 'local', nickname: 'Sol'),
+    );
+    final llamadas = <MethodCall>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        llamadas.add(call);
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
+
+    final comunicador = container.read(comunicadorProvider.notifier);
+    comunicador.openCategory('emociones');
+    await tester.pumpAndSettle();
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+
+    expect(container.read(comunicadorProvider).categoryId, isNull);
+    expect(llamadas.any((c) => c.method == 'SystemNavigator.pop'), isFalse);
+  });
+
   testWidgets('P1 fila 4: Atrás en la zona de padre: subpantalla al panel, '
       'panel a Ajustes', (tester) async {
     final prefs = await _givenPrefs();
@@ -475,18 +512,15 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(privacidad);
     await tester.pumpAndSettle();
-    expect(
-      find.text('Este contenido estará disponible en una versión futura.'),
-      findsOneWidget,
-    );
+    expect(find.text('1. Responsable del tratamiento'), findsOneWidget);
 
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
 
     expect(
-      find.text('Este contenido estará disponible en una versión futura.'),
+      find.text('1. Responsable del tratamiento'),
       findsNothing,
-      reason: 'el diálogo se cierra',
+      reason: 'Atrás cierra la política',
     );
     expect(
       find.text('Zona de adultos'),

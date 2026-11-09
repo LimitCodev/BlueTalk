@@ -107,6 +107,18 @@ anotadas aquí como constancia.
   porque es la única que filtra el navegador y las apps a la vez sin enviar
   datos a un servidor.
 
+## Administrador de dispositivo (resuelto 2026-11-08)
+
+- El dueño eligió **quitarlo** (P0-3 de `requisitosPlayStore.md`). Play
+  prohíbe usar el administrador para bloquear la desinstalación.
+- Se eliminaron `ProteccionReceiver`, `ProteccionChannel`,
+  `device_admin.xml`, el canal `bluetalk/proteccion`, la tile de Control y
+  la entrada del asistente de permisos.
+- La app se desinstala como cualquier otra. Si más adelante se quiere una
+  barrera, la alternativa permitida es el **anclaje de pantalla** de
+  Android, que el adulto activa y puede salir con el gesto del sistema; no
+  está implementado.
+
 ## Cribado/evaluación de TEA con software (solicitud del dueño, 2026-10-19)
 
 - Llegó un texto proponiendo incorporar detección de TEA (M-CHAT-R/F,
@@ -127,3 +139,28 @@ anotadas aquí como constancia.
   real: **no se inventa ninguno**.
 - Pregunta: ¿qué correo de soporte quiere publicar (y crearlo si no
   existe)? La pantalla de FAQ queda pendiente de esa respuesta.
+
+## Ruta de Play (resuelto 2026-11-08)
+
+El dueño eligió la **ruta A**: la edición `play` no lleva VPN, acceso al uso ni
+`INTERNET`. El filtro y el monitoreo siguen en la edición `directa`. Detalle en
+`docs/informes/p0-2-ruta-a.md`.
+
+## Freemium y AWS (abierto el 2026-11-07)
+
+Decidido por el dueño: modelo freemium; AWS solo fuera de la app
+(opciones 1–3 de `docs/infra/aws-freemium.md`); la app sigue sin red en la v1.
+
+Falta decidir:
+
+- **Producto de Play:** compra única (recomendado) o suscripción, y precio.
+- **Dependencia `in_app_purchase`** para conectar Play Billing (§5 del doc).
+- **Reproductor de MP3:** canal nativo propio (sin dependencia, recomendado)
+  o `audioplayers`.
+- **Voz premium de la v1:** escuchar Lupe, Pedro, Mia, Andrés, Lucia y
+  Sergio, y elegir una para incluirla en el APK.
+- **Cuenta de AWS:** quién la crea, con MFA, y qué correo recibe la alarma
+  de gasto.
+- **Correo e identidad legal reales:** `scripts/aws/publicar_legal.sh` se
+  niega a publicar mientras quede `demo@bluetalk.app`.
+

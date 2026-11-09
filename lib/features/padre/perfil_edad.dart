@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bluetalk/core/almacen/almacen_local.dart';
 
 import '../../app/di.dart';
 import 'filtro_web/filtro_web_controller.dart' show filtroWebProvider;
@@ -94,8 +94,8 @@ enum PerfilEdad {
 
   static const clavePref = 'padre_perfil_edad';
 
-  static PerfilEdad desdePrefs(SharedPreferences prefs) =>
-      desdeNombre(prefs.getString(clavePref));
+  static PerfilEdad desdePrefs(AlmacenLocal prefs) =>
+      desdeNombre(prefs.texto(clavePref));
 
   static PerfilEdad desdeNombre(String? nombre) => values.firstWhere(
         (perfil) => perfil.name == nombre,
@@ -105,15 +105,15 @@ enum PerfilEdad {
 
 class PerfilEdadController extends Notifier<PerfilEdad> {
   @override
-  PerfilEdad build() => PerfilEdad.desdePrefs(ref.read(sharedPreferencesProvider));
+  PerfilEdad build() => PerfilEdad.desdePrefs(ref.read(almacenLocalProvider));
 
   /// Elige el perfil. Además ajusta los grupos del filtro de páginas a los
   /// de esa edad; el adulto puede volver a cambiarlos después.
   Future<void> elegir(PerfilEdad perfil) async {
     state = perfil;
     await ref
-        .read(sharedPreferencesProvider)
-        .setString(PerfilEdad.clavePref, perfil.name);
+        .read(almacenLocalProvider)
+        .guardarTexto(PerfilEdad.clavePref, perfil.name);
     if (perfil.bloquearJuegos != null) {
       await ref
           .read(filtroWebProvider.notifier)

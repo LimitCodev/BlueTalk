@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:bluetalk/core/almacen/almacen_local.dart';
 import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/comunicador/tts_service.dart';
 import 'package:bluetalk/features/padre/control/control_parental.dart';
@@ -199,6 +200,8 @@ void main() {
       300,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.ensureVisible(find.text('Cambiar código'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Cambiar código'));
     await tester.pumpAndSettle();
     expect(find.text('Cambia el código'), findsOneWidget);
@@ -242,7 +245,7 @@ void main() {
     // FakeAsync de testWidgets, vía `runAsync` (plan 12 §0.2).
     final resultado = await tester.runAsync(
       () =>
-          PinStore(prefs, almacen: AlmacenPin(prefs: prefs), ahora: () => ahoraFija)
+          PinStore(AlmacenPrefs(prefs), almacen: AlmacenPin(prefs: AlmacenPrefs(prefs)), ahora: () => ahoraFija)
               .verificar('111111'),
     );
     expect(resultado, VerificacionPin.correcto);
@@ -374,7 +377,7 @@ void main() {
     tester,
   ) async {
     final prefs = await prefsDePrueba();
-    final almacen = AlmacenPin(prefs: prefs, sistema: KeystorePrueba());
+    final almacen = AlmacenPin(prefs: AlmacenPrefs(prefs), sistema: KeystorePrueba());
     await almacen.cargar();
 
     await pumpPadre(
@@ -405,7 +408,7 @@ void main() {
   ) async {
     final prefs = await prefsDePrueba();
     final almacen = AlmacenPin(
-      prefs: prefs,
+      prefs: AlmacenPrefs(prefs),
       sistema: KeystorePrueba(conKeystore: false),
     );
     await almacen.cargar();
@@ -430,5 +433,29 @@ void main() {
       reason: 'un respaldo sin cifrar no puede pasar desapercibido',
     );
     expect(find.textContaining('Cifrado por este teléfono'), findsNothing);
+  });
+
+  testWidgets('el horario se edita desde Control y Volver regresa', (
+    tester,
+  ) async {
+    final prefs = await prefsDePrueba();
+    await pumpPadre(
+      tester,
+      home: const Scaffold(body: ControlScreen()),
+      overrides: overridesDePadre(prefs),
+    );
+
+    final tile = find.widgetWithText(ListTile, 'Editar horario');
+    await tester.scrollUntilVisible(tile, 200);
+    await tester.ensureVisible(tile);
+    await tester.pumpAndSettle();
+    await tester.tap(tile);
+    await tester.pumpAndSettle();
+    expect(find.text('Nueva hora'), findsOneWidget);
+
+    await tester.tap(find.text('Volver'));
+    await tester.pumpAndSettle();
+    expect(find.text('Nueva hora'), findsNothing);
+    expect(tile, findsOneWidget);
   });
 }

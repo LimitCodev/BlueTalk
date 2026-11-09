@@ -1,19 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/theme/calm_mode.dart';
 import '../core/widgets/logo_bluetalk.dart';
-import '../features/juegos/juegos_controller.dart';
-
-/// Si el botón Atrás puede salir de la app desde Comunicar (fila 3 del
-/// plan 13 P1).
-///
-/// `true` por defecto. El plan 12 (modo niño/kiosko) lo pondrá en `false`
-/// para que el niño no pueda salir de BlueTalk con el botón Atrás
-/// (plan 13 P1, gancho «saleConAtras»).
-final saleConAtrasProvider = Provider<bool>((ref) => true);
+import 'atras_shell.dart';
 
 /// Shell fijo con navegación inferior predecible (plan 01 §4):
 /// Comunicar · Aprender · Rutinas · Ajustes.
@@ -50,22 +41,7 @@ class AppShell extends ConsumerWidget {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        // Fila 1: dentro de un juego, el Atrás vuelve a la lista de Aprender
-        // (y cierra la sesión de juego con su duración, plan 03 §6).
-        if (index == 1 && ref.read(juegosProvider) != JuegoVista.inicio) {
-          ref.read(juegosProvider.notifier).irAlInicio();
-          return;
-        }
-        // Fila 2: de Aprender, Rutinas o Ajustes, el Atrás va a Comunicar.
-        if (index != 0) {
-          shell.goBranch(0);
-          return;
-        }
-        // Fila 3: en Comunicar el Atrás sale de la app… salvo en kiosko.
-        if (ref.read(saleConAtrasProvider)) {
-          SystemNavigator.pop();
-        }
+        if (!didPop) manejarAtras(ref, shell);
       },
       child: Scaffold(
         appBar: AppBar(

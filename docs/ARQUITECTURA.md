@@ -39,6 +39,42 @@ APK Android (MVP) construido en Flutter, con persistencia local offline-first en
 | **Modo calma** | Guías de diseño para autismo: baja sobrecarga sensorial, control del usuario sobre color/movimiento | Paleta fija sin control |
 | **Rendimiento** | Impeller (por defecto), imágenes con `cacheWidth`, trabajos pesados en isolates, AAB con split-per-abi | Precarga SkSL (obsoleto), deferred components (no compensa) |
 
+## Capas y puertas del core (desde 2026-11-07)
+
+Cada feature pide lo que necesita a **una sola puerta** del core; ninguna habla
+por su cuenta con el sistema. Así un cambio de soporte (cifrado, otra base de
+datos, Play Billing) se hace en un sitio y las pantallas no se enteran.
+
+```text
+features/<x>/  pantalla → controlador (Riverpod) → gateway / repositorio
+                                                     │
+core/almacen/     AlmacenLocal  ← almacenLocalProvider (única puerta a SharedPreferences)
+core/plataforma/  CanalNativo   ← única puerta a MethodChannel (null = sin canal, nunca excepción)
+core/premium/     plan, Funcion, FuenteDerechos, TiendaCompras ← puedeUsarProvider
+data/local/       un archivo por repositorio; mock_repos.dart solo reexporta
+app/di.dart       raíz de composición: el único sitio que elige implementaciones
+```
+
+| Regla | Quién la hace cumplir |
+|---|---|
+| Solo `core/almacen`, `data/local` y la raíz de composición importan `shared_preferences` | `test/arquitectura/capas_test.dart` |
+| Solo `core/plataforma` crea `MethodChannel` | `test/arquitectura/capas_test.dart` |
+| Ningún archivo de `lib/` nuevo pasa de 100 líneas; los viejos solo encogen | `test/arquitectura/tamano_test.dart` (trinquete) |
+| Comunicar nunca es premium | `lib/core/premium/plan.dart` (catálogo `Funcion`) |
+
+Cómo partir un archivo grande sin romper nada:
+
+1. Separar por responsabilidad: un widget o una sección por archivo, con
+   prefijo de su feature (`comunicador_buscador.dart`).
+2. Los widgets privados que cruzan archivos pasan a públicos con `super.key`.
+3. Lógica repetida → bucle o función (`_tras` en la barra de Artista), no copias.
+4. `flutter analyze` y `flutter test` en verde; bajar o borrar la entrada en
+   `_deuda` de `tamano_test.dart`. Un commit por archivo partido.
+
+El límite de 100 líneas es una guía para detectar «archivos Dios», no un fin.
+Los archivos de **datos** (textos legales, paleta de colores) pueden quedarse
+en la deuda si partirlos solo reparte texto.
+
 ## Paleta celeste pastel
 
 Tokens en `lib/core/theme/` (contraste AA verificado por test):

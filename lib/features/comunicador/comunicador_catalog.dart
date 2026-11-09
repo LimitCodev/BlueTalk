@@ -7,7 +7,7 @@ import '../padre/perfil_edad.dart';
 
 /// Catálogo completo del comunicador: categorías + todos sus pictogramas.
 ///
-/// Cabe entero en memoria (muestra actual: 42 pictos) y se cachea en un
+/// Cabe entero en memoria (unos 240 pictos) y se cachea en un
 /// único FutureProvider, así el grid, el buscador y los favoritos leen de
 /// aquí sin repetir cargas de assets.
 class Catalog {
@@ -23,6 +23,12 @@ class Catalog {
     final lists = await Future.wait([
       for (final category in categories) repo.pictogramsOf(category.id),
     ]);
+    // El tablero nuclear es memoria motora: su orden sale solo de `order`.
+    for (var i = 0; i < categories.length; i++) {
+      if (categories[i].nuclear) {
+        lists[i].sort((a, b) => a.order!.compareTo(b.order!));
+      }
+    }
     return Catalog(
       categories: categories,
       pictograms: [for (final list in lists) ...list],
@@ -45,7 +51,8 @@ class Catalog {
 /// Si la persona adulta eligió un perfil de edad (fase 3b), se ocultan las
 /// categorías que no son de esa edad. Se **ocultan**, no se borran: los
 /// pictogramas guardados en una frase o en favoritos siguen resolviéndose
-/// con normalidad.
+/// con normalidad. El tablero nuclear nunca se oculta: comunicar no depende
+/// de la edad.
 final catalogProvider = FutureProvider<Catalog>((ref) async {
   final catalogo = await Catalog.load(ref.watch(pictogramRepoProvider));
   final perfil = ref.watch(perfilEdadProvider);
@@ -53,7 +60,7 @@ final catalogProvider = FutureProvider<Catalog>((ref) async {
   return Catalog(
     categories: [
       for (final categoria in catalogo.categories)
-        if (perfil.seVe(categoria.id)) categoria,
+        if (categoria.nuclear || perfil.seVe(categoria.id)) categoria,
     ],
     pictograms: catalogo.pictograms,
   );
