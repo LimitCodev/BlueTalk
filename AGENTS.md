@@ -84,7 +84,9 @@ flutter analyze
 flutter test
 flutter test test/rutinas/ --plain-name "texto del test"
 flutter build apk --debug
-flutter build apk --release --split-per-abi   # tras la Fase 3 (firma)
+flutter build apk --debug --flavor directa    # con filtro VPN y acceso al uso
+scripts/build-aab.sh                          # Play, fuera del sandbox (firma)
+scripts/build-apk.sh                          # APK directo firmado
 ```
 
 ## Al terminar TODO

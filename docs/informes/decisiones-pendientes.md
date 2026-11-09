@@ -140,6 +140,12 @@ anotadas aquí como constancia.
 - Pregunta: ¿qué correo de soporte quiere publicar (y crearlo si no
   existe)? La pantalla de FAQ queda pendiente de esa respuesta.
 
+## Ruta de Play (resuelto 2026-11-08)
+
+El dueño eligió la **ruta A**: la edición `play` no lleva VPN, acceso al uso ni
+`INTERNET`. El filtro y el monitoreo siguen en la edición `directa`. Detalle en
+`docs/informes/p0-2-ruta-a.md`.
+
 ## Freemium y AWS (abierto el 2026-11-07)
 
 Decidido por el dueño: modelo freemium; AWS solo fuera de la app

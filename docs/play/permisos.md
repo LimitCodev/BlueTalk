@@ -1,5 +1,12 @@
 # Permisos de Android y su justificación (plan 11 §0.1.7 y plan 14)
 
+> **Edición Play (ruta A, 2026-11-08):** el manifiesto de release solo declara
+> `RECEIVE_BOOT_COMPLETED`, `POST_NOTIFICATIONS`, `VIBRATE`, `USE_BIOMETRIC` y
+> `USE_FINGERPRINT`, más el permiso interno
+> `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`. Sin VPN, sin acceso al uso, sin
+> servicio en primer plano y sin `INTERNET`. Las tablas siguientes con esos
+> permisos describen solo la edición `directa` (APK fuera de Play).
+
 Cada permiso que declara la app en
 `android/app/src/main/AndroidManifest.xml`, para qué existe y dónde lo
 experimenta el usuario. `flutter_local_notifications` trae en su propio
