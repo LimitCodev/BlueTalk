@@ -36,10 +36,15 @@ class PictoGrid extends ConsumerWidget {
 
     final favorites = ref.watch(favoritesProvider);
 
+    // Columnas según el lado corto: al girar el teléfono cada palabra sigue
+    // en su sitio, y la memoria motora no se pierde (plan 11 §2.1).
+    final columnas =
+        ((MediaQuery.sizeOf(context).shortestSide - 16) / 136).ceil();
+
     return GridView.builder(
       padding: const EdgeInsets.all(12),
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 128,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: columnas,
         // 112 desbordaba con etiquetas de 2 líneas (52 de icono + 6 +
         // 2×22 de texto = 102 > 100 útiles tras el padding). 120 deja
         // margen también con el textScaler del sistema.
