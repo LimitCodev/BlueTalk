@@ -20,14 +20,23 @@ dejan fuera a propósito hasta que un caso concreto los justifique.
 
 ### Números de referencia (verificados el 7-nov-2026, cambian)
 
-- Polly neural: 16 USD por millón de caracteres; 1 M/mes gratis los 12
-  primeros meses. 400 palabras × ~8 letras × 6 voces ≈ 19.200 caracteres ≈
-  **0,31 USD**, una sola vez. El vocabulario actual (42 palabras) cuesta ~0,004 USD.
+- Polly neural: 16 USD por millón de caracteres (revisado el 8-nov-2026: una
+  página de AWS muestra también 19,20; confirmar antes de pagar). 400 palabras
+  × ~8 letras × 6 voces ≈ 19.200 caracteres ≈ **0,31 USD**, una sola vez. El
+  vocabulario actual (239 entradas, unos 1.450 caracteres) cuesta ~0,02 USD por voz.
+- **Cuentas creadas desde el 15-jul-2025:** ya no hay 12 meses gratis. Reciben
+  100 USD de crédito (hasta 200 con actividades) y eligen plan gratuito o de
+  pago. El **plan gratuito se cierra a los 6 meses** o al agotar los créditos,
+  lo que ocurra antes. La URL de la política debe seguir viva mientras la app
+  esté en Play: **hay que pasar a plan de pago antes de los 6 meses**. El coste
+  esperado sigue siendo de céntimos al mes.
 - Polly permite guardar y reproducir el audio generado sin coste adicional
   (FAQ de Polly). **Pendiente:** leer la sección de Polly en los AWS Service
   Terms antes de publicar, para confirmar la redistribución dentro de la app.
-- CloudFront: nivel gratuito permanente de 1 TB de transferencia y 10 M de
-  peticiones al mes. 10.000 descargas de un paquete de 5 MB son 50 GB, dentro de ese nivel.
+- CloudFront: nivel gratuito de 1 TB de transferencia y 10 M de peticiones al
+  mes. La mayoría de fuentes lo dan como permanente, pero alguna lo limita a 12
+  meses: **confirmar en la página de precios de AWS**. 10.000 descargas de un
+  paquete de 5 MB son 50 GB, dentro de ese nivel.
 
 ## 2. Qué es gratis y qué es premium
 
