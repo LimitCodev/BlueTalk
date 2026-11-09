@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/etiqueta_ajustada.dart';
 import '../../../data/models/models.dart';
 import '../avance_juegos.dart';
 import '../juegos_catalog.dart';
@@ -17,12 +18,11 @@ class MemoriaScreen extends ConsumerWidget {
     final estado = ref.watch(memoriaProvider);
 
     return switch (estado) {
-      AsyncData(:final value) => value.enTablero
-          ? _Tablero(estado: value)
-          : _SelectorNiveles(desbloqueado: value.desbloqueado),
-      AsyncError() => const Center(
-          child: Text('No se pudo cargar el juego.'),
-        ),
+      AsyncData(:final value) =>
+        value.enTablero
+            ? _Tablero(estado: value)
+            : _SelectorNiveles(desbloqueado: value.desbloqueado),
+      AsyncError() => const Center(child: Text('No se pudo cargar el juego.')),
       _ => const Center(child: CircularProgressIndicator()),
     };
   }
@@ -123,8 +123,10 @@ class _Tablero extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
           child: Row(
             children: [
-              Text('Nivel $nivel',
-                  style: Theme.of(context).textTheme.titleSmall),
+              Text(
+                'Nivel $nivel',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
               const Spacer(),
               Text(
                 'Parejas: ${estado.descubiertas.length ~/ 2} de ${estado.parejas}',
@@ -195,8 +197,8 @@ class _Ficha extends ConsumerWidget {
             color: descubierta || fallida
                 ? colorFondo
                 : levantada
-                    ? context.colores.surface
-                    : context.colores.primary.withValues(alpha: 0.35),
+                ? context.colores.surface
+                : context.colores.primary.withValues(alpha: 0.35),
             border: Border.all(color: colorBorde, width: 3),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -218,19 +220,11 @@ class _Ficha extends ConsumerWidget {
                       height: 52,
                       fit: BoxFit.contain,
                       // Sin spinner animado: solo un espacio neutro al cargar.
-                      placeholderBuilder: (context) => const SizedBox(
-                        width: 52,
-                        height: 52,
-                      ),
+                      placeholderBuilder: (context) =>
+                          const SizedBox(width: 52, height: 52),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      picto.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
+                    EtiquetaAjustada(picto.label),
                   ],
                 ),
         ),

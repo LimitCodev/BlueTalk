@@ -23,7 +23,7 @@ const _deuda = <String, int>{
   'lib/features/juegos/cuentos/cuentos_controller.dart': 288,
   'lib/features/juegos/juegos_screen.dart': 142,
   'lib/features/juegos/memoria/memoria_controller.dart': 194,
-  'lib/features/juegos/memoria/memoria_screen.dart': 298,
+  'lib/features/juegos/memoria/memoria_screen.dart': 292,
   'lib/features/onboarding/onboarding_screen.dart': 144,
   'lib/features/padre/control/cambiar_codigo.dart': 146,
   'lib/features/padre/control/control_parental.dart': 159,
@@ -61,7 +61,7 @@ const _deuda = <String, int>{
   'lib/features/rutinas/rutinas_providers.dart': 188,
   'lib/features/rutinas/rutinas_screen.dart': 107,
   'lib/features/salud/salud_providers.dart': 122,
-  'lib/features/salud/salud_screen.dart': 276,
+  'lib/features/salud/salud_screen.dart': 267,
 };
 
 void main() {

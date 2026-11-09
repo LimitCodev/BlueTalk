@@ -50,7 +50,7 @@ class TtsSection extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'La voz se activará en una próxima versión.',
+            'La voz suena solo cuando tocas un pictograma o una frase.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),

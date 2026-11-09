@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/core/theme/calm_mode.dart';
@@ -39,6 +42,43 @@ void main() {
     expect(find.text('Hoy te sientes: Triste'), findsOneWidget);
   });
 
+  testWidgets('las etiquetas de emoción caben en un teléfono estrecho', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(320, 640));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await prefsDePrueba();
+    final container = ProviderContainer(
+      overrides: overridesDeRutinas(prefs).cast(),
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: DefaultAssetBundle(
+          bundle: DiskAssetBundle(),
+          child: const MaterialApp(home: Scaffold(body: SaludScreen())),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    for (final label in [
+      'Triste',
+      'Enojado',
+      'Preocupado',
+      'Asustado',
+      'Feliz',
+    ]) {
+      final texto = tester.widget<Text>(find.text(label));
+      expect(texto.maxLines, 1, reason: label);
+    }
+  });
+
   testWidgets('el check-in persiste al volver a entrar', (tester) async {
     await pumpRutinas(tester);
     await abrirSalud(tester);
@@ -51,8 +91,7 @@ void main() {
     expect(find.text('Hoy te sientes: Enojado'), findsOneWidget);
   });
 
-  testWidgets('los hábitos se marcan y desmarcan y persisten',
-      (tester) async {
+  testWidgets('los hábitos se marcan y desmarcan y persisten', (tester) async {
     final container = await pumpRutinas(tester);
     await abrirSalud(tester);
 
@@ -67,10 +106,7 @@ void main() {
     // Desmarcar vuelve a false (persiste como hecho=false).
     await tester.tap(find.text('Tomar agua'));
     await tester.pumpAndSettle();
-    expect(
-      (await container.read(habitosHoyProvider.future)).isEmpty,
-      isTrue,
-    );
+    expect((await container.read(habitosHoyProvider.future)).isEmpty, isTrue);
 
     await tester.tap(find.text('Moverme un rato'));
     await tester.pumpAndSettle();
@@ -88,8 +124,11 @@ void main() {
     await abrirSalud(tester);
 
     // Queda bajo el pliegue del ListView: se desplaza antes de tocar.
-    await tester.scrollUntilVisible(find.text('Modo calma'), 240);
-    await tester.tap(find.text('Modo calma'));
+    final toggle = find.byType(SwitchListTile);
+    await tester.scrollUntilVisible(toggle, 240);
+    await tester.ensureVisible(toggle);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(Switch));
     await tester.pumpAndSettle();
     expect(container.read(calmModeProvider), isTrue);
   });
@@ -106,9 +145,6 @@ void main() {
 
   test('opciones de emoción usan los 5 moods del semilla', () {
     expect(opcionesEmocion, hasLength(5));
-    expect(
-      opcionesEmocion.map((e) => e.mood).toSet(),
-      {1, 2, 3, 4, 5},
-    );
+    expect(opcionesEmocion.map((e) => e.mood).toSet(), {1, 2, 3, 4, 5});
   });
 }
