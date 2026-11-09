@@ -32,6 +32,11 @@ consultas dirigidas a su propio DNS (`10.111.222.1` y su equivalente IPv6) y
 no enruta el resto del tráfico. El consentimiento de VPN lo concede el adulto
 con el diálogo propio de Android.
 
+El administrador de dispositivo se retiró el **2026-11-08** (P0-3 de
+`requisitosPlayStore.md`): la app no declara `BIND_DEVICE_ADMIN`, no tiene
+`DeviceAdminReceiver` y se desinstala como cualquier otra. El PIN del adulto
+protege el panel, no impide desinstalar.
+
 Para Google Play hay que declarar el uso de `VpnService` en Play Console y
 completar la sección de seguridad de datos. La app no vende ni comparte datos;
 las consultas DNS permitidas salen al servidor de la red, no a un servidor del

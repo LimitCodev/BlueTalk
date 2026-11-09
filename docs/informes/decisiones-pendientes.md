@@ -107,6 +107,18 @@ anotadas aquí como constancia.
   porque es la única que filtra el navegador y las apps a la vez sin enviar
   datos a un servidor.
 
+## Administrador de dispositivo (resuelto 2026-11-08)
+
+- El dueño eligió **quitarlo** (P0-3 de `requisitosPlayStore.md`). Play
+  prohíbe usar el administrador para bloquear la desinstalación.
+- Se eliminaron `ProteccionReceiver`, `ProteccionChannel`,
+  `device_admin.xml`, el canal `bluetalk/proteccion`, la tile de Control y
+  la entrada del asistente de permisos.
+- La app se desinstala como cualquier otra. Si más adelante se quiere una
+  barrera, la alternativa permitida es el **anclaje de pantalla** de
+  Android, que el adulto activa y puede salir con el gesto del sistema; no
+  está implementado.
+
 ## Cribado/evaluación de TEA con software (solicitud del dueño, 2026-10-19)
 
 - Llegó un texto proponiendo incorporar detección de TEA (M-CHAT-R/F,

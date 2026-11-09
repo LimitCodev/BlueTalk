@@ -15,7 +15,6 @@ import '../monitoreo/uso_telefono_screen.dart';
 import '../padre_controller.dart';
 import '../perfil_edad.dart';
 import '../permisos/permisos_asistente_screen.dart';
-import '../proteccion/proteccion_tile.dart';
 import 'cambiar_codigo.dart';
 import 'control_parental.dart';
 import 'perfil_edad_dialogo.dart';
@@ -130,7 +129,6 @@ class ControlScreen extends ConsumerWidget {
           ),
         ),
         const SectionHeader('Permisos del teléfono'),
-        const ProteccionTile(),
         ListTile(
           leading: const Icon(Icons.rule_outlined),
           title: const Text('Revisar los permisos'),

@@ -53,8 +53,9 @@ puede ser obligatorio para entrar.
 
 Pruebas nuevas o reescritas:
 
-- Con **todos** los permisos denegados (avisos, uso y administrador), el
-  panel abre y muestra «Uso del día».
+- Con **todos** los permisos denegados (avisos, uso y batería), el panel
+  abre y muestra «Uso del día». (El administrador se retiró después, en
+  P0-3.)
 - Con el **filtro activo y la VPN denegada**, el panel también abre; la
   VPN queda como permiso pendiente sin cerrar nada.
 - Revocar un permiso fuera de la app y volver **no** cierra el panel.

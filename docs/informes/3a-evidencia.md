@@ -6,6 +6,12 @@ Contenido de la fase: PIN cifrado en el keystore, bloqueo de desinstalación
 (`DeviceAdminReceiver`) y asistente de permisos que no deja entrar en el panel
 si falta un permiso obligatorio.
 
+> **Actualización 2026-11-08:** el administrador de dispositivo descrito en
+> esta fase se retiró por P0-3 de `requisitosPlayStore.md` (Play prohíbe
+> usarlo para bloquear la desinstalación). Ver
+> `docs/informes/p0-3-admin-fuera.md`. El resto de la evidencia sigue siendo
+> histórica y válida para lo que se probó en su momento.
+
 ## Commits
 
 | Commit | Qué |
@@ -143,12 +149,10 @@ se volvió a pasar la suite completa (334/334):
 - **Keystore dañado (lee, no escribe o no borra).** El caso está cubierto
   con dobles: se deja de usar, el borrado se niega y se avisa en pantalla.
   No se ha provocado en un teléfono real, así que no está probado ahí.
-- **Fricción real de desinstalación.** El `DeviceAdminReceiver` pide
-  **cero políticas** (`<uses-policies />` vacío en `res/xml/device_admin.xml`):
-  es fricción, no un muro. Que Android ofrezca o no «desactivar la
-  administración» con PIN lo decide el fabricante, y en un teléfono con
-  administrador de dispositivo corporativo puede no activarse nunca. No se ha
-  probado en un teléfono físico.
+- **Fricción real de desinstalación (ya no aplica).** El
+  `DeviceAdminReceiver` pide **cero políticas** (`<uses-policies />` vacío en
+  `res/xml/device_admin.xml`): era fricción, no un muro. Se retiró en P0-3
+  (2026-11-08), así que esta comprobación queda como histórica.
 - **Batería.** El asistente abre `Settings.ACTION_IGNORE_BATTERY_OPTIMIZATIONS_SETTINGS`
   (verificado con `javap` contra `~/android-sdk/platforms/android-36/android.jar`),
   que es una pantalla de ajustes y **el dueño puede ignorarla**. No es la

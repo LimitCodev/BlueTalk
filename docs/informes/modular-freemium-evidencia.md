@@ -17,6 +17,12 @@ Deuda que queda: **53 archivos** por encima de 100 líneas (lista en
 ni la protección: la auditoría de Play recomienda sacarlos de la v1, y
 partirlos ahora podría ser trabajo perdido.
 
+> **Actualización 2026-11-08:** la protección contra desinstalación
+> (administrador de dispositivo) ya se retiró por P0-3 de
+> `requisitosPlayStore.md`; ver `docs/informes/p0-3-admin-fuera.md`. El
+> filtro web y el monitoreo siguen esperando la decisión de la ruta A/B de
+> P0-2.
+
 **NO VERIFICADO:**
 
 - Ningún comando real de AWS; la plantilla no pasó `cfn-lint` ni

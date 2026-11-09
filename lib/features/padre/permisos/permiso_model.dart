@@ -14,9 +14,6 @@ enum PermisoId {
 
   /// Consentimiento de VPN del filtro de páginas (`VpnService`).
   vpn,
-
-  /// Administrador del dispositivo, contra la desinstalación.
-  administrador,
 }
 
 /// Cómo está un permiso según Android.

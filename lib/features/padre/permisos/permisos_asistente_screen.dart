@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/section_header.dart';
 import '../filtro_web/filtro_web_controller.dart';
 import '../monitoreo/uso_telefono_controller.dart';
-import '../proteccion/proteccion_controller.dart';
 import 'permiso_model.dart';
 import 'permisos_controller.dart';
 
@@ -54,8 +53,6 @@ class _PermisosAsistenteScreenState
         await ref.read(usoTelefonoGatewayProvider).abrirAjustes();
       case PermisoId.vpn:
         await ref.read(filtroWebGatewayProvider).abrirAjustesVpn();
-      case PermisoId.administrador:
-        await ref.read(proteccionGatewayProvider).pedirActivacion();
     }
     ref.invalidate(permisosProvider);
   }

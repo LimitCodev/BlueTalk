@@ -7,14 +7,12 @@ import io.flutter.embedding.engine.FlutterEngine
 class MainActivity : FlutterActivity() {
     private var filtroWeb: FiltroWebChannel? = null
     private var usoTelefono: UsoTelefonoChannel? = null
-    private var proteccion: ProteccionChannel? = null
     private var permisos: PermisosChannel? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         filtroWeb = FiltroWebChannel(this, flutterEngine.dartExecutor.binaryMessenger)
         usoTelefono = UsoTelefonoChannel(this, flutterEngine.dartExecutor.binaryMessenger)
-        proteccion = ProteccionChannel(this, flutterEngine.dartExecutor.binaryMessenger)
         permisos = PermisosChannel(this, flutterEngine.dartExecutor.binaryMessenger)
     }
 
@@ -28,8 +26,6 @@ class MainActivity : FlutterActivity() {
         filtroWeb = null
         usoTelefono?.dispose()
         usoTelefono = null
-        proteccion?.dispose()
-        proteccion = null
         permisos?.dispose()
         permisos = null
         super.onDestroy()

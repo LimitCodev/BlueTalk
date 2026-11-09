@@ -5,8 +5,8 @@ import 'permiso_model.dart';
 /// Acceso nativo a los dos permisos que no tienen puente propio:
 /// avisos del horario y exclusión de optimización de batería.
 ///
-/// El resto («Acceso al uso», VPN y administrador del dispositivo) ya
-/// tienen su gateway y se consultan desde el controlador.
+/// El resto («Acceso al uso» y VPN) ya tienen su gateway y se consultan
+/// desde el controlador.
 abstract interface class PermisosGateway {
   Future<EstadoPermiso> estadoAvisos();
 

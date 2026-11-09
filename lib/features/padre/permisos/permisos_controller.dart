@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../filtro_web/filtro_web_controller.dart';
 import '../monitoreo/uso_telefono_controller.dart';
-import '../proteccion/proteccion_controller.dart';
 import 'permiso_model.dart';
 import 'permisos_gateway.dart';
 
@@ -13,7 +12,7 @@ final permisosGatewayProvider = Provider<PermisosGateway>(
 
 /// Diagnóstico de todos los permisos, leído de Android de una vez.
 ///
-/// Las cinco consultas corren en paralelo y nunca lanzan: una que falle
+/// Las cuatro consultas corren en paralelo y nunca lanzan: una que falle
 /// deja su permiso como [EstadoPermiso.desconocido]. Ningún permiso de esta
 /// lista es obligatorio (P0-4 de Play): el comunicador y el panel del
 /// adulto funcionan sin concederlos; el asistente solo los explica.
@@ -21,7 +20,6 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
   final avisos = ref.watch(permisosGatewayProvider);
   final uso = ref.watch(usoTelefonoGatewayProvider);
   final filtro = ref.watch(filtroWebGatewayProvider);
-  final admin = ref.watch(proteccionGatewayProvider);
   final filtroActivo = ref.watch(filtroWebProvider).activo;
 
   // Disparadas todas antes de esperar: que no se serialicen.
@@ -29,9 +27,6 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
   final bateriaP = avisos.estadoBateria();
   final usoP = uso.estadoPermiso();
   final vpnP = filtro.estado();
-  final adminP = admin.estado();
-
-  final adminActual = await adminP;
 
   // El canal de la VPN se dispara siempre, pero **solo se espera** si el
   // filtro está encendido: sin filtro no hay nada que pedir, y esperarlo
@@ -81,22 +76,6 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
       queNoLee:
           'No se lee el nivel ni el consumo de batería, ni el de otras apps.',
       estado: await bateriaP,
-      requerido: false,
-    ),
-    PermisoPadre(
-      id: PermisoId.administrador,
-      titulo: 'Administrador del dispositivo',
-      paraQueSirve:
-          'Para que desinstalar BlueTalk exija antes pasar por una '
-          'pantalla de Android.',
-      queNoLee:
-          'BlueTalk no cambia la configuración del teléfono, no bloquea '
-          'otras apps y no borra nada.',
-      estado: adminActual.comprobado
-          ? (adminActual.activo
-              ? EstadoPermiso.concedido
-              : EstadoPermiso.pendiente)
-          : EstadoPermiso.desconocido,
       requerido: false,
     ),
     // La VPN solo se necesita si el filtro está encendido: mientras no lo

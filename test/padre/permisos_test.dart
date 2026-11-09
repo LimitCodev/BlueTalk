@@ -17,8 +17,6 @@ import 'package:bluetalk/features/padre/filtro_web/filtro_web_controller.dart';
 import 'package:bluetalk/features/padre/filtro_web/filtro_web_gateway.dart';
 import 'package:bluetalk/features/padre/filtro_web/filtro_web_model.dart';
 import 'package:bluetalk/features/padre/padre_screen.dart';
-import 'package:bluetalk/features/padre/proteccion/proteccion_controller.dart';
-import 'package:bluetalk/features/padre/proteccion/proteccion_gateway.dart';
 
 import '../core/accessibility_helper.dart';
 import 'harness.dart';
@@ -85,42 +83,17 @@ class _UsoFalso implements UsoTelefonoGateway {
       ResumenUso.sinPermiso(desde, hasta);
 }
 
-/// Administrador del dispositivo con el estado fijado por el test.
-class _AdminFalso implements ProteccionGateway {
-  _AdminFalso(this.activo);
-
-  bool activo;
-  int activaciones = 0;
-
-  @override
-  Future<ProteccionEstado> estado() async => ProteccionEstado(activo: activo);
-
-  @override
-  Future<bool> pedirActivacion() async {
-    activaciones++;
-    activo = true;
-    return true;
-  }
-
-  @override
-  Future<void> desactivar() async {
-    activo = false;
-  }
-}
-
 /// Los gateways del asistente que no son de permisos, decididos por el test.
 /// El de permisos vive en [overridesDePadre] (o en [_fuentes]) para no
 /// declarar la misma doble dos veces en el mismo contenedor.
 List<Object> _gateways({
   bool usoConcedido = true,
   EstadoPermiso? usoEstado,
-  bool adminActivo = true,
 }) =>
     [
       usoTelefonoGatewayProvider.overrideWithValue(
         _UsoFalso(usoConcedido, estado: usoEstado),
       ),
-      proteccionGatewayProvider.overrideWithValue(_AdminFalso(adminActivo)),
     ];
 
 /// [_gateways] más las preferencias y el canal de permisos: sin ellas
@@ -131,16 +104,11 @@ List<Object> _fuentes(
   PermisosGateway? permisos,
   bool usoConcedido = true,
   EstadoPermiso? usoEstado,
-  bool adminActivo = true,
 }) =>
     [
       sharedPreferencesProvider.overrideWithValue(prefs),
       permisosGatewayProvider.overrideWithValue(permisos ?? _PermisosFalsos()),
-      ..._gateways(
-        usoConcedido: usoConcedido,
-        usoEstado: usoEstado,
-        adminActivo: adminActivo,
-      ),
+      ..._gateways(usoConcedido: usoConcedido, usoEstado: usoEstado),
     ];
 
 /// Filtro con el estado que fije el test: sirve para emular el canal
@@ -188,7 +156,6 @@ Future<PermisosEstado> _diagnostico({required FiltroWebEstado filtro}) async {
         ),
       ),
       usoTelefonoGatewayProvider.overrideWithValue(_UsoFalso(true)),
-      proteccionGatewayProvider.overrideWithValue(_AdminFalso(true)),
       filtroWebGatewayProvider.overrideWithValue(_FiltroFalso(filtro)),
     ],
   );
@@ -214,8 +181,8 @@ void main() {
 
       const soloOpcional = PermisosEstado([
         PermisoPadre(
-          id: PermisoId.administrador,
-          titulo: 'Admin',
+          id: PermisoId.bateria,
+          titulo: 'Batería',
           paraQueSirve: 'x',
           queNoLee: 'y',
           estado: EstadoPermiso.pendiente,
@@ -263,7 +230,6 @@ void main() {
       PermisosGateway? permisos,
       bool usoConcedido = true,
       EstadoPermiso? usoEstado,
-      bool adminActivo = true,
     }) async {
       final prefs = await prefsDePrueba();
       await tester.pumpWidget(
@@ -273,7 +239,6 @@ void main() {
             permisos: permisos,
             usoConcedido: usoConcedido,
             usoEstado: usoEstado,
-            adminActivo: adminActivo,
           ).cast(),
           child: const MaterialApp(
             home: PermisosAsistenteScreen(),
@@ -344,7 +309,6 @@ void main() {
           avisos: EstadoPermiso.pendiente,
           bateria: EstadoPermiso.concedido,
         ),
-        adminActivo: false,
       );
 
       expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
@@ -438,7 +402,7 @@ void main() {
         home: PadreScreen(onSalir: () {}),
         overrides: [
           ...overridesDePadre(prefs, permisos: _PermisosFalsos()),
-          ..._gateways(usoConcedido: false, adminActivo: false),
+          ..._gateways(usoConcedido: false),
         ],
       );
 
@@ -468,7 +432,7 @@ void main() {
         home: PadreScreen(onSalir: () {}),
         overrides: [
           ...overridesDePadre(prefs, permisos: _PermisosFalsos()),
-          ..._gateways(usoConcedido: false, adminActivo: false),
+          ..._gateways(usoConcedido: false),
           filtroWebGatewayProvider.overrideWithValue(
             _FiltroFalso(
               const FiltroWebEstado(activo: true, comprobado: true),
@@ -577,7 +541,6 @@ void main() {
           sharedPreferencesProvider.overrideWithValue(prefs),
           permisosGatewayProvider.overrideWithValue(_PermisosFalsos()),
           usoTelefonoGatewayProvider.overrideWithValue(_UsoFalso(false)),
-          proteccionGatewayProvider.overrideWithValue(_AdminFalso(false)),
           filtroWebGatewayProvider.overrideWithValue(
             _FiltroFalso(
               const FiltroWebEstado(activo: true, comprobado: true),

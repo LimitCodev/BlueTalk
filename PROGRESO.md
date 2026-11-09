@@ -7,6 +7,13 @@ Reglas de recursos (§0) aplicadas desde el commit `d28df52`:
 `systemd-run --user --scope -p CPUQuota=400% -p MemoryMax=6G nice -n 10
 taskset -c 0-3`.
 
+> **Actualización 2026-11-08:** el administrador de dispositivo
+> (`DeviceAdminReceiver`) se retiró por **P0-3** de
+> `requisitosPlayStore.md`; Play prohíbe usarlo para bloquear la
+> desinstalación. Donde este documento diga que falta el administrador o
+> que la desinstalación está bloqueada, describe el estado anterior y ya
+> no aplica. Ver `docs/informes/p0-3-admin-fuera.md`.
+
 ---
 
 ## FASE 1 — Auditoría de lo que ya existe (cerrada)
@@ -74,7 +81,7 @@ un test (`test/padre/uso_telefono_test.dart`). Ya corregidos, ver "Cierre".
 | Subtarea | Estado |
 |---|---|
 | 3.1 PIN 4–6 dígitos en `EncryptedSharedPreferences` | **Parcial**: PIN con PBKDF2-HMAC-SHA256 + sal y bloqueo escalonado tras 5 fallos, pero guardado en `SharedPreferences`, no en `EncryptedSharedPreferences` |
-| 3.1 "El niño no puede desinstalar la app" | **No hecho**: falta `DeviceAdminReceiver` |
+| 3.1 "El niño no puede desinstalar la app" | **Descartado (P0-3, 2026-11-08)**: se retiró el `DeviceAdminReceiver`; Play prohíbe bloquear la desinstalación |
 | 3.2 Asistente de permisos (onboarding del padre) | **No hecho**: solo 2 `ListTile` en Control; faltan AccessibilityService, superposición, DeviceAdmin, batería y avisos |
 | 3.3 Filtro DNS con lista blanca/negra | **Hecho** |
 | 3.3 SafeSearch forzado (Google/Bing/DuckDuckGo) | **No hecho** |
@@ -327,7 +334,11 @@ mueve y que el PIN en claro no aparece en ningún almacén).
 usan un keystore falso; en el emulador API 28 haría falta una pasada de
 verificación. Queda para la Fase 3c, que ya pide emulador.
 
-### 3a.2 Desinstalación bloqueada (hecho, `5bb784d`)
+### 3a.2 Desinstalación bloqueada (hecho, `5bb784d`; retirado en P0-3)
+
+> **Retirado 2026-11-08:** el receptor, el canal nativo, el XML y la tile
+> se eliminaron por P0-3 de `requisitosPlayStore.md`. Lo que sigue es la
+> descripción histórica de lo que hubo.
 
 `ProteccionChannel.kt` + `ProteccionReceiver` + `res/xml/device_admin.xml`.
 El receiver **no pide ninguna política** (`<uses-policies />` vacío): es
@@ -373,9 +384,9 @@ aporta una doble inofensiva por defecto y el parámetro `permisos:`.
 terminar · `uptime` tras la suite (1 min subió a 6,75 → esperado; 2,30 antes
 de compilar). Detalle en `docs/informes/3a-evidencia.md`.
 
-**NO VERIFICADO:** keystore real (doble en tests), fricción de desinstalación
-en teléfono físico, exención de batería (el dueño puede ignorarla; la app
-funciona sin ella).
+**NO VERIFICADO:** keystore real (doble en tests), exención de batería (el
+dueño puede ignorarla; la app funciona sin ella). La fricción de
+desinstalación ya no aplica: se retiró en P0-3.
 
 **Pendiente sin decidir:** `docs/plan/14-filtro-web.md` no existe y el código
 lo cita en comentarios: o se escribe o se quitan las citas.

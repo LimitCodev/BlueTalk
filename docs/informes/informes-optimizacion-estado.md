@@ -38,5 +38,5 @@ Rama `feat/modular-freemium-aws` (sin push ni merge). Última suite completa:
    - Hábitos (`WellbeingRepo.habits`) en el mensual.
    - Comparación de categorías con el periodo anterior.
    - Recordar cada semana que hay un informe nuevo (aviso local, sin red).
-4. **Partir archivos de la deuda** (53, en `test/arquitectura/tamano_test.dart`). Primero `pin_store`, `gate_screen`, `editor_horario_view` y `memoria_screen`. El filtro web, el monitoreo y la protección esperan la decisión de la ruta A de Play.
+4. **Partir archivos de la deuda** (53, en `test/arquitectura/tamano_test.dart`). Primero `pin_store`, `gate_screen`, `editor_horario_view` y `memoria_screen`. El filtro web y el monitoreo esperan la decisión de la ruta A de Play; la protección contra desinstalación ya se retiró (P0-3, 2026-11-08).
 5. **Cuando la máquina esté libre**: `scripts/build-apk.sh`, probar Informes en el teléfono y medir el tamaño del APK.
