@@ -4,6 +4,13 @@
 de AWS conectada ni se ha llamado a ningún servicio. La app **no** habla con
 AWS en ningún momento.
 
+## 0. Qué hace falta para el piloto
+
+**Nada de AWS.** La app no usa la red. El piloto y la prueba cerrada solo
+necesitan una URL pública con la política de privacidad, y sirve cualquier
+alojamiento estable. AWS hace falta únicamente para las voces de Polly y para
+servir esa página desde CloudFront, si se elige esa opción. Los pasos están en §4.
+
 ## 1. Idea central: AWS trabaja antes de compilar, no mientras el niño usa la app
 
 | Pieza | Qué hace | Cuándo corre | Coste esperado |
