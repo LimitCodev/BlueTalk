@@ -146,6 +146,20 @@ El dueño eligió la **ruta A**: la edición `play` no lleva VPN, acceso al uso 
 `INTERNET`. El filtro y el monitoreo siguen en la edición `directa`. Detalle en
 `docs/informes/p0-2-ruta-a.md`.
 
+## BLOQUEADO: Atrás en una categoría del Comunicador (2026-11-09)
+
+En el emulador (release `play`, API 28), Atrás dentro de una categoría cierra la
+app en vez de volver al tablero. El commit `9f8acae` dice arreglarlo: su prueba
+de widget pasa, pero **en el emulador el defecto sigue**.
+
+- Un `PopScope` en `ComunicadorScreen` tampoco lo arregla en el emulador.
+- Quitar `SystemNavigator.pop()` de `manejarAtras` no evita el cierre desde el
+  inicio de Comunicar: esa salida no viene del manejador del shell. Es probable
+  que `saleConAtrasProvider = false` (kiosko) tampoco funcione en un teléfono.
+- `handlePopRoute()` en `flutter test` no reproduce el fallo: las pruebas P1 no
+  demuestran este caso.
+- Atrás desde Rutinas sí vuelve a Comunicar. Causa aún sin identificar.
+
 ## Freemium y AWS (abierto el 2026-11-07)
 
 Decidido por el dueño: modelo freemium; AWS solo fuera de la app
