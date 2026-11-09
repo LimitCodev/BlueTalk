@@ -11,7 +11,6 @@ const limite = 100;
 
 const _deuda = <String, int>{
   'lib/app/router.dart': 101,
-  'lib/app/shell.dart': 111,
   'lib/core/theme/app_colors.dart': 339,
   'lib/core/theme/app_theme.dart': 213,
   'lib/core/widgets/logo_bluetalk.dart': 136,
