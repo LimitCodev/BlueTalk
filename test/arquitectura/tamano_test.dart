@@ -60,7 +60,7 @@ const _deuda = <String, int>{
   'lib/features/rutinas/recordatorios/recordatorio_scheduler_real.dart': 175,
   'lib/features/rutinas/recordatorios/recordatorios_controller.dart': 141,
   'lib/features/rutinas/rutinas_providers.dart': 188,
-  'lib/features/rutinas/rutinas_screen.dart': 162,
+  'lib/features/rutinas/rutinas_screen.dart': 107,
   'lib/features/salud/salud_providers.dart': 122,
   'lib/features/salud/salud_screen.dart': 276,
 };

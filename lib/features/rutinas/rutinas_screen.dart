@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/theme/app_colors.dart';
 import '../padre/control/control_parental.dart';
 import '../padre/control/juegos_gate.dart';
 import 'estadisticas_view.dart';
 import 'horario_view.dart';
+import 'primero_luego_view.dart';
 import 'rutinas_controller.dart';
+import 'seccion_card.dart';
 import '../entorno/entorno_screen.dart';
 import '../salud/salud_screen.dart';
 
@@ -26,6 +27,7 @@ class RutinasScreen extends ConsumerWidget {
     return switch (vista) {
       RutinaVista.inicio => const _HomeView(),
       RutinaVista.horario => const HorarioView(),
+      RutinaVista.primeroLuego => const PrimeroLuegoView(),
       RutinaVista.bienestar => const SaludScreen(),
       RutinaVista.colegio => const _VistaColegio(),
       RutinaVista.estadisticas => const EstadisticasView(),
@@ -68,25 +70,31 @@ class _HomeView extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: 16),
       children: const [
         BannerSiguienteActividad(),
-        _SeccionCard(
+        SeccionCard(
           vista: RutinaVista.horario,
           icono: Icons.schedule,
           titulo: 'Mi horario',
           subtitulo: 'Mira tus actividades de hoy y márcalas como hechas.',
         ),
-        _SeccionCard(
+        SeccionCard(
+          vista: RutinaVista.primeroLuego,
+          icono: Icons.looks_two_outlined,
+          titulo: 'Primero y luego',
+          subtitulo: 'Mira qué haces ahora y qué haces después.',
+        ),
+        SeccionCard(
           vista: RutinaVista.bienestar,
           icono: Icons.favorite_outline,
           titulo: 'Mi día',
           subtitulo: 'Elige cómo te sientes y revisa tus hábitos.',
         ),
-        _SeccionCard(
+        SeccionCard(
           vista: RutinaVista.colegio,
           icono: Icons.school_outlined,
           titulo: 'Mi colegio',
           subtitulo: 'Datos de mi escuela (demostración) y mi llegada.',
         ),
-        _SeccionCard(
+        SeccionCard(
           vista: RutinaVista.estadisticas,
           icono: Icons.bar_chart,
           titulo: 'Mis estadísticas',
@@ -94,69 +102,6 @@ class _HomeView extends ConsumerWidget {
         ),
         DiaHoySection(),
       ],
-    );
-  }
-}
-
-/// Tarjeta de una sección: targets ≥48dp, literal, sin metáforas.
-class _SeccionCard extends ConsumerWidget {
-  const _SeccionCard({
-    required this.vista,
-    required this.icono,
-    required this.titulo,
-    required this.subtitulo,
-  });
-
-  final RutinaVista vista;
-  final IconData icono;
-  final String titulo;
-  final String subtitulo;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
-      margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => ref.read(rutinasProvider.notifier).abrir(vista),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 72),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: context.colores.primary.withValues(alpha: 0.35),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(icono, color: context.colores.primaryStrong),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        titulo,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitulo,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

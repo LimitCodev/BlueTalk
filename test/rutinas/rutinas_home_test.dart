@@ -10,10 +10,11 @@ import '../core/accessibility_helper.dart';
 import 'harness.dart';
 
 void main() {
-  testWidgets('el inicio muestra las cuatro secciones', (tester) async {
+  testWidgets('el inicio muestra las cinco secciones', (tester) async {
     await pumpRutinas(tester);
 
     expect(find.text('Mi horario'), findsOneWidget);
+    expect(find.text('Primero y luego'), findsOneWidget);
     expect(find.text('Mi día'), findsOneWidget);
     expect(find.text('Mi colegio'), findsOneWidget);
     expect(find.text('Mis estadísticas'), findsOneWidget);
