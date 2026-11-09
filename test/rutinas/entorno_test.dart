@@ -13,25 +13,15 @@ Future<void> abrirEntorno(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('la pantalla muestra el colegio ficticio y el aviso de demo',
+  testWidgets('no enseña colegio, coordinadora ni correo inventados',
       (tester) async {
     await pumpRutinas(tester);
     await abrirEntorno(tester);
 
-    expect(find.text('Colegio Demostración Norte'), findsOneWidget);
-    expect(
-      find.text('Datos de demostración. Esta información no es real.'),
-      findsOneWidget,
-    );
-    expect(find.text('Aula de ejemplo — grupo azul'), findsOneWidget);
-  });
-
-  testWidgets('el contacto es el correo demo', (tester) async {
-    await pumpRutinas(tester);
-    await abrirEntorno(tester);
-
-    expect(find.text('Coordinadora: Sra. Ejemplo'), findsOneWidget);
-    expect(find.text('demo@bluetalk.app'), findsOneWidget);
+    expect(find.textContaining('Demostración'), findsNothing);
+    expect(find.textContaining('demostración'), findsNothing);
+    expect(find.textContaining('Ejemplo'), findsNothing);
+    expect(find.text('demo@bluetalk.app'), findsNothing);
   });
 
   testWidgets('la guía de llegada muestra sus pasos', (tester) async {

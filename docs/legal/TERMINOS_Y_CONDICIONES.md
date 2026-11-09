@@ -23,7 +23,6 @@ BlueTalk se encuentra en una fase de versión preliminar (MVP) de prueba. Durant
 - Todos los datos que produce la app se guardan en el almacenamiento local del teléfono y no se envían a servidores del desarrollador.
 - Los pictogramas, cuentos, actividades de horario y ejemplos incluidos son contenido de demostración incluido con fines de prueba; no representan casos clínicos ni recomendaciones particulares.
 - No se ofrecen pagos, suscripciones ni funciones premium. Cualquier versión futura con pago se anunciará por separado y requerirá aceptación expresa de condiciones adicionales.
-- Ciertas métricas de la zona de adultos se etiquetan como «Datos de demostración» mientras no exista sincronización con un servicio en la nube.
 
 ## 4. Uso por menores de edad y consentimiento parental
 

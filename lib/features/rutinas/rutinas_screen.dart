@@ -92,7 +92,7 @@ class _HomeView extends ConsumerWidget {
           vista: RutinaVista.colegio,
           icono: Icons.school_outlined,
           titulo: 'Mi colegio',
-          subtitulo: 'Datos de mi escuela (demostración) y mi llegada.',
+          subtitulo: 'Mira cómo es mi llegada al colegio.',
         ),
         SeccionCard(
           vista: RutinaVista.estadisticas,

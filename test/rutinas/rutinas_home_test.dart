@@ -36,7 +36,7 @@ void main() {
 
     await tester.tap(find.text('Mi colegio'));
     await tester.pumpAndSettle();
-    expect(find.text('Colegio Demostración Norte'), findsOneWidget);
+    expect(find.text('Mi llegada al colegio'), findsOneWidget);
 
     await tester.tap(find.text('Volver'));
     await tester.pumpAndSettle();

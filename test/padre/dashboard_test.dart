@@ -21,7 +21,7 @@ Future<void> _hasta(WidgetTester tester, Finder finder) async {
 
 void main() {
   testWidgets(
-      'el resumen muestra el banner de demostración y sus métricas locales',
+      'el resumen muestra sus métricas locales sin banner de demostración',
       (tester) async {
     final prefs = await prefsDePrueba();
     final reloj = RelojPrueba();
@@ -67,7 +67,7 @@ void main() {
       overrides: overridesDePadre(prefs, reloj: reloj),
     );
 
-    expect(find.text('Datos de demostración'), findsOneWidget);
+    expect(find.text('Datos de demostración'), findsNothing);
     expect(find.text('Pictogramas tocados hoy'), findsOneWidget);
     expect(find.text('Tiempo de juego hoy'), findsOneWidget);
     expect(find.text('5 min'), findsOneWidget);
@@ -126,7 +126,7 @@ void main() {
       overrides: overridesDePadre(prefs),
     );
 
-    expect(find.text('Datos de demostración'), findsOneWidget);
+    expect(find.text('Datos de demostración'), findsNothing);
     await _hasta(tester, find.text(disclaimerObservaciones));
     expect(
       find.text(

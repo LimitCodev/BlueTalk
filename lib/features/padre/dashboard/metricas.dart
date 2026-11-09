@@ -6,8 +6,7 @@ import '../reloj.dart';
 /// Métricas locales de uso para el dashboard del padre (plan 05 §2).
 ///
 /// Se calculan sobre `UsageRepo` (cap 200 eventos), `GameProgressRepo`,
-/// `ScheduleRepo` y `WellbeingRepo`: todo local, sin red. Se muestran con el
-/// banner «Datos de demostración» hasta que exista sync real con Supabase.
+/// `ScheduleRepo` y `WellbeingRepo`: todo local, sin red.
 class Metricas {
   const Metricas({
     required this.pictosHoy,

@@ -8,12 +8,11 @@ import '../../../core/widgets/section_header.dart';
 import '../diagnostico/observaciones.dart';
 import '../reloj.dart';
 import '../informes/informes_screen.dart';
-import 'banner_demo.dart';
 import 'barras.dart';
 import 'metricas.dart';
 import 'uso_telefono_resumen.dart';
 
-/// Resumen del padre: banner de demostración, métricas locales y
+/// Resumen del padre: métricas locales y
 /// observaciones con disclaimer (plan 05 §2–§3).
 class ResumenScreen extends ConsumerWidget {
   const ResumenScreen({super.key});
@@ -25,7 +24,6 @@ class ResumenScreen extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.only(bottom: 32),
       children: [
-        const BannerDemo(),
         const AccesoInformes(),
         switch (metricas) {
           AsyncData(:final value) => _Cuerpo(metricas: value),
@@ -156,8 +154,7 @@ class _Cuerpo extends StatelessWidget {
         const Padding(
           padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
           child: Text(
-            'Los datos se guardan solo en este teléfono y se muestran como '
-            'demostración mientras no haya sincronización real.',
+            'Los datos se guardan solo en este teléfono.',
             style: TextStyle(fontSize: 13),
           ),
         ),
