@@ -32,27 +32,38 @@ class _PasosState extends ConsumerState<PasosPrimeroLuego> {
   @override
   Widget build(BuildContext context) {
     final luego = widget.luego;
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
+    // «Listo» fuera de la lista: en un teléfono pequeño siempre se ve.
+    return Column(
       children: [
-        _Tarjeta(rotulo: 'Primero', entry: widget.primero),
-        const SizedBox(height: 8),
-        if (luego != null)
-          _Tarjeta(rotulo: 'Luego', entry: luego)
-        else
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              'Es la última actividad de hoy.',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+            children: [
+              _Tarjeta(rotulo: 'Primero', entry: widget.primero),
+              const SizedBox(height: 8),
+              if (luego != null)
+                _Tarjeta(rotulo: 'Luego', entry: luego)
+              else
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    'Es la última actividad de hoy.',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+            ],
           ),
-        const SizedBox(height: 16),
-        FilledButton(
-          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(64)),
-          onPressed: _ocupado ? null : _listo,
-          child: const Text('Listo'),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: FilledButton(
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(64),
+            ),
+            onPressed: _ocupado ? null : _listo,
+            child: const Text('Listo'),
+          ),
         ),
       ],
     );
@@ -71,12 +82,12 @@ class _Tarjeta extends StatelessWidget {
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           children: [
             Text(rotulo, style: t.titleMedium),
             const SizedBox(height: 8),
-            PictoMini(entry.pictoId, size: 120, semanticsLabel: entry.title),
+            PictoMini(entry.pictoId, size: 88, semanticsLabel: entry.title),
             const SizedBox(height: 8),
             Text(entry.title, textAlign: TextAlign.center, style: t.titleLarge),
             Text(formatHora(entry.timeMinutes), style: t.bodyMedium),

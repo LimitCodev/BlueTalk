@@ -1,8 +1,8 @@
 # Etapa C — evidencia (plan 11 §2.1, 2026-11-08)
 
-Rama `feat/modular-freemium-aws`. Solo se cerró §2.1 (vocabulario y tablero
-nuclear). Primero–Luego (§2.2), fotos propias (§2.3) y copia de seguridad
-(§2.4) siguen sin hacer.
+Rama `feat/modular-freemium-aws`. Cerrados §2.1 (vocabulario y tablero nuclear)
+y §2.2 (Primero–Luego). Fotos propias (§2.3) y copia de seguridad (§2.4) siguen
+sin hacer: necesitan dependencias que el dueño debe aprobar.
 
 ## Qué cambió
 
@@ -35,7 +35,7 @@ nuclear). Primero–Luego (§2.2), fotos propias (§2.3) y copia de seguridad
 ## Verificado
 
 - `flutter analyze`: sin problemas.
-- `flutter test`: 388 pasan, 1 falla. La falla es `tamano_test`, por
+- `flutter test`: 401 pasan, 1 falla. La falla es `tamano_test`, por
   `memoria_screen.dart` y `salud_screen.dart`, cambios sin commit de P0-6 que no
   forman parte de esta etapa.
 - `test/data/seed_integrity_test.dart`: ids, assets, presupuesto, lectura de
@@ -48,10 +48,21 @@ El plan pide SVG de 20 KB como máximo. El test permite 32 KB porque `eat`,
 `play`, `family` (ya existentes), abuelos, tíos, `salad` y `drive` no bajan sin
 perder detalle.
 
+## Emulador (2026-11-08, AVD API 28, 1 GB, edición `play` en debug)
+
+- Tablero nuclear: abre y muestra los símbolos con su color.
+- Al girar a horizontal siguen las 3 columnas: Yo, Tú y Él en la misma fila.
+- Primero–Luego: «Listo» avanza a la actividad siguiente. Se encontró el botón
+  casi oculto en pantalla de 5"; ahora va fijo abajo y se ve entero.
+- Mi colegio sin datos ficticios. Resumen del adulto sin banner de demostración.
+- La versión legal 1.2.0 se vuelve a pedir; PIN nuevo de 6 dígitos funciona.
+- Editar horario abre desde Control y «Volver» regresa. El niño no ve el botón.
+- Control no menciona filtro, VPN ni uso del teléfono.
+
 ## NO VERIFICADO
 
-- Tablero en emulador o teléfono: no se compiló porque había otro Gradle activo
-  en la máquina compartida. Tampoco se midió el desplazamiento.
+- Tablero en teléfono físico y medición de fotogramas al desplazar.
+- Voz real en español y recordatorios con la pantalla apagada.
 - Los iconos propios y las etiquetas no los ha revisado un terapeuta ni una
   familia.
 - Revisión del `revisor` de esta etapa: pendiente.
