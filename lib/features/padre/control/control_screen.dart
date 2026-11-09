@@ -135,7 +135,7 @@ class ControlScreen extends ConsumerWidget {
           leading: const Icon(Icons.rule_outlined),
           title: const Text('Revisar los permisos'),
           subtitle: const Text(
-            'Qué pide BlueTalk, para qué sirve y qué no lee.',
+            'Qué pide y qué no lee. Puedes continuar sin concederlos.',
           ),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => Navigator.of(context).push<void>(

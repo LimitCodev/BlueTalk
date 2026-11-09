@@ -14,9 +14,9 @@ final permisosGatewayProvider = Provider<PermisosGateway>(
 /// Diagnóstico de todos los permisos, leído de Android de una vez.
 ///
 /// Las cinco consultas corren en paralelo y nunca lanzan: una que falle
-/// deja su permiso como [EstadoPermiso.desconocido], y los desconocidos
-/// **no bloquean** (`PermisosEstado.faltanRequeridos`), porque cerrar el
-/// paso por un fallo de consulta dejaría a la persona adulta sin salida.
+/// deja su permiso como [EstadoPermiso.desconocido]. Ningún permiso de esta
+/// lista es obligatorio (P0-4 de Play): el comunicador y el panel del
+/// adulto funcionan sin concederlos; el asistente solo los explica.
 final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
   final avisos = ref.watch(permisosGatewayProvider);
   final uso = ref.watch(usoTelefonoGatewayProvider);
@@ -56,7 +56,7 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
           'BlueTalk no lee los avisos de otras apps. Solo avisa de las '
           'actividades del horario, a la hora que tú pusiste.',
       estado: await avisosP,
-      requerido: true,
+      requerido: false,
     ),
     PermisoPadre(
       id: PermisoId.uso,
@@ -70,7 +70,7 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
       // bloquea. Bloquear con un fallo de consulta dejaría al adulto sin
       // salida, porque «pedir» devuelve lo mismo que ya falló.
       estado: await usoP,
-      requerido: true,
+      requerido: false,
     ),
     PermisoPadre(
       id: PermisoId.bateria,
@@ -111,7 +111,7 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
             'El tráfico no pasa por servidores de BlueTalk: la app solo '
             'comprueba nombres de dominio en el propio teléfono.',
         estado: estadoVpn ?? EstadoPermiso.desconocido,
-        requerido: true,
+        requerido: false,
       ),
   ];
 

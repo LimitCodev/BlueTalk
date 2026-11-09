@@ -31,7 +31,7 @@ Rama `feat/modular-freemium-aws` (sin push ni merge). Última suite completa:
 2. **Decisiones del dueño** (no hacer sin respuesta):
    - Dev-dependencia `vector_graphics_compiler` (ya está en `pubspec.lock`): precompilar los SVG de pictogramas para no parsear XML en cada arranque. Es la mejora de rendimiento más clara en gama baja.
    - Migrar `SharedPreferences` (API legacy, en camino a deprecarse) a `SharedPreferencesWithCache` con `migrateLegacySharedPreferencesToSharedPreferencesAsyncIfNecessary`. Solo cambia `lib/core/almacen/` y `lib/data/local/`. Hay riesgo de datos: requiere test de migración.
-   - P0-4 de Play: el asistente obliga a dar permisos antes de abrir el panel. Era un encargo del dueño; Play lo considera coercitivo.
+   - ~~P0-4 de Play: el asistente obliga a dar permisos antes de abrir el panel.~~ **HECHO (2026-11-08):** permisos opcionales, panel accesible y botón «Continuar sin estos permisos». Evidencia en `docs/informes/p0-4-permisos-opcionales.md`.
    - Texto legal: añadir que los informes se calculan en el teléfono y que compartirlos lo decide la persona adulta. Sube `versionLegal` y pide aceptar de nuevo.
    - Exportar el informe a PDF: necesita los paquetes `pdf` y `share_plus`, o un canal nativo.
 3. **Informes**:
