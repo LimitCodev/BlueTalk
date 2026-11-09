@@ -1,6 +1,6 @@
 # P0-4 — Permisos opcionales y panel accesible (2026-11-08)
 
-Rama `feat/modular-freemium-aws`. Base `c71687d`.
+Rama `feat/modular-freemium-aws`. Base `cde55bd`.
 
 ## Qué se corrigió
 
@@ -15,7 +15,7 @@ puede ser obligatorio para entrar.
 | `PadreScreen` cambiaba el panel por el asistente si faltaba un «requerido» | El panel se muestra siempre tras aceptar la legal |
 | El asistente decía «Todavía no se puede avanzar» en rojo | Tarjeta neutra: «Ninguno de estos permisos es obligatorio» |
 | No había salida explícita | Botón persistente «Continuar sin estos permisos» |
-| El acceso a la política dependía del PIN | Ya estaba resuelto en `103aa3f`: Ajustes › Legal abre los textos sin PIN |
+| El acceso a la política dependía del PIN | Ya estaba resuelto en `d095c03`: Ajustes › Legal abre los textos sin PIN |
 
 ## Archivos tocados
 

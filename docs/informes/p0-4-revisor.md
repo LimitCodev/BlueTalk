@@ -2,7 +2,7 @@
 
 Veredicto: **CORRECCIONES** — sin BLOQUEANTE ni GRAVE; 5 MENOR y 4 SUGERENCIA.
 
-Alcance: cambios **sin commitear** sobre `c71687d` en `feat/modular-freemium-aws`.
+Alcance: cambios **sin commitear** sobre `cde55bd` en `feat/modular-freemium-aws`.
 No hay commits de la entrega que revisar: no se puede verificar la convención
 de mensajes ni «1 cambio por commit». El dueño debe commitear, e incluir la
 evidencia `docs/informes/p0-4-permisos-opcionales.md`, que está sin trackear.

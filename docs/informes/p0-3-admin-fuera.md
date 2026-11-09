@@ -1,6 +1,6 @@
 # P0-3 — Administrador de dispositivo fuera de la app (2026-11-08)
 
-Rama `feat/modular-freemium-aws`. Base `c6ca23b`.
+Rama `feat/modular-freemium-aws`. Base `41cfcc5`.
 
 ## Qué se corrigió
 

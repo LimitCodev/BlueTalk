@@ -1,6 +1,6 @@
 # Informe — P0-3 (administrador de dispositivo) — 2026-11-08
 
-Rama `feat/modular-freemium-aws`, base `c6ca23b`, cambios **sin commitear**.
+Rama `feat/modular-freemium-aws`, base `41cfcc5`, cambios **sin commitear**.
 Objetivo: retirar el `DeviceAdminReceiver` por la política de Play (opción A).
 
 Veredicto: **CORRECCIONES** (0 bloqueantes, 0 graves, 3 menores, 2 sugerencias)
@@ -18,7 +18,7 @@ Veredicto: **CORRECCIONES** (0 bloqueantes, 0 graves, 3 menores, 2 sugerencias)
 | `pubspec.yaml` / `pubspec.lock` | Sin cambios |
 | Texto de IA / `Co-Authored-By` en el diff | No aparece |
 | `print()` / `TODO` / `FIXME` en lo tocado | No aparece |
-| `git log c6ca23b..HEAD` | 0 commits: no hay mensaje que auditar; todo está en el árbol de trabajo |
+| `git log 41cfcc5..HEAD` | 0 commits: no hay mensaje que auditar; todo está en el árbol de trabajo |
 
 El código de la retirada está completo: no quedan referencias en `lib/`, `test/`, `android/` ni en los textos de la app. El manifiesto fuente y el APK debug no declaran el administrador.
 
@@ -46,6 +46,6 @@ El código de la retirada está completo: no quedan referencias en `lib/`, `test
 
 ## Commits
 
-No hay commits en la entrega (`c6ca23b..HEAD` vacío), así que no se puede auditar mensaje, granularidad ni texto de IA. Al commitear, usar un `FIX:` coherente (p. ej. `FIX: retira el administrador de dispositivo por Play`) y no mezclar con otros cambios.
+No hay commits en la entrega (`41cfcc5..HEAD` vacío), así que no se puede auditar mensaje, granularidad ni texto de IA. Al commitear, usar un `FIX:` coherente (p. ej. `FIX: retira el administrador de dispositivo por Play`) y no mezclar con otros cambios.
 
 Untracked del módulo que deben entrar en el commit: `test/arquitectura/manifiesto_test.dart` y `docs/informes/p0-3-admin-fuera.md`. No mezclar las capturas `docs/informes/capturas/3b-*.png` ni `requisitosPlayStore.md`, que no son de P0-3.

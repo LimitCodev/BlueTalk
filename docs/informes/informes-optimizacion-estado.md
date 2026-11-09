@@ -8,16 +8,16 @@ Rama `feat/modular-freemium-aws` (sin push ni merge). Última suite completa:
 
 | Commit | Qué |
 |---|---|
-| `2b85485` | FIX: desmarcar una actividad sumaba como hecha en el panel (test: sin arreglo da 3, con arreglo 1) |
-| `2058077` | Resumen diario por mes (`lib/features/padre/informes/`): decorador de `UsageRepo`, 13 meses, siembra única |
-| `ac815a7` | Copia diaria del uso de otras apps: Android borra el detalle a los 10 días (AOSP `UsageStatsDatabase.prune`) |
-| `9e3a97f` | Informe semanal y mensual (función pura) y texto para copiar, sin el nombre del niño |
-| `49aa921` | Pantalla Informes (pestañas Semanal y Mensual), gráficas `CustomPainter` con semántica y «Copiar informe» |
-| `faefd4f` | PERF: el índice de meses ya no se reescribe en cada toque (test que cuenta escrituras) |
-| `103aa3f` | FIX Play: Ajustes abre la política y los términos reales sin PIN (antes era un aviso provisional) |
-| `d8bd388` | El aviso de «Acceso al uso» menciona los informes y que se guarda solo en el teléfono |
-| `de7f60d` | `scripts/build-aab.sh`: AAB ofuscado con símbolos en `dist/simbolos/`; se bloquea sin keystore |
-| `4bb55a4` | Desglose por semanas en el informe mensual |
+| `872e629` | FIX: desmarcar una actividad sumaba como hecha en el panel (test: sin arreglo da 3, con arreglo 1) |
+| `bf3064f` | Resumen diario por mes (`lib/features/padre/informes/`): decorador de `UsageRepo`, 13 meses, siembra única |
+| `8461266` | Copia diaria del uso de otras apps: Android borra el detalle a los 10 días (AOSP `UsageStatsDatabase.prune`) |
+| `52db375` | Informe semanal y mensual (función pura) y texto para copiar, sin el nombre del niño |
+| `90ca5e7` | Pantalla Informes (pestañas Semanal y Mensual), gráficas `CustomPainter` con semántica y «Copiar informe» |
+| `5b42454` | PERF: el índice de meses ya no se reescribe en cada toque (test que cuenta escrituras) |
+| `d095c03` | FIX Play: Ajustes abre la política y los términos reales sin PIN (antes era un aviso provisional) |
+| `321de4d` | El aviso de «Acceso al uso» menciona los informes y que se guarda solo en el teléfono |
+| `331756a` | `scripts/build-aab.sh`: AAB ofuscado con símbolos en `dist/simbolos/`; se bloquea sin keystore |
+| `d201a68` | Desglose por semanas en el informe mensual |
 | (este) | `scripts/test-por-partes.sh`: suite por partes (base 104 tests en ~25 s) |
 
 ## NO VERIFICADO
