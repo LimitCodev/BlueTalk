@@ -80,13 +80,15 @@ python3 -m unittest discover -s infra/aws -p 'test_*.py'
 
 ## 4. Conectar AWS (cuando el dueño lo decida), en este orden
 
-1. Crear la cuenta de AWS y un usuario o rol **solo para publicar**. Nunca
-   la cuenta raíz. Activar MFA.
-2. `aws configure --profile bluetalk` y `export AWS_PROFILE=bluetalk`.
+1. Crear la cuenta de AWS y activar MFA. Nunca usar la cuenta raíz: crear un
+   usuario administrador para el despliegue y otro **solo para publicar**. La
+   política de publicar no alcanza para crear la pila.
+2. `aws configure --profile bluetalk-admin` y `export AWS_PROFILE=bluetalk-admin`.
 3. Simular: `scripts/aws/desplegar_cdn.sh tu@correo`. Revisar la salida.
 4. Real: `DE_VERDAD=1 scripts/aws/desplegar_cdn.sh tu@correo` y confirmar
    el correo de la alarma.
-5. Asignar la política `PoliticaPublicar` (salida de la pila) al usuario de publicación.
+5. Asignar la política `PoliticaPublicar` (salida de la pila) al usuario de
+   publicación, `aws configure --profile bluetalk` y `export AWS_PROFILE=bluetalk`.
 6. Poner el correo y la identidad reales en `docs/legal/*.md`.
 7. `DE_VERDAD=1 scripts/aws/publicar_legal.sh` y copiar la URL que imprime
    en Play Console (política de privacidad).

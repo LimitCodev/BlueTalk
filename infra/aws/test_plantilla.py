@@ -48,6 +48,12 @@ class PruebasPlantilla(unittest.TestCase):
         self.assertFalse([a for a in acciones if a.endswith("*")])
         self.assertNotIn("s3:PutBucketPolicy", acciones)
 
+    def test_publicar_puede_leer_las_salidas_de_su_pila(self):
+        reglas = R["PermisosPublicar"]["Properties"]["PolicyDocument"]["Statement"]
+        (regla,) = [r for r in reglas
+                    if "cloudformation:DescribeStacks" in r["Action"]]
+        self.assertEqual(regla["Resource"], "AWS::StackId")
+
 
 if __name__ == "__main__":
     unittest.main()

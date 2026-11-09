@@ -114,6 +114,10 @@ Resources:
           - Effect: Allow
             Action: [polly:SynthesizeSpeech]
             Resource: '*'
+          # publicar_legal.sh lee el bucket y la distribucion de las salidas.
+          - Effect: Allow
+            Action: [cloudformation:DescribeStacks]
+            Resource: !Ref AWS::StackId
 
   AlarmaGasto:
     Type: AWS::Budgets::Budget
