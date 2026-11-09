@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../core/plataforma/edicion.dart';
-import '../../../core/theme/calm_mode.dart';
 import '../../../core/widgets/section_header.dart';
 import '../dashboard/barras.dart';
 import '../gate/biometria.dart';
@@ -15,9 +13,9 @@ import '../permisos/permisos_asistente_screen.dart';
 import 'cambiar_codigo.dart';
 import 'control_dispositivo.dart';
 import 'control_parental.dart';
+import 'control_rutina_voz.dart';
 import 'perfil_edad_dialogo.dart';
 import 'recuperacion_dialogo.dart';
-import 'voz_diagnostico.dart';
 
 /// Control parental (plan 05 §4): tiempo de juegos, secciones, pantalla y
 /// voz (enlaces a Ajustes, sin duplicar lógica), desbloqueo y documentos.
@@ -137,25 +135,7 @@ class ControlScreen extends ConsumerWidget {
           ),
         ),
         const SeccionesDispositivo(),
-        const SectionHeader('Pantalla y voz'),
-        const CalmModeToggle(),
-        ListTile(
-          leading: const Icon(Icons.text_fields_outlined),
-          title: const Text('Tamaño de texto y velocidad de voz'),
-          subtitle: const Text('Se cambian en la pestaña Ajustes.'),
-          trailing: const Icon(Icons.chevron_right),
-          // Enlace real a Ajustes: la app no duplica esa lógica aquí.
-          onTap: () => GoRouter.maybeOf(context)?.go('/home/ajustes'),
-        ),
-        ListTile(
-          leading: const Icon(Icons.record_voice_over_outlined),
-          title: const Text('Probar la voz'),
-          subtitle: const Text('¿No se oye? Comprueba el sonido aquí.'),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => Navigator.of(context).push<void>(
-            MaterialPageRoute(builder: (_) => const VozDiagnosticoScreen()),
-          ),
-        ),
+        const SeccionesRutinaYVoz(),
         const SectionHeader('Desbloqueo'),
         SwitchListTile(
           title: const Text('Huella o rostro'),

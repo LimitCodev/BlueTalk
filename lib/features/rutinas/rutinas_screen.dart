@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../padre/control/control_parental.dart';
 import '../padre/control/juegos_gate.dart';
-import 'editor_horario_view.dart';
 import 'estadisticas_view.dart';
 import 'horario_view.dart';
 import 'rutinas_controller.dart';
@@ -27,7 +26,6 @@ class RutinasScreen extends ConsumerWidget {
     return switch (vista) {
       RutinaVista.inicio => const _HomeView(),
       RutinaVista.horario => const HorarioView(),
-      RutinaVista.editor => const EditorHorarioView(),
       RutinaVista.bienestar => const SaludScreen(),
       RutinaVista.colegio => const _VistaColegio(),
       RutinaVista.estadisticas => const EstadisticasView(),

@@ -1,24 +1,29 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/data/contracts/repos.dart';
 import 'package:bluetalk/data/models/models.dart';
+import 'package:bluetalk/features/rutinas/editor_horario_view.dart';
 import 'package:bluetalk/features/rutinas/rutinas_providers.dart';
+import 'package:bluetalk/features/rutinas/rutinas_screen.dart';
 
 import 'harness.dart';
 
 Future<void> abrirEditor(WidgetTester tester) async {
-  await tester.tap(find.text('Mi horario'));
-  await tester.pumpAndSettle();
-  await tester.tap(find.byTooltip('Editar horario (personas adultas)'));
+  unawaited(
+    Navigator.of(tester.element(find.byType(RutinasScreen))).push<void>(
+      MaterialPageRoute(
+        builder: (_) => const Scaffold(body: EditorHorarioView()),
+      ),
+    ),
+  );
   await tester.pumpAndSettle();
 }
 
 /// Repo de horario que falla al guardar pero deja leer (plan 13 P6.1).
-///
-/// Devuelve una actividad para que la cabecera con el botón de edición
-/// exista (con lista vacía esa cabecera no se construye).
 class _HorarioFalla implements ScheduleRepo {
   @override
   Future<List<ScheduleEntry>> schedule() async => const [

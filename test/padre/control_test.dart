@@ -200,6 +200,8 @@ void main() {
       300,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.ensureVisible(find.text('Cambiar código'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Cambiar código'));
     await tester.pumpAndSettle();
     expect(find.text('Cambia el código'), findsOneWidget);
@@ -431,5 +433,29 @@ void main() {
       reason: 'un respaldo sin cifrar no puede pasar desapercibido',
     );
     expect(find.textContaining('Cifrado por este teléfono'), findsNothing);
+  });
+
+  testWidgets('el horario se edita desde Control y Volver regresa', (
+    tester,
+  ) async {
+    final prefs = await prefsDePrueba();
+    await pumpPadre(
+      tester,
+      home: const Scaffold(body: ControlScreen()),
+      overrides: overridesDePadre(prefs),
+    );
+
+    final tile = find.widgetWithText(ListTile, 'Editar horario');
+    await tester.scrollUntilVisible(tile, 200);
+    await tester.ensureVisible(tile);
+    await tester.pumpAndSettle();
+    await tester.tap(tile);
+    await tester.pumpAndSettle();
+    expect(find.text('Nueva hora'), findsOneWidget);
+
+    await tester.tap(find.text('Volver'));
+    await tester.pumpAndSettle();
+    expect(find.text('Nueva hora'), findsNothing);
+    expect(tile, findsOneWidget);
   });
 }

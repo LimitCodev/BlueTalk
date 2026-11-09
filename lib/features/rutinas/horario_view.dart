@@ -5,7 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/section_header.dart';
 import '../../data/models/models.dart';
 import 'actividad_tile.dart';
-import 'rutinas_controller.dart';
+import 'cabecera_vista.dart';
 import 'rutinas_providers.dart';
 
 /// Vista del niño: "Actividades por día" con banner de la siguiente
@@ -35,20 +35,27 @@ class _HorarioLista extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (entradas.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24),
-          child: Text(
-            'Todavía no hay actividades en tu horario.',
-            textAlign: TextAlign.center,
+      return const Column(
+        children: [
+          CabeceraVista(titulo: 'Mi horario'),
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Text(
+                  'Todavía no hay actividades en tu horario.',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       );
     }
 
     return Column(
       children: [
-        const _CabeceraHorario(),
+        const CabeceraVista(titulo: 'Mi horario'),
         const BannerSiguienteActividad(),
         Expanded(
           child: ListView.builder(
@@ -75,45 +82,6 @@ class _TileHoy extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final hechas = ref.watch(hechasHoyProvider).value ?? const <String>{};
     return ActividadTile(entry: entry, hecha: hechas.contains(entry.id));
-  }
-}
-
-/// Cabecera con "Volver" y el botón de edición para persona adulta.
-class _CabeceraHorario extends ConsumerWidget {
-  const _CabeceraHorario();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 8, 12, 4),
-      child: Row(
-        children: [
-          OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(minimumSize: const Size(64, 48)),
-            onPressed: () => ref.read(rutinasProvider.notifier).irAlInicio(),
-            icon: const Icon(Icons.chevron_left),
-            label: const Text('Volver'),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'Mi horario',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-          // Edición del horario: función de persona adulta; el gate PIN del
-          // modo padre se cablea en la Ola 2b (ver informe).
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            tooltip: 'Editar horario (personas adultas)',
-            onPressed: () =>
-                ref.read(rutinasProvider.notifier).abrir(RutinaVista.editor),
-          ),
-        ],
-      ),
-    );
   }
 }
 

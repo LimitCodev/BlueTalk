@@ -4,14 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/di.dart';
 import '../../data/models/models.dart';
 import 'actividad_tile.dart';
-import 'rutinas_controller.dart';
+import 'cabecera_vista.dart';
 import 'rutinas_providers.dart';
 
 /// Vista de persona adulta: crear, editar y eliminar actividades del
 /// horario (plan 04 §1, "Nueva hora" como en la web).
 ///
-/// El gate con PIN del modo padre pertenece a `features/padre` (plan 05);
-/// esta vista queda lista para que el coordinador la abra tras el gate.
+/// Solo se abre desde Control, dentro de la zona de adultos (tras el PIN).
 class EditorHorarioView extends ConsumerWidget {
   const EditorHorarioView({super.key});
 
@@ -23,7 +22,10 @@ class EditorHorarioView extends ConsumerWidget {
     return switch (horario) {
       AsyncData(:final value) => Column(
           children: [
-            const _CabeceraEditor(),
+            CabeceraVista(
+              titulo: 'Editar horario',
+              onVolver: () => Navigator.of(context).maybePop(),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
               child: SizedBox(
@@ -67,36 +69,6 @@ class EditorHorarioView extends ConsumerWidget {
         ),
       _ => const Center(child: CircularProgressIndicator()),
     };
-  }
-}
-
-class _CabeceraEditor extends ConsumerWidget {
-  const _CabeceraEditor();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 8, 12, 4),
-      child: Row(
-        children: [
-          OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(minimumSize: const Size(64, 48)),
-            onPressed: () => ref.read(rutinasProvider.notifier).irAlInicio(),
-            icon: const Icon(Icons.chevron_left),
-            label: const Text('Volver'),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'Editar horario',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 

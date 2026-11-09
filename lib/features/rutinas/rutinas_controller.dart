@@ -8,7 +8,7 @@ import '../../data/models/models.dart';
 /// La navegación entre vistas es interna (sin rutas propias), igual que en
 /// JuegosScreen: el router raíz pertenece al shell y así no hay acoplamiento
 /// entre features.
-enum RutinaVista { inicio, horario, editor, bienestar, colegio, estadisticas }
+enum RutinaVista { inicio, horario, bienestar, colegio, estadisticas }
 
 /// Controlador de la vista activa de la pestaña Rutinas.
 class RutinasController extends Notifier<RutinaVista> {
