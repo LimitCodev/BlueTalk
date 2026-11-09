@@ -7,6 +7,7 @@ import 'informe_secciones.dart';
 import 'informe_semanas.dart';
 import 'informe_texto.dart';
 import 'informe_uso_telefono.dart';
+import '../../../core/plataforma/edicion.dart';
 import 'informes_providers.dart';
 
 /// Un informe (semanal o mensual) con sus secciones y «Copiar informe».
@@ -24,7 +25,8 @@ class InformeVista extends ConsumerWidget {
             CabeceraInforme(informe: value),
             SeccionComunicacion(informe: value),
             SeccionJuegoYAnimo(informe: value),
-            SeccionUsoTelefono(informe: value),
+            if (ref.watch(edicionDirectaProvider))
+              SeccionUsoTelefono(informe: value),
             if (periodo == Periodo.mes) SeccionPorSemana(informe: value),
             _BotonCopiar(informe: value),
           ],

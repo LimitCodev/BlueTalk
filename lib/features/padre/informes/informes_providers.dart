@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/di.dart';
+import '../../../core/plataforma/edicion.dart';
 import '../monitoreo/uso_telefono_controller.dart';
 import '../reloj.dart';
 import 'captura_apps.dart';
@@ -14,11 +15,13 @@ final informeProvider =
   final ahora = ref.watch(relojProvider)();
   final repo = ref.watch(resumenesRepoProvider);
   await repo.sembrarUnaVez(await ref.watch(usageRepoProvider).events());
-  await capturarUsoApps(
-    gateway: ref.watch(usoTelefonoGatewayProvider),
-    repo: repo,
-    ahora: ahora,
-  );
+  if (ref.watch(edicionDirectaProvider)) {
+    await capturarUsoApps(
+      gateway: ref.watch(usoTelefonoGatewayProvider),
+      repo: repo,
+      ahora: ahora,
+    );
+  }
   final pictos = ref.watch(pictogramRepoProvider);
   final categorias = await pictos.categories();
   final nombres = <String, String>{

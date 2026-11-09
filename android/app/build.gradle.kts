@@ -43,6 +43,14 @@ android {
         versionName = flutter.versionName
     }
 
+    // Ruta A de Play: `play` no lleva VPN ni acceso al uso; `directa` es el
+    // APK fuera de Play. Mismo applicationId: el piloto se actualiza encima.
+    flavorDimensions += "edicion"
+    productFlavors {
+        create("play") { dimension = "edicion" }
+        create("directa") { dimension = "edicion" }
+    }
+
     signingConfigs {
         if (keystorePropertiesFile.exists()) {
             create("release") {

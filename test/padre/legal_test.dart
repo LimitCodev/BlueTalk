@@ -82,13 +82,13 @@ void main() {
 
     final aceptacion = container.read(legalProvider);
     expect(aceptacion, isNotNull);
-    expect(aceptacion!.version, '1.1.0');
+    expect(aceptacion!.version, '1.2.0');
     expect(aceptacion.consentimientoPadre, isTrue);
     expect(aceptacion.fecha, ahoraFija);
 
     // Registrada en preferencias con su versión.
     final guardado = prefs.getString('padre_legal_aceptacion');
-    expect(guardado, contains('"version":"1.1.0"'));
+    expect(guardado, contains('"version":"1.2.0"'));
 
     // Al aceptar, el modo padre pasa al gate (no al resumen sin PIN).
     expect(container.read(padreProvider), PadreVista.gate);
@@ -156,7 +156,7 @@ void main() {
     container.read(padreProvider.notifier).irA(PadreVista.legal);
     await tester.pumpAndSettle();
 
-    expect(find.text('Aceptado el 13/10/2026 (versión 1.1.0).'),
+    expect(find.text('Aceptado el 13/10/2026 (versión 1.2.0).'),
         findsOneWidget);
     expect(find.text('Consentimiento parental registrado.'), findsOneWidget);
     expect(find.byType(CheckboxListTile), findsNothing);

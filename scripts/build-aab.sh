@@ -31,10 +31,10 @@ SIMBOLOS="dist/simbolos/$VERSION"
 mkdir -p "$SIMBOLOS"
 
 systemd-run --user --scope -p CPUQuota=400% -p MemoryMax=6G \
-  nice -n 10 flutter build appbundle --release \
+  nice -n 10 flutter build appbundle --release --flavor play \
   --obfuscate --split-debug-info="$SIMBOLOS"
 
-AAB=build/app/outputs/bundle/release/app-release.aab
+AAB=build/app/outputs/bundle/playRelease/app-play-release.aab
 cp "$AAB" "dist/BlueTalk-$VERSION.aab"
 echo "AAB: dist/BlueTalk-$VERSION.aab ($(du -h "$AAB" | cut -f1))"
 echo "sha256: $(sha256sum "$AAB" | cut -d' ' -f1)"

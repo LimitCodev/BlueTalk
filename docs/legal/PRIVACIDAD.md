@@ -1,7 +1,7 @@
 # Política de privacidad de BlueTalk
 
-**Fecha de entrada en vigencia:** 20 de octubre de 2026
-**Versión:** 1.1.0
+**Fecha de entrada en vigencia:** 8 de noviembre de 2026
+**Versión:** 1.2.0
 
 ## 1. Responsable del tratamiento
 
@@ -16,7 +16,6 @@ BlueTalk está construida como aplicación local. En la versión actual:
 - No hay publicidad, ni SDK de analítica, ni herramientas de seguimiento de terceros.
 - No se envían eventos, errores ni métricas a ningún destino externo.
 
-La única función que usa la red es el **filtro de páginas opcional**: cuando la persona adulta lo activa, Android crea una VPN local que reenvía las consultas DNS al servidor DNS de la red (Wi-Fi o datos móviles). BlueTalk no envía el historial de navegación a ningún servidor del desarrollador.
 
 Todo lo que la app guarda vive en el almacenamiento privado de la aplicación, dentro del teléfono. Si la app se desinstala o el teléfono se restablece de fábrica, esos datos desaparecen.
 
@@ -36,7 +35,6 @@ Los datos se agrupan en seis bloques:
 
 Sobre el PIN de la zona de adultos: no se guarda el PIN. Se guarda su huella calculada con PBKDF2-HMAC-SHA256 (librería `cryptography`) junto a una sal aleatoria de 16 bytes. La huella no permite recuperar el PIN. Los intentos fallidos y el instante en que termina un bloqueo también se guardan localmente para que el bloqueo sobreviva a un reinicio.
 
-**f) Filtro de páginas (opcional).** Categorías activadas, sitios que la persona adulta agrega a la lista y un registro local de los últimos dominios bloqueados (dominio y hora). El registro se guarda solo en el teléfono y se puede borrar desde la pantalla del filtro. No se guardan las páginas permitidas que el niño visita ni el contenido de esas páginas.
 
 ## 4. Qué datos NO recoge la app
 
@@ -46,13 +44,11 @@ Sobre el PIN de la zona de adultos: no se guarda el PIN. Se guarda su huella cal
 - Datos de salud clínica, diagnósticos o informes.
 - Identificadores publicitarios o de dispositivo con fines de seguimiento.
 - Datos de uso enviados a terceros.
-- El historial de navegación permitido. Del filtro de páginas solo se guardan localmente los dominios bloqueados, no las páginas que el niño abre.
 
 El reconocimiento de huella o rostro, cuando se activa, lo realiza el sistema Android con sus propios servicios biométricos. BlueTalk recibe únicamente un resultado de «correcto» o «incorrecto»; no accede ni almacena la imagen de la huella ni del rostro.
 
 ## 5. Voz y otras funciones del sistema
 
-La lectura de pictogramas usa el sintetizador de voz instalado en el teléfono. El texto que se lee se pasa al sistema Android para que lo pronuncie; no queda registrado por BlueTalk. Las notificaciones, si se autorizan, se generan localmente con el sistema de notificaciones de Android. El filtro de páginas, si se activa, usa una VPN local de Android que solo intercepta consultas DNS; las consultas permitidas se reenvían al DNS de la red y las bloqueadas se responden en el propio teléfono.
 
 ## 6. Base jurídica
 
@@ -60,7 +56,7 @@ El tratamiento se basa en el consentimiento de la persona adulta responsable, ot
 
 ## 7. Menores de edad
 
-La app está pensada para uso supervisado por personas adultas. No se recogen deliberadamente datos de menores más allá de los bloques descritos en el apartado 3, todos ellos locales y de naturaleza no identificativa. La familia responsable evita introducir datos identificativos en campos de texto libres. El registro de intentos bloqueados del filtro es local, se limita a los dominios bloqueados y no se usa para perfilar al menor.
+La app está pensada para uso supervisado por personas adultas. No se recogen deliberadamente datos de menores más allá de los bloques descritos en el apartado 3, todos ellos locales y de naturaleza no identificativa. La familia responsable evita introducir datos identificativos en campos de texto libres.
 
 ## 8. Sincronización futura con la nube (Supabase)
 
@@ -80,9 +76,8 @@ Los datos se conservan mientras la app esté instalada. Para eliminarlos:
 - Borrar los datos de la app desde Ajustes de Android (Aplicaciones › BlueTalk › Borrar datos) elimina todos los bloques, incluida la huella del PIN.
 - Desinstalar la app elimina el almacenamiento privado asociado.
 - Borrar solo el perfil o el historial desde la propia app, cuando esa opción esté disponible, elimina los bloques correspondientes sin tocar el resto.
-- Borrar el registro de intentos bloqueados desde la pantalla del filtro elimina solo ese registro.
 
-Restaurar una copia del teléfono desde el sistema Android puede restaurar también los datos de la app; eso depende de las copias de seguridad configuradas en el dispositivo, no de BlueTalk.
+BlueTalk desactiva las copias de seguridad automáticas de Android: ni una copia del teléfono ni el paso a otro dispositivo restauran estos datos.
 
 ## 10. Derechos de las personas
 
@@ -95,7 +90,6 @@ Si en el futuro hay datos en la nube, el mismo correo servirá para solicitar un
 - Huella del PIN con sal aleatoria y función de derivación de claves (nunca el PIN en claro).
 - Bloqueo de 60 segundos tras cinco intentos fallidos, con persistencia local.
 - Almacenamiento privado de la app: otros procesos del teléfono no acceden a esos archivos sin permiso del sistema.
-- El filtro de páginas, si el adulto lo activa, usa una VPN local de Android que solo intercepta consultas DNS. No hay conexión con servidores del desarrollador; las consultas permitidas salen al DNS de la red y las bloqueadas se responden en el propio teléfono.
 
 Ningún sistema es infalible; la app no garantiza seguridad absoluta frente a un dispositivo con el sistema comprometido.
 
@@ -103,7 +97,6 @@ Ningún sistema es infalible; la app no garantiza seguridad absoluta frente a un
 
 La app no incluye SDK de terceros con fines publicitarios o de analítica. Google Play Store actúa como canal de distribución y aplica sus propias condiciones y políticas en la descarga, actualización y pago, si llegara a haberlo. Si en el futuro se incorpora la sincronización en la nube, el proveedor de infraestructura figurará en este apartado con su ubicación y sus garantías.
 
-El filtro de páginas consulta el servidor DNS de la red (el del Wi-Fi o el de los datos móviles), que puede ser del proveedor de internet o del colegio. BlueTalk no controla ese servidor ni le envía datos adicionales.
 
 ## 13. Cambios en esta política
 
@@ -112,4 +105,4 @@ Cada versión de la política lleva número y fecha. Los cambios sustanciales ex
 ## 14. Contacto
 
 Correo: demo@bluetalk.app (dirección de demostración de este proyecto).
-Última actualización: 20 de octubre de 2026, versión 1.1.0.
+Última actualización: 8 de noviembre de 2026, versión 1.2.0.

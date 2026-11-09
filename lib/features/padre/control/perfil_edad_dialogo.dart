@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/plataforma/edicion.dart';
 import '../perfil_edad.dart';
 
 /// Elección del perfil de edad (fase 3b).
@@ -13,6 +14,7 @@ class PerfilEdadDialogo extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final actual = ref.watch(perfilEdadProvider);
+    final directa = ref.watch(edicionDirectaProvider);
 
     return AlertDialog(
       title: const Text('Perfil de edad'),
@@ -24,12 +26,12 @@ class PerfilEdadDialogo extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-              const Text(
+              Text(
                 'Elige la edad del niño o niña. Con eso se ocultan categorías '
-                'del comunicador que no son de esa edad y se ajustan los '
-                'grupos del filtro de páginas. Puedes cambiarlo cuando '
-                'quieras.',
-                style: TextStyle(fontSize: 13),
+                'del comunicador que no son de esa edad'
+                '${directa ? ' y se ajustan los grupos del filtro de páginas' : ''}. '
+                'Puedes cambiarlo cuando quieras.',
+                style: const TextStyle(fontSize: 13),
               ),
               const SizedBox(height: 8),
               for (final perfil in PerfilEdad.values)
@@ -41,7 +43,11 @@ class PerfilEdadDialogo extends ConsumerWidget {
                         : Icons.radio_button_unchecked,
                   ),
                   title: Text(perfil.titulo),
-                  subtitle: Text(perfil.explicacion),
+                  subtitle: Text(
+                    directa
+                        ? perfil.explicacion
+                        : quitarFrasesDeFiltro(perfil.explicacion),
+                  ),
                   onTap: () async {
                     await ref
                         .read(perfilEdadProvider.notifier)

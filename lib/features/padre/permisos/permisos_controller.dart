@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/plataforma/edicion.dart';
 import '../filtro_web/filtro_web_controller.dart';
 import '../monitoreo/uso_telefono_controller.dart';
 import 'permiso_model.dart';
@@ -20,7 +21,8 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
   final avisos = ref.watch(permisosGatewayProvider);
   final uso = ref.watch(usoTelefonoGatewayProvider);
   final filtro = ref.watch(filtroWebGatewayProvider);
-  final filtroActivo = ref.watch(filtroWebProvider).activo;
+  final directa = ref.watch(edicionDirectaProvider);
+  final filtroActivo = directa && ref.watch(filtroWebProvider).activo;
 
   // Disparadas todas antes de esperar: que no se serialicen.
   final avisosP = avisos.estadoAvisos();
@@ -94,7 +96,11 @@ final permisosProvider = FutureProvider<PermisosEstado>((ref) async {
       ),
   ];
 
-  return PermisosEstado(lista);
+  // Play (ruta A): sin VPN ni acceso al uso; la batería solo servía al filtro.
+  return PermisosEstado([
+    for (final p in lista)
+      if (directa || p.id == PermisoId.avisos) p,
+  ]);
 });
 
 /// Qué dice Android sobre un permiso, para la pantalla.

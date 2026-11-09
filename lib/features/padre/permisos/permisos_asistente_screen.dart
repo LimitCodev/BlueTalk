@@ -94,8 +94,7 @@ class _PermisosAsistenteScreenState
           padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
           child: Text(
             'BlueTalk funciona sin conceder ninguno de estos permisos. '
-            'Sirven para el horario, el tiempo por pantalla y el filtro de '
-            'páginas. Cada uno dice qué lee y qué no.',
+            'Cada uno dice para qué sirve, qué lee y qué no.',
           ),
         ),
         // P0-4 de Play: ningún permiso es obligatorio. La tarjeta lo dice
@@ -111,7 +110,7 @@ class _PermisosAsistenteScreenState
           child: Text(
             'Ninguno de estos permisos es obligatorio. El comunicador y el '
             'panel del adulto funcionan sin concederlos; actívalos solo si '
-            'quieres avisos, informes de uso o el filtro de páginas.',
+            'quieres la función que explica cada uno.',
             style: tema.textTheme.bodyMedium,
           ),
         ),

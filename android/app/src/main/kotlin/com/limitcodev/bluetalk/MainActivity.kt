@@ -5,27 +5,23 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 
 class MainActivity : FlutterActivity() {
-    private var filtroWeb: FiltroWebChannel? = null
-    private var usoTelefono: UsoTelefonoChannel? = null
+    private var canalesEdicion: CanalesEdicion? = null
     private var permisos: PermisosChannel? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        filtroWeb = FiltroWebChannel(this, flutterEngine.dartExecutor.binaryMessenger)
-        usoTelefono = UsoTelefonoChannel(this, flutterEngine.dartExecutor.binaryMessenger)
+        canalesEdicion = CanalesEdicion(this, flutterEngine.dartExecutor.binaryMessenger)
         permisos = PermisosChannel(this, flutterEngine.dartExecutor.binaryMessenger)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        filtroWeb?.onActivityResult(requestCode, resultCode)
+        canalesEdicion?.onActivityResult(requestCode, resultCode)
     }
 
     override fun onDestroy() {
-        filtroWeb?.dispose()
-        filtroWeb = null
-        usoTelefono?.dispose()
-        usoTelefono = null
+        canalesEdicion?.dispose()
+        canalesEdicion = null
         permisos?.dispose()
         permisos = null
         super.onDestroy()

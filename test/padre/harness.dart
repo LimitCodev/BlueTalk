@@ -10,6 +10,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:bluetalk/core/almacen/almacen_local.dart';
+import 'package:bluetalk/core/plataforma/edicion.dart';
 import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/data/local/mock_repos.dart';
 import 'package:bluetalk/data/local/seed_store.dart';
@@ -199,8 +200,10 @@ List<Object> overridesDePadre(
   BiometriaPrueba? biometria,
   DerivadorPin? derivador,
   PermisosGateway? permisos,
+  bool edicionDirecta = true,
 }) =>
     [
+      edicionDirectaProvider.overrideWithValue(edicionDirecta),
       sharedPreferencesProvider.overrideWithValue(prefs),
       seedStoreProvider.overrideWithValue(
         SeedStore(
@@ -329,5 +332,5 @@ Future<void> sembrarRecuperacionDePrueba(SharedPreferences prefs) async {
 
 /// Regla de aceptación legal ya registrada (para arrancar tras el gate).
 String aceptacionLegalDePrueba() =>
-    '{"version":"1.1.0","fecha":${ahoraFija.millisecondsSinceEpoch},'
+    '{"version":"1.2.0","fecha":${ahoraFija.millisecondsSinceEpoch},'
     '"consentimientoPadre":true}';

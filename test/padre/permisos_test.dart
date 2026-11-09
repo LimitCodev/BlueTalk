@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:bluetalk/app/di.dart';
+import 'package:bluetalk/core/plataforma/edicion.dart';
 import 'package:bluetalk/core/theme/app_colors.dart';
 import 'package:bluetalk/core/theme/app_theme.dart';
 import 'package:bluetalk/features/padre/monitoreo/uso_telefono_controller.dart';
@@ -106,6 +107,7 @@ List<Object> _fuentes(
   EstadoPermiso? usoEstado,
 }) =>
     [
+      edicionDirectaProvider.overrideWithValue(true),
       sharedPreferencesProvider.overrideWithValue(prefs),
       permisosGatewayProvider.overrideWithValue(permisos ?? _PermisosFalsos()),
       ..._gateways(usoConcedido: usoConcedido, usoEstado: usoEstado),
@@ -148,6 +150,7 @@ Future<PermisosEstado> _diagnostico({required FiltroWebEstado filtro}) async {
   );
   final container = ProviderContainer(
     overrides: [
+      edicionDirectaProvider.overrideWithValue(true),
       sharedPreferencesProvider.overrideWithValue(prefs),
       permisosGatewayProvider.overrideWithValue(
         _PermisosFalsos(
@@ -538,6 +541,7 @@ void main() {
       );
       final container = ProviderContainer(
         overrides: [
+          edicionDirectaProvider.overrideWithValue(true),
           sharedPreferencesProvider.overrideWithValue(prefs),
           permisosGatewayProvider.overrideWithValue(_PermisosFalsos()),
           usoTelefonoGatewayProvider.overrideWithValue(_UsoFalso(false)),

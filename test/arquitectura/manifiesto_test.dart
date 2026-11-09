@@ -49,7 +49,30 @@ void main() {
     // Control positivo: si el archivo se vaciara, las aserciones de arriba
     // pasarían sin comprobar nada.
     expect(texto, contains('<application'));
-    expect(texto, contains('FiltroWebVpnService'));
+    expect(texto, contains('.MainActivity'));
+  });
+
+  test('la edición Play no declara VPN, acceso al uso ni red', () {
+    const raiz = 'android/app/src';
+    final main = File('$raiz/main/AndroidManifest.xml').readAsStringSync();
+    for (final prohibido in [
+      'BIND_VPN_SERVICE',
+      'FOREGROUND_SERVICE_SPECIAL_USE',
+      'PACKAGE_USAGE_STATS',
+      'android.permission.INTERNET',
+      'FiltroWebVpnService',
+    ]) {
+      expect(main, isNot(contains(prohibido)), reason: prohibido);
+    }
+    expect(File('$raiz/play/AndroidManifest.xml').existsSync(), isFalse);
+    final directa = File('$raiz/directa/AndroidManifest.xml').readAsStringSync();
+    expect(directa, contains('FiltroWebVpnService'));
+    expect(
+      File(
+        '$raiz/main/kotlin/com/limitcodev/bluetalk/FiltroWebVpnService.kt',
+      ).existsSync(),
+      isFalse,
+    );
   });
 
   test('no quedan el canal nativo ni el XML del administrador', () {

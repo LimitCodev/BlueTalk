@@ -1,0 +1,42 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- Solo para el APK fuera de Play. La edición Play no declara nada de
+         esto (P0-2 y ruta A de requisitosPlayStore.md). -->
+    <!-- Diagnóstico de uso (plan 14): el adulto concede «Acceso al uso»
+         en Ajustes de Android. Solo se lee el tiempo de primer plano por
+         app; no se leen mensajes, pantallas ni contenido. -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions"/>
+    <!-- Android 11+: poder leer nombre e ícono de las apps con lanzador
+         para el diagnóstico de uso, sin pedir QUERY_ALL_PACKAGES. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent>
+    </queries>
+    <!-- Filtro de páginas (plan 14): VPN local que solo intercepta DNS.
+         INTERNET se usa para reenviar las consultas al DNS de la red;
+         la app no envía datos a servidores del desarrollador. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+    <application>
+        <!-- VPN local del filtro de páginas. Android la autoriza con su
+             propio diálogo; no es un servicio exportado. -->
+        <service
+            android:name=".FiltroWebVpnService"
+            android:exported="false"
+            android:permission="android.permission.BIND_VPN_SERVICE"
+            android:foregroundServiceType="specialUse">
+            <intent-filter>
+                <action android:name="android.net.VpnService"/>
+            </intent-filter>
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="parental_control_dns_filter"/>
+        </service>
+    </application>
+</manifest>
