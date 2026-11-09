@@ -79,7 +79,18 @@ class CreditsSection extends StatelessWidget {
         SectionHeader('Créditos'),
         ListTile(
           title: Text('Pictogramas: Mulberry Symbols'),
-          subtitle: Text('© Mulberry Project — licencia CC BY-SA 4.0'),
+          subtitle: Text(
+            '© Steve Lee y colaboradores — licencia CC BY-SA 4.0 — '
+            'mulberrysymbols.org. Dibujos sin cambios; se adaptó el formato '
+            'de los archivos para que carguen en la app.',
+          ),
+        ),
+        ListTile(
+          title: Text('Iconos de palabras básicas'),
+          subtitle: Text(
+            'Sí, No, Yo, Tú, Él, Ella, Nosotros, Me gusta, Parar, Por favor, '
+            'Gracias, Adiós, Aquí y Allí se dibujaron para BlueTalk.',
+          ),
         ),
       ],
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/colores_gramatica.dart';
 import 'comunicador_catalog.dart';
 import 'comunicador_catalogo_error.dart';
 import 'comunicador_picto_grid.dart';
@@ -23,6 +24,7 @@ class CategoryView extends ConsumerWidget {
         // La web tiñe los pictogramas con el tono de su categoría
         // (docs/branding/WEB-EXTRACCION.md §2); la app hace lo mismo.
         categoria: coloresCategorias[categoryId],
+        colorDe: (picto) => coloresDeClase(picto.clase),
       ),
       AsyncError() => const CatalogError(),
       _ => const Center(child: CircularProgressIndicator()),

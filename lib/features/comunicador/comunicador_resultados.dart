@@ -14,10 +14,16 @@ class SearchResults extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final needle = query.toLowerCase();
+    // Una palabra puede estar en el tablero nuclear y en su tema: se
+    // enseña una sola vez.
+    final vistas = <String>{};
     final results = [
       for (final picto in catalog.pictograms)
-        if (picto.label.toLowerCase().contains(needle) ||
-            picto.keywords.any((word) => word.toLowerCase().contains(needle)))
+        if ((picto.label.toLowerCase().contains(needle) ||
+                picto.keywords.any(
+                  (word) => word.toLowerCase().contains(needle),
+                )) &&
+            vistas.add(picto.label.toLowerCase()))
           picto,
     ];
 

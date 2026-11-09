@@ -5,6 +5,7 @@ class Category {
     required this.name,
     required this.icon,
     this.order = 0,
+    this.tipo = 'tematica',
   });
 
   /// Identificador estable en snake_case: `comida`, `emociones`…
@@ -15,11 +16,17 @@ class Category {
   final String icon;
   final int order;
 
+  /// `nuclear` (posiciones fijas, siempre visible) o `tematica`.
+  final String tipo;
+
+  bool get nuclear => tipo == 'nuclear';
+
   factory Category.fromMap(Map<String, dynamic> map) => Category(
         id: map['id'] as String,
         name: map['name'] as String? ?? '',
         icon: map['icon'] as String? ?? '',
         order: (map['order'] as num?)?.toInt() ?? 0,
+        tipo: map['tipo'] as String? ?? 'tematica',
       );
 
   Map<String, dynamic> toMap() => {
@@ -27,5 +34,6 @@ class Category {
         'name': name,
         'icon': icon,
         'order': order,
+        'tipo': tipo,
       };
 }

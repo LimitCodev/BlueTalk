@@ -74,6 +74,7 @@ void main() {
       final reducido = await container.read(catalogProvider.future);
 
       expect(reducido.categories.map((c) => c.id), [
+        'basicas',
         'emociones',
         'comida',
         'animales',

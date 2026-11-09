@@ -15,6 +15,7 @@ class PictoGrid extends ConsumerWidget {
     required this.pictograms,
     required this.emptyText,
     this.categoria,
+    this.colorDe,
   });
 
   final List<Pictogram> pictograms;
@@ -23,6 +24,9 @@ class PictoGrid extends ConsumerWidget {
   /// Tono de la categoría cuando toda la rejilla es de una sola; en
   /// Inicio o en la búsqueda las tarjetas quedan neutras.
   final ColoresCategoria? categoria;
+
+  /// Tono por pictograma (clase gramatical); manda sobre [categoria].
+  final ColoresCategoria? Function(Pictogram)? colorDe;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -48,7 +52,7 @@ class PictoGrid extends ConsumerWidget {
         final picto = pictograms[index];
         return PictoTile(
           pictogram: picto,
-          categoria: categoria,
+          categoria: colorDe?.call(picto) ?? categoria,
           favorited: favorites.contains(picto.id),
           onTap: () => onPictoTap(context, ref, picto),
           onLongPress: () => onPictoLongPress(context, ref, picto),

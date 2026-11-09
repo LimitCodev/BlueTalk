@@ -1,4 +1,5 @@
 [
+  { "id": "basicas", "name": "Palabras básicas", "icon": "nuc_quiero", "order": 0, "tipo": "nuclear" },
   { "id": "emociones", "name": "Emociones", "icon": "happy_man", "order": 1 },
   { "id": "comida", "name": "Comida", "icon": "apple", "order": 2 },
   { "id": "animales", "name": "Animales", "icon": "cat", "order": 3 },

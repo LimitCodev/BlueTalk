@@ -18,18 +18,19 @@ void main() {
   setUp(() => store = SeedStore(rootBundle.loadString));
 
   group('seeds', () {
-    test('categorías: 7 ordenadas de 1 a 7', () async {
+    test('categorías: la nuclear primero y luego las 7 temáticas', () async {
       final cats = (await store.list('categorias')).map(Category.fromMap).toList()
         ..sort((a, b) => a.order.compareTo(b.order));
-      expect(cats, hasLength(7));
-      expect(cats.first.id, 'emociones');
+      expect(cats, hasLength(8));
+      expect(cats.first.id, 'basicas');
+      expect(cats.first.nuclear, isTrue);
       expect(cats.last.id, 'clima');
-      expect(cats.map((c) => c.order), [1, 2, 3, 4, 5, 6, 7]);
+      expect(cats.map((c) => c.order), [0, 1, 2, 3, 4, 5, 6, 7]);
     });
 
-    test('pictogramas: 42 y cada asset existe en disco', () async {
+    test('pictogramas: más de 200 y cada asset existe en disco', () async {
       final rows = await store.list('pictogramas');
-      expect(rows, hasLength(42));
+      expect(rows.length, greaterThan(200));
       for (final row in rows) {
         final picto = Pictogram.fromMap(row);
         expect(
