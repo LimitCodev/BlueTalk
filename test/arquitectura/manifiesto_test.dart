@@ -9,6 +9,13 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   final raizAndroid = Directory('android/app/src');
 
+  test('el manifiesto principal puede ver el motor de voz (Android 11+)', () {
+    final texto =
+        File('android/app/src/main/AndroidManifest.xml').readAsStringSync();
+
+    expect(texto, contains('android.intent.action.TTS_SERVICE'));
+  });
+
   test('ningún manifiesto fuente declara administrador de dispositivo', () {
     final manifiestos = raizAndroid
         .listSync(recursive: true)
