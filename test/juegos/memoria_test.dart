@@ -76,6 +76,28 @@ void main() {
     expect(find.text('Parejas: 1 de 4'), findsOneWidget);
   });
 
+  testWidgets('Elegir otro nivel vuelve al selector de niveles', (tester) async {
+    final container = await pumpJuegos(tester);
+
+    await tester.tap(find.text('Memoria'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Nivel 1'));
+    await tester.pumpAndSettle();
+
+    final tablero = container.read(memoriaProvider).requireValue.tablero;
+    for (final pareja in parejasDe(tablero)) {
+      await _tocarFicha(tester, pareja.first);
+      await _tocarFicha(tester, pareja.last);
+    }
+    await tester.pump();
+
+    await tester.tap(find.text('Elegir otro nivel'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Cada nivel es más difícil 💙'), findsOneWidget);
+    expect(container.read(memoriaProvider).requireValue.desbloqueado, 2);
+  });
+
   testWidgets('completar el nivel desbloquea el nivel 2 y persiste al reiniciar',
       (tester) async {
     final container = await pumpJuegos(tester);

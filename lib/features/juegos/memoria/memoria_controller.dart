@@ -175,14 +175,9 @@ class MemoriaController extends AsyncNotifier<MemoriaViewState> {
 
   /// Vuelve al selector de niveles.
   void volverAlSelector() {
+    // Estado nuevo: copyWith trata null como «no cambiar» y dejaría el nivel.
     state = AsyncData(
-      state.requireValue.copyWith(
-        nivel: null,
-        seleccion: const [],
-        fallas: const {},
-        descubiertas: const {},
-        completado: false,
-      ),
+      MemoriaViewState(desbloqueado: state.requireValue.desbloqueado),
     );
   }
 }

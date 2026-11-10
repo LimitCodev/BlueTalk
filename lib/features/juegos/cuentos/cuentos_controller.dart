@@ -121,13 +121,9 @@ class CuentosController extends AsyncNotifier<CuentosViewState> {
   }
 
   void irALista() {
+    // Estado nuevo: copyWith trata null como «no cambiar» y dejaría el cuento.
     state = AsyncData(
-      state.requireValue.copyWith(
-        storyId: null,
-        pagina: 0,
-        fase: CuentoFase.leyendo,
-        limpiarIncorrecta: true,
-      ),
+      CuentosViewState(completados: state.requireValue.completados),
     );
   }
 
