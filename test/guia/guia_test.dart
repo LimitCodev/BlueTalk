@@ -242,4 +242,22 @@ void main() {
     expect(brillo().value, 1);
     expect(tester.binding.hasScheduledFrame, isFalse);
   });
+
+  testWidgets('con el código ya creado, el paso 11 dice que entras con él', (
+    tester,
+  ) async {
+    final (c, p) = await _pump(
+      tester,
+      prefs: {GuiaController.claveVista: true},
+    );
+    await crearPinDePrueba(p);
+    final guia = c.read(guiaProvider.notifier)..iniciar();
+    for (var i = 0; i < 10; i++) {
+      guia.siguiente();
+      await tester.pumpAndSettle();
+    }
+    expect(find.text('Paso 11 de 11'), findsOneWidget);
+    expect(find.textContaining('Aquí entras con tu código'), findsOneWidget);
+    expect(find.textContaining('crea un código'), findsNothing);
+  });
 }
