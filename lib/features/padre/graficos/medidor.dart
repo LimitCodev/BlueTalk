@@ -42,6 +42,8 @@ class Medidor extends StatelessWidget {
               child: RepaintBoundary(
                 child: AnimacionGrafico(
                   builder: (context, t) => CustomPaint(
+                    // Sin hijo, sin esto mide 0 de ancho y no pinta nada.
+                    size: Size.infinite,
                     painter: PintorMedidor(
                       angulo: angulo,
                       progreso: t,

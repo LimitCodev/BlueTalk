@@ -82,6 +82,22 @@ void main() {
     semantica.dispose();
   });
 
+  testWidgets('el medidor ocupa el ancho de su tarjeta', (tester) async {
+    // Sin esto el lienzo medía 0 de ancho y no se dibujaba nada.
+    await _pump(
+      tester,
+      const SizedBox(
+        width: 300,
+        child: Medidor(actual: 12, anterior: 10, descripcion: 'x'),
+      ),
+    );
+    final lienzo = find.descendant(
+      of: find.byType(Medidor),
+      matching: find.byType(CustomPaint),
+    );
+    expect(tester.getSize(lienzo).width, 300);
+  });
+
   testWidgets('la línea muestra el último día y cambia al tocar',
       (tester) async {
     await _pump(
