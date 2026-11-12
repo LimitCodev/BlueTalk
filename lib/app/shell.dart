@@ -11,8 +11,8 @@ import 'atras_shell.dart';
 ///
 /// Centraliza el botón Atrás (plan 13 P1): dentro de la app el Atrás
 /// siempre se mueve a un sitio de la tabla del plan, nunca se queda quieto
-/// ni mata la app donde no toca. El único punto de salida es Comunicar
-/// (con el gancho `saleConAtrasProvider` para el kiosko del plan 12).
+/// ni mata la app donde no toca. El único punto de salida es el menú
+/// principal (con el gancho `saleConAtrasProvider` del kiosko, plan 12).
 class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.shell});
 
@@ -41,10 +41,16 @@ class AppShell extends ConsumerWidget {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) manejarAtras(ref, shell);
+        if (!didPop) manejarAtras(context, ref, shell);
       },
       child: Scaffold(
         appBar: AppBar(
+          // Vuelve al menú principal (plan 14A §A3).
+          leading: IconButton(
+            icon: const Icon(Icons.home_outlined),
+            tooltip: 'Inicio',
+            onPressed: () => context.go('/inicio'),
+          ),
           title: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

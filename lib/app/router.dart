@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/theme/calm_mode.dart';
+import '../features/inicio/inicio_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/onboarding/profile_controller.dart';
 import '../features/padre/padre_screen.dart';
@@ -28,16 +29,21 @@ final routerProvider = Provider<GoRouter>((ref) {
     return MaterialPage<Object?>(child: child);
   }
 
-  // Si ya hay perfil guardado, arranca directo en el home (sin onboarding).
+  // Si ya hay perfil guardado, arranca directo en el menú (sin onboarding).
   final hasProfile = ref.read(profileProvider) != null;
 
   return GoRouter(
-    initialLocation: hasProfile ? '/home/comunicar' : '/onboarding',
+    initialLocation: hasProfile ? '/inicio' : '/onboarding',
     routes: [
       GoRoute(
         path: '/onboarding',
         pageBuilder: (context, state) =>
             page(context, state, const OnboardingScreen()),
+      ),
+      GoRoute(
+        path: '/inicio',
+        pageBuilder: (context, state) =>
+            page(context, state, const InicioScreen()),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => AppShell(shell: shell),

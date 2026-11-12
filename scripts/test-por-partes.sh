@@ -11,7 +11,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 declare -A PARTES=(
-  [base]="test/arquitectura test/core test/data test/widget_test.dart"
+  [base]="test/arquitectura test/core test/data test/inicio test/widget_test.dart"
   [comunicador]="test/comunicador test/features"
   [juegos]="test/juegos"
   [rutinas]="test/rutinas test/recordatorios"
