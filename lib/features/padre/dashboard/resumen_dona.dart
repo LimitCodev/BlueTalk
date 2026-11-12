@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../graficos/colores_grafico.dart';
 import '../graficos/dona.dart';
+import '../graficos/dona_leyenda.dart';
 import '../graficos/tarjeta_grafico.dart';
 import 'metricas.dart';
 
@@ -19,7 +21,7 @@ class DonaTemasHoy extends StatelessWidget {
     final colorPorNombre = <String, Color>{
       for (final entrada in entradas)
         metricas.nombresDeCategoria[entrada.key] ?? entrada.key:
-            _colorCategoria(entrada.key, paleta),
+            colorCategoria(entrada.key, paleta),
     };
     final porciones = [
       for (final porcion in agruparDona([
@@ -33,8 +35,8 @@ class DonaTemasHoy extends StatelessWidget {
           etiqueta: porcion.etiqueta,
           valor: porcion.valor,
           color: porcion.etiqueta == 'Otras'
-              ? _colorOtras(paleta)
-              : colorPorNombre[porcion.etiqueta] ?? _colorOtras(paleta),
+              ? colorOtras(paleta)
+              : colorPorNombre[porcion.etiqueta] ?? colorOtras(paleta),
         ),
     ];
     final detalle = porciones
@@ -47,21 +49,10 @@ class DonaTemasHoy extends StatelessWidget {
       hayDatos: porciones.isNotEmpty,
       semantica: 'Temas de hoy: $detalle. '
           'Total ${metricas.pictosHoy} pictogramas.',
-      grafico: Dona(
+      grafico: DonaConLeyenda(
         porciones: porciones,
         descripcion: 'Temas de hoy: $detalle.',
       ),
     );
   }
 }
-
-Color _colorCategoria(String id, AppColors paleta) {
-  final categoria = coloresCategorias[id];
-  if (categoria == null) return paleta.primaryStrong;
-  return paleta.brillo == Brightness.light
-      ? categoria.tinta
-      : categoria.fondo;
-}
-
-Color _colorOtras(AppColors paleta) =>
-    paleta.brillo == Brightness.light ? paleta.primaryStrong : paleta.primary;

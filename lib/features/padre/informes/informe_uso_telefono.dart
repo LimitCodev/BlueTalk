@@ -1,48 +1,57 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/widgets/section_header.dart';
+import '../../../core/theme/app_colors.dart';
+import '../graficos/colores_grafico.dart';
+import '../graficos/dona.dart';
+import '../graficos/dona_leyenda.dart';
+import '../graficos/tarjeta_grafico.dart';
 import '../monitoreo/uso_telefono_model.dart';
-import 'grafica_columnas.dart';
 import 'informe_modelo.dart';
-import 'lista_ranking.dart';
 
 /// Uso de otras apps del teléfono (solo tiempos; nunca contenido).
-class SeccionUsoTelefono extends StatelessWidget {
-  const SeccionUsoTelefono({super.key, required this.informe});
+class SeccionApps extends StatelessWidget {
+  const SeccionApps({super.key, required this.informe});
 
   final Informe informe;
 
   @override
   Widget build(BuildContext context) {
-    final i = informe;
-    final minutos = [
-      for (final p in i.serie)
-        p.segundosPantalla == null ? null : p.segundosPantalla! ~/ 60,
-    ];
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const SectionHeader('Uso del teléfono'),
-        if (i.diasConApps == 0)
-          const Text('Sin datos. Activa «Acceso al uso» en Control. Android '
-              'guarda solo los últimos 10 días: BlueTalk los copia cada vez '
-              'que abres los informes.')
-        else ...[
-          Text('Tiempo en otras apps: ${formatearDuracion(i.segundosPantalla)} '
-              '(${i.diasConApps} de ${i.periodo.dias} días con datos).'),
-          const SizedBox(height: 8),
-          GraficaColumnas(
-            valores: minutos,
-            descripcion: 'Minutos de pantalla por día: '
-                '${minutos.map((m) => m ?? 'sin datos').join(', ')}.',
-          ),
-          ListaRanking(
-            titulo: 'Apps más usadas',
-            ranking: i.apps,
-            formato: formatearDuracion,
-          ),
-        ],
-      ]),
+    if (informe.diasConApps == 0) return const SizedBox.shrink();
+    final paleta = context.colores;
+    final top = informe.apps;
+    final limite = top.length < 4 ? top.length : 4;
+    var suma = 0;
+    final porciones = <SegmentoDona>[];
+    for (var i = 0; i < limite; i++) {
+      porciones.add((
+        etiqueta: top[i].nombre,
+        valor: top[i].valor,
+        color: colorPorIndice(i, paleta),
+      ));
+      suma += top[i].valor;
+    }
+    final otras = informe.segundosPantalla - suma;
+    if (otras > 0) {
+      porciones.add((
+        etiqueta: 'Otras',
+        valor: otras,
+        color: colorOtras(paleta),
+      ));
+    }
+    final detalle = porciones
+        .map((porcion) => '${porcion.etiqueta} ${formatearDuracion(porcion.valor)}')
+        .join(', ');
+    return TarjetaGrafico(
+      pregunta: '¿En qué apps pasó el tiempo?',
+      numero: formatearDuracion(informe.segundosPantalla),
+      frase: 'en ${informe.diasConApps} días con datos',
+      hayDatos: porciones.isNotEmpty,
+      semantica: 'Tiempo en otras apps: $detalle.',
+      grafico: DonaConLeyenda(
+        porciones: porciones,
+        formato: formatearDuracion,
+        descripcion: 'Tiempo en otras apps: $detalle.',
+      ),
     );
   }
 }
