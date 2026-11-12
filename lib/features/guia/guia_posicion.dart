@@ -42,9 +42,7 @@ class GuiaPosicion extends StatelessWidget {
           // El fondo absorbe todos los toques: solo responde el globo.
           Positioned.fill(
             child: AbsorbPointer(
-              child: CustomPaint(
-                painter: GuiaFondo(hueco: h, borde: borde),
-              ),
+              child: GuiaFondoQueRespira(hueco: h, borde: borde),
             ),
           ),
           if (h == null)

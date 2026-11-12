@@ -14,6 +14,7 @@ import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/comunicador/comunicador_screen.dart';
 import 'package:bluetalk/features/comunicador/tts_service.dart';
 import 'package:bluetalk/features/guia/guia_controller.dart';
+import 'package:bluetalk/features/guia/guia_fondo.dart';
 import 'package:bluetalk/features/guia/guia_lista.dart';
 import 'package:bluetalk/features/guia/guia_objetivos.dart';
 import 'package:bluetalk/features/guia/guia_pasos.dart';
@@ -33,6 +34,10 @@ Future<(ProviderContainer, SharedPreferences)> _pump(
 }) async {
   SharedPreferences.setMockInitialValues(prefs);
   final p = await SharedPreferences.getInstance();
+  // El borde del hueco respira en bucle: sin esto `pumpAndSettle` no acaba.
+  tester.platformDispatcher.accessibilityFeaturesTestValue =
+      const FakeAccessibilityFeatures(disableAnimations: true);
+  addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
@@ -208,4 +213,33 @@ void main() {
       expect(find.text('Paso 1 de 11'), findsOneWidget);
     },
   );
+
+  testWidgets('el borde respira y se queda quieto sin animaciones', (
+    tester,
+  ) async {
+    Animation<double> brillo() =>
+        (tester.widget<CustomPaint>(find.byType(CustomPaint).last).painter!
+                as GuiaFondo)
+            .brillo!;
+    Widget fondo({required bool quieto}) => MaterialApp(
+      home: MediaQuery(
+        data: MediaQueryData(disableAnimations: quieto),
+        child: const GuiaFondoQueRespira(
+          hueco: Rect.fromLTWH(10, 10, 100, 50),
+          borde: Colors.blue,
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(fondo(quieto: false));
+    final antes = brillo().value;
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(brillo().value, isNot(antes));
+    expect(brillo().value, inInclusiveRange(0.6, 1));
+
+    await tester.pumpWidget(fondo(quieto: true));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(brillo().value, 1);
+    expect(tester.binding.hasScheduledFrame, isFalse);
+  });
 }
