@@ -1,3 +1,4 @@
+import 'package:bluetalk/core/theme/app_colors.dart';
 import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/padre/graficos/linea_tendencia.dart';
 import 'package:bluetalk/features/padre/informes/grafica_columnas.dart';
@@ -107,5 +108,20 @@ void main() {
     );
     expect(find.text('Por semana'), findsOneWidget);
     semantica.dispose();
+  });
+
+  testWidgets('las pestañas se leen sobre la barra de color', (tester) async {
+    final prefs = await prefsDePrueba();
+    await pumpPadre(
+      tester,
+      home: const InformesScreen(),
+      overrides: [
+        ...overridesDePadre(prefs),
+        usoTelefonoGatewayProvider.overrideWithValue(GatewayFalso()),
+      ],
+    );
+    final pestanas = tester.widget<TabBar>(find.byType(TabBar));
+    expect(pestanas.labelColor, AppColors.celeste.onHeader);
+    expect(pestanas.unselectedLabelColor, AppColors.celeste.onHeader);
   });
 }

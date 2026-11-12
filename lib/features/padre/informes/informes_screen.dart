@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_colors.dart';
+
 import 'informe_modelo.dart';
 import 'informe_vista.dart';
 
@@ -15,8 +17,13 @@ class InformesScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Informes'),
-          bottom: const TabBar(
-            tabs: [Tab(text: 'Semanal'), Tab(text: 'Mensual')],
+          // Sobre la barra de color: los tonos por defecto (primary) no se
+          // leían en ningún tema.
+          bottom: TabBar(
+            labelColor: context.colores.onHeader,
+            unselectedLabelColor: context.colores.onHeader,
+            indicatorColor: context.colores.onHeader,
+            tabs: const [Tab(text: 'Semanal'), Tab(text: 'Mensual')],
           ),
         ),
         body: const TabBarView(
