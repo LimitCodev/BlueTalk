@@ -12,7 +12,6 @@ import 'package:bluetalk/app/app.dart';
 import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/app/router.dart';
 import 'package:bluetalk/app/atras_shell.dart';
-import 'package:bluetalk/app/shell.dart';
 import 'package:bluetalk/core/theme/calm_mode.dart';
 import 'package:bluetalk/data/local/mock_repos.dart';
 import 'package:bluetalk/data/local/seed_store.dart';

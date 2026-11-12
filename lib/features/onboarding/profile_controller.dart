@@ -22,6 +22,15 @@ class ProfileController extends Notifier<ChildProfile?> {
     state = profile;
   }
 
+  /// Cambia el apodo desde el Modo padre (plan 14A §A4). Vacío = sin apodo.
+  Future<void> renombrar(String nombre) async {
+    final current = state;
+    if (current == null) return;
+    final updated = current.copyWith(nickname: nombre.trim());
+    await ref.read(profileRepoProvider).saveProfile(updated);
+    state = updated;
+  }
+
   /// Cambia el avatar (picto) del niño y lo persiste (plan 00 §5.2).
   Future<void> updateAvatar(String pictoId) async {
     final current = state;
