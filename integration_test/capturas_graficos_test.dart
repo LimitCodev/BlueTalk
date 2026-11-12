@@ -93,6 +93,7 @@ Widget _app({
   bool conApps = true,
 }) =>
     ProviderScope(
+      key: UniqueKey(), // estado nuevo en cada captura
       overrides: [
         edicionDirectaProvider.overrideWithValue(conApps),
         informeProvider(Periodo.semana).overrideWith((ref) async => semana),
