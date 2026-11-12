@@ -15,6 +15,7 @@ Future<ProviderContainer> _pump(
   WidgetTester tester, {
   bool talkBack = false,
   String apodo = 'Sol',
+  EdgeInsets padding = EdgeInsets.zero,
 }) async {
   SharedPreferences.setMockInitialValues({'guia_vista': true});
   final prefs = await SharedPreferences.getInstance();
@@ -35,7 +36,7 @@ Future<ProviderContainer> _pump(
         ),
       ],
       child: MediaQuery(
-        data: MediaQueryData(accessibleNavigation: talkBack),
+        data: MediaQueryData(accessibleNavigation: talkBack, padding: padding),
         child: MaterialApp.router(routerConfig: router),
       ),
     ),
@@ -102,5 +103,19 @@ void main() {
     for (final t in ['Comunicar', 'Aprender', 'Rutinas', 'Ajustes']) {
       expect(find.text(t), findsOneWidget);
     }
+  });
+
+  testWidgets('en horizontal los puntos caben sin desbordar', (tester) async {
+    // Emulador de gama baja girado: 1280×720 px a 280 dpi (411 dp de alto).
+    tester.view.physicalSize = const Size(1280, 720);
+    tester.view.devicePixelRatio = 1.75;
+    addTearDown(tester.view.reset);
+    // Barra de estado de Android: 24 dp arriba.
+    await _pump(tester, padding: const EdgeInsets.only(top: 24));
+    expect(tester.takeException(), isNull);
+    // Los puntos siguen siendo objetivos de 48 dp.
+    final punto = find.bySemanticsLabel('Ir a Ajustes, 4 de 5');
+    await tester.ensureVisible(punto);
+    expect(tester.getSize(punto).height, greaterThanOrEqualTo(48));
   });
 }

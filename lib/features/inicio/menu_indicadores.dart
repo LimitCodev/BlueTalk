@@ -30,41 +30,45 @@ class MenuIndicadores extends StatelessWidget {
           child: Row(
             children: [
               Expanded(child: child),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  for (var i = 0; i < total; i++)
-                    Semantics(
-                      button: true,
-                      label:
-                          'Ir a ${MenuOpcion.values[i].titulo}, '
-                          '${i + 1} de $total',
-                      excludeSemantics: true,
-                      child: InkResponse(
-                        onTap: () => onIr(i),
-                        radius: 24,
-                        child: SizedBox(
-                          width: 48,
-                          height: 48,
-                          child: Center(
-                            child: AnimatedContainer(
-                              duration: MediaQuery.disableAnimationsOf(context)
-                                  ? Duration.zero
-                                  : const Duration(milliseconds: 200),
-                              width: 8,
-                              height: i == actual ? 20 : 8,
-                              decoration: BoxDecoration(
-                                color: i == actual
-                                    ? color.primary
-                                    : color.onSurface.withValues(alpha: 0.3),
-                                borderRadius: BorderRadius.circular(4),
+              // En horizontal no caben 5 × 48 dp: se desplazan en vez de
+              // encoger por debajo del objetivo táctil mínimo.
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    for (var i = 0; i < total; i++)
+                      Semantics(
+                        button: true,
+                        label:
+                            'Ir a ${MenuOpcion.values[i].titulo}, '
+                            '${i + 1} de $total',
+                        excludeSemantics: true,
+                        child: InkResponse(
+                          onTap: () => onIr(i),
+                          radius: 24,
+                          child: SizedBox(
+                            width: 48,
+                            height: 48,
+                            child: Center(
+                              child: AnimatedContainer(
+                                duration:
+                                    MediaQuery.disableAnimationsOf(context)
+                                    ? Duration.zero
+                                    : const Duration(milliseconds: 200),
+                                width: 8,
+                                height: i == actual ? 20 : 8,
+                                decoration: BoxDecoration(
+                                  color: i == actual
+                                      ? color.primary
+                                      : color.onSurface.withValues(alpha: 0.3),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
