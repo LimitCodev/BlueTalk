@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../guia/guia_controller.dart';
+import '../guia/guia_lista.dart';
 import 'menu_opciones.dart';
 
 /// Botón del menú que está (o debe quedar) en el centro del carrusel.
@@ -8,8 +10,12 @@ import 'menu_opciones.dart';
 /// centra la tarjeta que explica. Se reinicia al salir del menú: el menú
 /// siempre empieza en Comunicar (plan 14A §2, orden fijo).
 class MenuCentrado extends Notifier<int> {
+  /// Empieza en Comunicar, o en la tarjeta que explica la guía.
   @override
-  int build() => 0;
+  int build() {
+    final paso = ref.read(guiaProvider);
+    return paso == null ? 0 : pasosGuia[paso].tarjeta?.index ?? 0;
+  }
 
   void centrar(MenuOpcion opcion) => ir(opcion.index);
 

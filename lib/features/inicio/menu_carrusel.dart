@@ -18,7 +18,10 @@ class MenuCarrusel extends ConsumerStatefulWidget {
 }
 
 class _MenuCarruselState extends ConsumerState<MenuCarrusel> {
-  final _pagina = PageController(viewportFraction: 0.38);
+  late final _pagina = PageController(
+    viewportFraction: 0.38,
+    initialPage: ref.read(menuCentradoProvider),
+  );
 
   @override
   void dispose() {

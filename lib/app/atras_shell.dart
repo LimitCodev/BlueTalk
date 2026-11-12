@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/comunicador/comunicador_controller.dart';
+import '../features/guia/guia_controller.dart';
 import '../features/juegos/juegos_controller.dart';
 import '../features/rutinas/rutinas_controller.dart';
 
@@ -22,6 +23,8 @@ void manejarAtras(
   WidgetRef ref,
   StatefulNavigationShell shell,
 ) {
+  // Durante la guía de la mascota, Atrás retrocede un paso (plan 14B).
+  if (guiaAtras(ref)) return;
   final index = shell.currentIndex;
   // Fila 1: dentro de un juego, el Atrás vuelve a la lista de Aprender
   // (y cierra la sesión de juego con su duración, plan 03 §6).

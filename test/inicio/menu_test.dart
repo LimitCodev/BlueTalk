@@ -16,7 +16,7 @@ Future<ProviderContainer> _pump(
   bool talkBack = false,
   String apodo = 'Sol',
 }) async {
-  SharedPreferences.setMockInitialValues({});
+  SharedPreferences.setMockInitialValues({'guia_vista': true});
   final prefs = await SharedPreferences.getInstance();
   final router = GoRouter(
     initialLocation: '/inicio',

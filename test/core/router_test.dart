@@ -34,7 +34,8 @@ import '../padre/harness.dart';
 Future<SharedPreferences> _givenPrefs() => _givenPrefsCon({});
 
 Future<SharedPreferences> _givenPrefsCon(Map<String, Object> values) async {
-  SharedPreferences.setMockInitialValues(values);
+  // La guía de la mascota (plan 14B) se prueba en test/guia/.
+  SharedPreferences.setMockInitialValues({'guia_vista': true, ...values});
   return SharedPreferences.getInstance();
 }
 

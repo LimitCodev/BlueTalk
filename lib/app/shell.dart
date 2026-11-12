@@ -4,15 +4,15 @@ import 'package:go_router/go_router.dart';
 
 import '../core/theme/calm_mode.dart';
 import '../core/widgets/logo_bluetalk.dart';
+import '../features/guia/guia_objetivos.dart';
+import '../features/guia/guia_pasos.dart';
 import 'atras_shell.dart';
 
 /// Shell fijo con navegación inferior predecible (plan 01 §4):
 /// Comunicar · Aprender · Rutinas · Ajustes.
 ///
-/// Centraliza el botón Atrás (plan 13 P1): dentro de la app el Atrás
-/// siempre se mueve a un sitio de la tabla del plan, nunca se queda quieto
-/// ni mata la app donde no toca. El único punto de salida es el menú
-/// principal (con el gancho `saleConAtrasProvider` del kiosko, plan 12).
+/// Centraliza el botón Atrás (plan 13 P1 y plan 14 §2): siempre se mueve
+/// a un sitio de la tabla; el único punto de salida es el menú principal.
 class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.shell});
 
@@ -44,35 +44,42 @@ class AppShell extends ConsumerWidget {
         if (!didPop) manejarAtras(context, ref, shell);
       },
       child: Scaffold(
-        appBar: AppBar(
-          // Vuelve al menú principal (plan 14A §A3).
-          leading: IconButton(
-            icon: const Icon(Icons.home_outlined),
-            tooltip: 'Inicio',
-            onPressed: () => context.go('/inicio'),
-          ),
-          title: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const LogoBluetalkWordmark(height: 23, pill: true),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  _tabs[index].label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: GuiaAncla(
+            objetivo: GuiaObjetivo.barraSuperior,
+            child: AppBar(
+              // Vuelve al menú principal (plan 14A §A3).
+              leading: IconButton(
+                icon: const Icon(Icons.home_outlined),
+                tooltip: 'Inicio',
+                onPressed: () => context.go('/inicio'),
               ),
-            ],
-          ),
-          actions: [
-            // Botón de modo calma visible siempre en el shell (plan 01 §3).
-            IconButton(
-              icon: const Icon(Icons.contrast),
-              tooltip: 'Modo calma',
-              onPressed: () => ref.read(calmModeProvider.notifier).set(!calm),
+              title: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const LogoBluetalkWordmark(height: 23, pill: true),
+                  const SizedBox(width: 10),
+                  Flexible(
+                    child: Text(
+                      _tabs[index].label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                // Botón de modo calma visible siempre en el shell (plan 01 §3).
+                IconButton(
+                  icon: const Icon(Icons.contrast),
+                  tooltip: 'Modo calma',
+                  onPressed: () =>
+                      ref.read(calmModeProvider.notifier).set(!calm),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
         body: shell,
         bottomNavigationBar: NavigationBar(

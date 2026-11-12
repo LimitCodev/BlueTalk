@@ -7,6 +7,9 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/calm_mode.dart';
 import '../../core/widgets/logo_bluetalk.dart';
 import '../onboarding/profile_controller.dart';
+import '../guia/guia_controller.dart';
+import '../guia/guia_objetivos.dart';
+import '../guia/guia_pasos.dart';
 import 'inicio_lista.dart';
 import 'menu_carrusel.dart';
 
@@ -20,12 +23,17 @@ class InicioScreen extends ConsumerWidget {
     final apodo = ref.watch(profileProvider)?.nickname.trim() ?? '';
     final calm = ref.watch(calmModeProvider);
     final texto = Theme.of(context).textTheme;
+    // Primera vez en el menú: empieza la guía de la mascota (plan 14B).
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => ref.read(guiaProvider.notifier).iniciarSiFalta(),
+    );
     return PopScope(
       canPop: false,
       // El menú es el único punto de salida de la app (plan 14 §2),
       // salvo con el kiosko del plan 12.
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop && ref.read(saleConAtrasProvider)) {
+        if (didPop || guiaAtras(ref)) return;
+        if (ref.read(saleConAtrasProvider)) {
           SystemNavigator.pop();
         }
       },
@@ -74,7 +82,10 @@ class InicioScreen extends ConsumerWidget {
                   ? const InicioLista()
                   : const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: MenuCarrusel(),
+                      child: GuiaAncla(
+                        objetivo: GuiaObjetivo.menuCarrusel,
+                        child: MenuCarrusel(),
+                      ),
                     ),
             ),
           ),

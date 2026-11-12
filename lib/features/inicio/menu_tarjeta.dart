@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../guia/guia_objetivos.dart';
+import '../guia/guia_pasos.dart';
 import 'menu_opciones.dart';
 
 /// Tarjeta del menú principal, como la de `/menu` de la web.
@@ -26,55 +28,58 @@ class MenuTarjeta extends StatelessWidget {
     final tinta = cat.texto(paleta);
     final t = distancia.clamp(0.0, 1.0);
     final texto = Theme.of(context).textTheme;
-    return Transform.scale(
-      scale: 1 - 0.1 * t,
-      child: Opacity(
-        opacity: 1 - 0.6 * t,
-        child: Semantics(
-          button: true,
-          label: '${opcion.titulo}. ${opcion.descripcion}',
-          excludeSemantics: true,
-          child: Material(
-            color: cat.relleno(paleta),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: cat.bordeSobre(paleta), width: 2),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: onTap,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: tinta.withValues(alpha: 0.10),
-                        borderRadius: BorderRadius.circular(12),
+    return GuiaAncla(
+      objetivo: objetivoTarjeta(opcion),
+      child: Transform.scale(
+        scale: 1 - 0.1 * t,
+        child: Opacity(
+          opacity: 1 - 0.6 * t,
+          child: Semantics(
+            button: true,
+            label: '${opcion.titulo}. ${opcion.descripcion}',
+            excludeSemantics: true,
+            child: Material(
+              color: cat.relleno(paleta),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: cat.bordeSobre(paleta), width: 2),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: onTap,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 64,
+                        height: 64,
+                        decoration: BoxDecoration(
+                          color: tinta.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(opcion.icono, size: 36, color: tinta),
                       ),
-                      child: Icon(opcion.icono, size: 36, color: tinta),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            opcion.titulo,
-                            style: texto.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: tinta,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              opcion.titulo,
+                              style: texto.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: tinta,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(opcion.descripcion, style: texto.bodyMedium),
-                        ],
+                            const SizedBox(height: 4),
+                            Text(opcion.descripcion, style: texto.bodyMedium),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
