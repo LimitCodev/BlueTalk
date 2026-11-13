@@ -12,7 +12,6 @@ import 'package:bluetalk/app/app.dart';
 import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/app/router.dart';
 import 'package:bluetalk/app/atras_shell.dart';
-import 'package:bluetalk/app/shell.dart';
 import 'package:bluetalk/core/theme/calm_mode.dart';
 import 'package:bluetalk/data/local/mock_repos.dart';
 import 'package:bluetalk/data/local/seed_store.dart';
@@ -20,6 +19,7 @@ import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/comunicador/comunicador_controller.dart';
 import 'package:bluetalk/features/comunicador/comunicador_screen.dart';
 import 'package:bluetalk/features/comunicador/tts_service.dart';
+import 'package:bluetalk/features/inicio/inicio_screen.dart';
 import 'package:bluetalk/features/juegos/artista/artista_screen.dart';
 import 'package:bluetalk/features/juegos/juegos_screen.dart';
 import 'package:bluetalk/features/padre/gate/gate_controller.dart';
@@ -34,7 +34,8 @@ import '../padre/harness.dart';
 Future<SharedPreferences> _givenPrefs() => _givenPrefsCon({});
 
 Future<SharedPreferences> _givenPrefsCon(Map<String, Object> values) async {
-  SharedPreferences.setMockInitialValues(values);
+  // La guía de la mascota (plan 14B) se prueba en test/guia/.
+  SharedPreferences.setMockInitialValues({'guia_vista': true, ...values});
   return SharedPreferences.getInstance();
 }
 
@@ -46,6 +47,9 @@ Future<ProviderContainer> _pumpApp(
   // la app desde Comunicar. (riverpod 3 no exporta el tipo Override,
   // por eso no se pasa una lista de overrides.)
   bool saleConAtras = true,
+  // Con perfil, la app arranca en el menú (plan 14A). Casi todos los
+  // tests empiezan dentro de Comunicar, como antes del menú.
+  bool enComunicar = true,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -70,7 +74,13 @@ Future<ProviderContainer> _pumpApp(
       child: const BlueTalkApp(),
     ),
   );
-  return ProviderScope.containerOf(tester.element(find.byType(BlueTalkApp)));
+  final container =
+      ProviderScope.containerOf(tester.element(find.byType(BlueTalkApp)));
+  if (profile != null && enComunicar) {
+    container.read(routerProvider).go('/home/comunicar');
+    await tester.pumpAndSettle();
+  }
+  return container;
 }
 
 /// Completa el onboarding escribiendo un apodo (sin PII).
@@ -113,7 +123,7 @@ Future<void> _entrarAlPanelPadre(
 }
 
 void main() {
-  testWidgets('onboarding: pide apodo y entra al shell', (tester) async {
+  testWidgets('onboarding: pide apodo y entra al menú', (tester) async {
     final prefs = await _givenPrefs();
     await _pumpApp(tester, prefs);
 
@@ -128,9 +138,8 @@ void main() {
 
     await _completarOnboarding(tester);
 
-    expect(find.byType(AppShell), findsOneWidget);
-    expect(find.byType(NavigationBar), findsOneWidget);
-    expect(find.text('Comunicar'), findsWidgets); // AppBar + pestaña
+    expect(find.byType(InicioScreen), findsOneWidget);
+    expect(find.text('¡Hola, Sol! 👋'), findsOneWidget);
     expect(find.text('¿Cómo te llamas?'), findsNothing);
 
     // El perfil quedó guardado localmente.
@@ -139,15 +148,16 @@ void main() {
     expect(saved!.nickname, 'Sol');
   });
 
-  testWidgets('con perfil guardado arranca directo en el home', (tester) async {
+  testWidgets('con perfil guardado arranca directo en el menú', (tester) async {
     final prefs = await _givenPrefs();
     await _pumpApp(
       tester,
       prefs,
       profile: const ChildProfile(id: 'local', nickname: 'Sol'),
+      enComunicar: false,
     );
 
-    expect(find.byType(AppShell), findsOneWidget);
+    expect(find.byType(InicioScreen), findsOneWidget);
     expect(find.text('¿Cómo te llamas?'), findsNothing);
   });
 
@@ -158,7 +168,8 @@ void main() {
     await tester.tap(find.text('Entrar sin apodo'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(AppShell), findsOneWidget);
+    expect(find.byType(InicioScreen), findsOneWidget);
+    expect(find.text('¡Hola! 👋'), findsOneWidget);
     final saved = await PrefsProfileRepo(prefs).currentProfile();
     expect(saved, isNotNull, reason: 'aunque sin apodo sí se crea el perfil');
   });
@@ -167,9 +178,11 @@ void main() {
     'las pestañas navegan y el botón del shell activa el modo calma',
     (tester) async {
       final prefs = await _givenPrefs();
-      await _pumpApp(tester, prefs);
+      final container = await _pumpApp(tester, prefs);
 
       await _completarOnboarding(tester);
+      container.read(routerProvider).go('/home/comunicar');
+      await tester.pumpAndSettle();
 
       await tester.tap(find.text('Ajustes'));
       await tester.pumpAndSettle();
@@ -344,16 +357,18 @@ void main() {
   });
 
   testWidgets(
-    'P1 fila 2: Atrás en Aprender, Rutinas o Ajustes va a Comunicar',
+    'Atrás en Aprender, Rutinas o Ajustes va al menú (plan 14 §2)',
     (tester) async {
       final prefs = await _givenPrefs();
-      await _pumpApp(
+      final container = await _pumpApp(
         tester,
         prefs,
         profile: const ChildProfile(id: 'local', nickname: 'Sol'),
       );
 
       for (final pestana in ['Aprender', 'Rutinas', 'Ajustes']) {
+        container.read(routerProvider).go('/home/comunicar');
+        await tester.pumpAndSettle();
         await tester.tap(find.text(pestana));
         await tester.pumpAndSettle();
 
@@ -361,15 +376,15 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(
-          find.byType(ComunicadorScreen),
+          find.byType(InicioScreen),
           findsOneWidget,
-          reason: 'Atrás desde $pestana debe volver a Comunicar',
+          reason: 'Atrás desde $pestana debe volver al menú',
         );
       }
     },
   );
 
-  testWidgets('P1 fila 3: Atrás en Comunicar pide salir de la app', (
+  testWidgets('Atrás en Comunicar va al menú y en el menú sale de la app', (
     tester,
   ) async {
     final prefs = await _givenPrefs();
@@ -396,9 +411,13 @@ void main() {
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
 
-    // La app sigue en Comunicar (no navega a ningún sitio)…
-    expect(find.byType(ComunicadorScreen), findsOneWidget);
-    // …y le pide al sistema cerrar (la fila «Comunicar → sale»).
+    // Desde Comunicar se vuelve al menú, sin salir (plan 14 §2)…
+    expect(find.byType(InicioScreen), findsOneWidget);
+    expect(llamadas.any((c) => c.method == 'SystemNavigator.pop'), isFalse);
+
+    // …y desde el menú se le pide al sistema cerrar la app.
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
     expect(
       llamadas.any((llamada) => llamada.method == 'SystemNavigator.pop'),
       isTrue,
@@ -441,7 +460,7 @@ void main() {
   });
 
   testWidgets('P1 fila 4: Atrás en la zona de padre: subpantalla al panel, '
-      'panel a Ajustes', (tester) async {
+      'panel al menú', (tester) async {
     final prefs = await _givenPrefs();
     final container = await _pumpApp(
       tester,
@@ -470,12 +489,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Escribe tu código'), findsOneWidget);
 
-    // Atrás otra vez: del panel a Ajustes. (La lista de Ajustes es perezosa:
-    // hay que desplazarse para que la sección exista en el árbol.)
+    // Atrás otra vez: del panel al menú principal (plan 14 §2).
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.text('Zona de adultos'), 300);
-    expect(find.text('Zona de adultos'), findsOneWidget);
+    expect(find.byType(InicioScreen), findsOneWidget);
   });
 
   testWidgets('P1 fila 4: Atrás en una pestaña del padre vuelve al panel, '
@@ -508,11 +525,10 @@ void main() {
     );
     expect(find.text('Límite diario de juegos'), findsNothing);
 
-    // Atrás desde el panel: sale a Ajustes (misma lógica de «Salir»).
+    // Atrás desde el panel: sale al menú (misma lógica de «Salir»).
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.text('Zona de adultos'), 300);
-    expect(find.text('Zona de adultos'), findsOneWidget);
+    expect(find.byType(InicioScreen), findsOneWidget);
   });
 
   testWidgets('P1 fila 5: Atrás cierra un diálogo sin salir de la pantalla', (
@@ -553,7 +569,7 @@ void main() {
   });
 
   testWidgets(
-    'P1 gancho kiosko: con saleConAtras=false, Atrás en Comunicar no sale',
+    'P1 gancho kiosko: con saleConAtras=false, Atrás en el menú no sale',
     (tester) async {
       final prefs = await _givenPrefs();
       await _pumpApp(
@@ -561,6 +577,7 @@ void main() {
         prefs,
         profile: const ChildProfile(id: 'local', nickname: 'Sol'),
         saleConAtras: false,
+        enComunicar: false,
       );
       final llamadas = <MethodCall>[];
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
@@ -581,7 +598,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.byType(ComunicadorScreen),
+        find.byType(InicioScreen),
         findsOneWidget,
         reason: 'el niño no sale de BlueTalk con el botón Atrás',
       );
@@ -615,9 +632,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.byType(AppShell),
+      find.byType(InicioScreen),
       findsOneWidget,
-      reason: 'se avanzó al shell con el teclado abierto',
+      reason: 'se avanzó al menú con el teclado abierto',
     );
   });
 

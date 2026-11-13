@@ -38,7 +38,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           .read(profileProvider.notifier)
           .create(_nicknameController.text);
       if (!mounted) return;
-      context.go('/home/comunicar');
+      context.go('/inicio');
     } catch (_) {
       if (!mounted) return;
       setState(() => _saving = false);

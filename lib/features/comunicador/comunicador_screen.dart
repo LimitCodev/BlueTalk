@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../guia/guia_objetivos.dart';
+import '../guia/guia_pasos.dart';
 import 'comunicador_controller.dart';
 import 'phrase_bar.dart';
 import 'comunicador_categoria_view.dart';
@@ -34,7 +36,7 @@ class ComunicadorScreen extends ConsumerWidget {
               ? const MessagesView()
               : const HomeView(),
         ),
-        const PhraseBar(),
+        const GuiaAncla(objetivo: GuiaObjetivo.fraseBarra, child: PhraseBar()),
       ],
     );
   }
