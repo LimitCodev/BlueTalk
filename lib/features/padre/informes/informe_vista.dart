@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/plataforma/edicion.dart';
+import 'graficos_animo.dart';
+import 'graficos_calendario.dart';
+import 'graficos_comparacion.dart';
+import 'graficos_dias.dart';
+import 'graficos_serie.dart';
+import 'graficos_temas.dart';
 import 'informe_modelo.dart';
 import 'informe_secciones.dart';
 import 'informe_semanas.dart';
 import 'informe_texto.dart';
 import 'informe_uso_telefono.dart';
-import '../../../core/plataforma/edicion.dart';
 import 'informes_providers.dart';
 
-/// Un informe (semanal o mensual) con sus secciones y «Copiar informe».
+/// Un informe (semanal o mensual) con sus gráficos y «Copiar informe».
 class InformeVista extends ConsumerWidget {
   const InformeVista({super.key, required this.periodo});
 
@@ -23,10 +29,16 @@ class InformeVista extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: 32),
           children: [
             CabeceraInforme(informe: value),
-            SeccionComunicacion(informe: value),
-            SeccionJuegoYAnimo(informe: value),
-            if (ref.watch(edicionDirectaProvider))
-              SeccionUsoTelefono(informe: value),
+            SeccionComparacion(informe: value),
+            SeccionDiasUso(informe: value),
+            SeccionMedidor(informe: value),
+            SeccionSerie(informe: value),
+            if (periodo == Periodo.mes) SeccionCalendario(informe: value),
+            SeccionCategorias(informe: value),
+            SeccionAnimo(informe: value),
+            SeccionJuego(informe: value),
+            if (ref.watch(edicionDirectaProvider)) SeccionApps(informe: value),
+            SeccionPalabras(informe: value),
             if (periodo == Periodo.mes) SeccionPorSemana(informe: value),
             _BotonCopiar(informe: value),
           ],

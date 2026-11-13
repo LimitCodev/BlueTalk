@@ -41,7 +41,7 @@ void main() {
 
     await _entrar(tester);
     expect(find.byType(NavigationBar), findsOneWidget);
-    expect(find.text('Uso del día'), findsOneWidget);
+    expect(find.text('¿Cuántas actividades hizo hoy?'), findsOneWidget);
 
     await tester.tap(find.text('Control'));
     await tester.pumpAndSettle();
@@ -57,7 +57,7 @@ void main() {
 
     await tester.tap(find.text('Resumen'));
     await tester.pumpAndSettle();
-    expect(find.text('Uso del día'), findsOneWidget);
+    expect(find.text('¿Cuántas actividades hizo hoy?'), findsOneWidget);
   });
 
   testWidgets('salir del modo padre cierra la sesión y el gate pide el PIN',

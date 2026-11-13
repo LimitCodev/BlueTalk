@@ -8,6 +8,7 @@ import 'package:bluetalk/features/padre/dashboard/resumen_screen.dart';
 import 'package:bluetalk/features/padre/diagnostico/observaciones.dart';
 
 import 'harness.dart';
+import '../core/accessibility_helper.dart';
 
 /// Desplaza la lista hasta un widget que está más abajo del primer pantallazo.
 Future<void> _hasta(WidgetTester tester, Finder finder) async {
@@ -69,8 +70,9 @@ void main() {
 
     expect(find.text('Datos de demostración'), findsNothing);
     expect(find.text('Pictogramas tocados hoy'), findsOneWidget);
-    expect(find.text('Tiempo de juego hoy'), findsOneWidget);
-    expect(find.text('5 min'), findsOneWidget);
+    expect(find.text('Minutos de juego'), findsOneWidget);
+    expect(find.text('5'), findsOneWidget);
+    expect(find.text('¿Cuántas actividades hizo hoy?'), findsOneWidget);
 
     final metricas = await container.read(metricasProvider.future);
     expect(metricas.pictosHoy, 7);
@@ -81,11 +83,42 @@ void main() {
     expect(metricas.minutosJuegoHoy, 5);
     expect(metricas.dibujosGuardados, 1);
     expect(metricas.eventosPorDia.last, 9, reason: '7 pictos + juego + dibujo');
+    expect(
+      find.text(
+        '${metricas.actividadesHechasHoy} de ${metricas.actividadesHorario}',
+      ),
+      findsOneWidget,
+    );
 
-    // Más abajo en la lista: horario y gráfica semanal.
-    await _hasta(tester, find.text('Últimos 7 días'));
-    expect(find.text('Actividades del horario'), findsOneWidget);
-    expect(find.text('Últimos 7 días'), findsOneWidget);
+    // Más abajo en la lista: gráfica semanal y tarjetas sin gráfico.
+    await _hasta(tester, find.text('¿Cómo fue esta semana?'));
+    expect(find.text('¿Cómo fue esta semana?'), findsOneWidget);
+    await _hasta(tester, find.text('Más datos'));
+    expect(find.text('Más datos'), findsOneWidget);
+  });
+
+  testWidgets('el resumen con gráficos no tiene problemas de accesibilidad',
+      (tester) async {
+    final prefs = await prefsDePrueba();
+    await sembrarEventos(prefs, [
+      UsageEvent(
+        id: 'a1',
+        type: 'picto_tap',
+        createdAt: ahoraFija,
+        data: {'pictoId': 'p1', 'categoryId': 'comida'},
+      ),
+      UsageEvent(
+        id: 'a2',
+        type: 'juego_fin',
+        createdAt: ahoraFija,
+        data: {'juego': 'memoria', 'segundos': 120},
+      ),
+    ]);
+    await expectSinProblemasDeAccesibilidad(
+      tester,
+      overrides: overridesDePadre(prefs, reloj: RelojPrueba()),
+      home: const Scaffold(body: ResumenScreen()),
+    );
   });
 
   testWidgets('las observaciones salen con su disclaimer obligatorio',
@@ -127,6 +160,8 @@ void main() {
     );
 
     expect(find.text('Datos de demostración'), findsNothing);
+    expect(find.text('¿Cuántas actividades hizo hoy?'), findsOneWidget);
+    expect(find.textContaining('Aún no hay datos'), findsWidgets);
     await _hasta(tester, find.text(disclaimerObservaciones));
     expect(
       find.text(

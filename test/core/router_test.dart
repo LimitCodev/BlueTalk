@@ -26,6 +26,7 @@ import 'package:bluetalk/features/padre/gate/gate_controller.dart';
 import 'package:bluetalk/features/padre/legal/legal_screen.dart';
 import 'package:bluetalk/features/padre/padre_controller.dart';
 import 'package:bluetalk/features/onboarding/profile_controller.dart';
+import 'package:bluetalk/features/rutinas/rutinas_controller.dart';
 
 import '../comunicador/dobles.dart';
 import '../padre/harness.dart';
@@ -318,6 +319,28 @@ void main() {
 
     expect(find.byType(ArtistaScreen), findsNothing);
     expect(find.text('Memoria'), findsOneWidget, reason: 'está en la lista');
+  });
+
+  testWidgets('Atrás en una vista de Rutinas vuelve a la lista de Rutinas', (
+    tester,
+  ) async {
+    final prefs = await _givenPrefs();
+    final container = await _pumpApp(
+      tester,
+      prefs,
+      profile: const ChildProfile(id: 'local', nickname: 'Sol'),
+    );
+
+    await tester.tap(find.text('Rutinas'));
+    await tester.pumpAndSettle();
+    container.read(rutinasProvider.notifier).abrir(RutinaVista.horario);
+    await tester.pumpAndSettle();
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+
+    expect(container.read(rutinasProvider), RutinaVista.inicio);
+    expect(find.byType(ComunicadorScreen), findsNothing);
   });
 
   testWidgets(

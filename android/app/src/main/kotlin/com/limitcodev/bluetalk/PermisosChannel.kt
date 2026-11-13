@@ -40,8 +40,18 @@ class PermisosChannel(
             "estado" -> result.success(estado())
             "pedirAvisos" -> result.success(pedirAvisos())
             "pedirBateria" -> result.success(pedirBateria())
+            "abrirAjustesVoz" -> result.success(abrirAjustesVoz())
             else -> result.notImplemented()
         }
+    }
+
+    private fun abrirAjustesVoz(): Boolean = try {
+        // Android no publica una constante para esta pantalla.
+        activity.startActivity(Intent("com.android.settings.TTS_SETTINGS"))
+        true
+    } catch (e: android.content.ActivityNotFoundException) {
+        Log.w("PermisosChannel", "sin pantalla de ajustes de voz", e)
+        false
     }
 
     private fun estado(): Map<String, Any> = mapOf(

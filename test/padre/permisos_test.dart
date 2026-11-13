@@ -414,7 +414,7 @@ void main() {
       await entrar(tester);
 
       expect(find.byType(NavigationBar), findsOneWidget);
-      expect(find.text('Uso del día'), findsOneWidget);
+      expect(find.text('¿Cuántas actividades hizo hoy?'), findsOneWidget);
       expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
       // La salida siempre está, para no dejar al adulto encerrado.
       expect(find.byTooltip('Salir del modo padre'), findsOneWidget);
@@ -447,7 +447,7 @@ void main() {
       await entrar(tester);
 
       expect(find.byType(NavigationBar), findsOneWidget);
-      expect(find.text('Uso del día'), findsOneWidget);
+      expect(find.text('¿Cuántas actividades hizo hoy?'), findsOneWidget);
       expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
     });
 
@@ -472,7 +472,7 @@ void main() {
       await entrar(tester);
 
       expect(find.byType(NavigationBar), findsOneWidget);
-      expect(find.text('Uso del día'), findsOneWidget);
+      expect(find.text('¿Cuántas actividades hizo hoy?'), findsOneWidget);
       expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
     });
 
@@ -507,7 +507,7 @@ void main() {
       expect(find.byType(NavigationBar), findsOneWidget,
           reason: 'un permiso opcional no puede cerrar el panel');
       expect(find.textContaining('Todavía no se puede avanzar'), findsNothing);
-      expect(find.text('Uso del día'), findsOneWidget);
+      expect(find.text('¿Cuántas actividades hizo hoy?'), findsOneWidget);
     });
   });
 

@@ -31,6 +31,24 @@ void main() {
     expect(find.text('El día de lluvia'), findsOneWidget);
   });
 
+  testWidgets('Volver dentro de un cuento regresa a la lista de cuentos',
+      (tester) async {
+    await pumpJuegos(tester);
+
+    await tester.tap(find.text('Cuentos interactivos'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('El gato de Lola'));
+    await tester.pumpAndSettle();
+    expect(find.text('Página 1 de 5'), findsOneWidget);
+
+    await tester.tap(find.text('Volver'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Página 1 de 5'), findsNothing);
+    expect(find.text('Un día en la escuela'), findsOneWidget);
+    expect(find.text('El día de lluvia'), findsOneWidget);
+  });
+
   testWidgets('el lector muestra páginas con picto clave y la tarea al final',
       (tester) async {
     final container = await pumpJuegos(tester);

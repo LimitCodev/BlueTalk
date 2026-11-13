@@ -49,9 +49,9 @@ class FlutterTtsSpeaker implements TtsSpeaker {
     final dynamic raw = await tts.getLanguages;
     final languages =
         raw is List ? raw.whereType<String>().toList() : const <String>[];
-    _spanishLanguages =
-        languages.where((lang) => lang.startsWith('es')).toList();
-    return _spanishLanguages!;
+    final spanish = languages.where((lang) => lang.startsWith('es')).toList();
+    if (spanish.isNotEmpty) _spanishLanguages = spanish; // sin voz, reintenta
+    return spanish;
   }
 
   Future<String?> _bestSpanish(FlutterTts tts) async {

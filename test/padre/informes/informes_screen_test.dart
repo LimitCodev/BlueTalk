@@ -1,4 +1,7 @@
+import 'package:bluetalk/core/theme/app_colors.dart';
 import 'package:bluetalk/data/models/models.dart';
+import 'package:bluetalk/features/padre/graficos/linea_tendencia.dart';
+import 'package:bluetalk/features/padre/informes/grafica_columnas.dart';
 import 'package:bluetalk/features/padre/informes/informes_screen.dart';
 import 'package:bluetalk/features/padre/monitoreo/uso_telefono_controller.dart';
 import 'package:flutter/material.dart';
@@ -42,19 +45,37 @@ void main() {
       ],
     );
 
-    expect(find.textContaining('Pictogramas tocados: 3'), findsOneWidget);
+    expect(find.text('¿Cómo va comparado con antes?'), findsOneWidget);
     expect(find.textContaining('No es un diagnóstico'), findsOneWidget);
-    expect(find.bySemanticsLabel(RegExp('^Pictogramas por día')), findsOneWidget);
-    expect(find.text('Manzana'), findsOneWidget, reason: 'nombre del seed');
 
+    final listaSemana = find
+        .descendant(of: find.byType(ListView), matching: find.byType(Scrollable))
+        .first;
+    await tester.scrollUntilVisible(
+      find.text('¿Cómo cambió la comunicación día a día?'),
+      300,
+      scrollable: listaSemana,
+    );
+    expect(find.bySemanticsLabel(RegExp('^Pictogramas por día')), findsOneWidget);
+    expect(find.byType(GraficaColumnas), findsWidgets,
+        reason: 'la semana se lee en columnas');
+    await tester.scrollUntilVisible(
+      find.text('¿En qué apps pasó el tiempo?'),
+      300,
+      scrollable: listaSemana,
+    );
+    expect(find.text('¿En qué apps pasó el tiempo?'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Manzana'),
+      300,
+      scrollable: listaSemana,
+    );
+    expect(find.text('Manzana'), findsOneWidget, reason: 'nombre del seed');
     await tester.scrollUntilVisible(
       find.text('Copiar informe'),
       300,
-      scrollable: find
-          .descendant(of: find.byType(ListView), matching: find.byType(Scrollable))
-          .first,
+      scrollable: listaSemana,
     );
-    expect(find.text('Apps más usadas'), findsOneWidget);
     await tester.tap(find.text('Copiar informe'));
     await tester.pumpAndSettle();
     expect(copiado, startsWith('Informe semanal de BlueTalk'));
@@ -63,15 +84,44 @@ void main() {
 
     await tester.tap(find.text('Mensual'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('de 30 días'), findsWidgets);
+    final listaMes = find
+        .descendant(of: find.byType(ListView).last, matching: find.byType(Scrollable))
+        .first;
+    await tester.scrollUntilVisible(
+      find.byType(LineaTendencia),
+      300,
+      scrollable: listaMes,
+    );
+    expect(find.byType(LineaTendencia), findsOneWidget,
+        reason: 'el mes se lee como línea de tendencia');
+    await tester.scrollUntilVisible(
+      find.text('¿Qué días usó la app?'),
+      300,
+      scrollable: listaMes,
+    );
+    expect(find.text('¿Qué días usó la app?'), findsOneWidget,
+        reason: 'el mes incluye calendario de calor');
     await tester.scrollUntilVisible(
       find.text('Por semana'),
       300,
-      scrollable: find
-          .descendant(of: find.byType(ListView).last, matching: find.byType(Scrollable))
-          .first,
+      scrollable: listaMes,
     );
     expect(find.text('Por semana'), findsOneWidget);
     semantica.dispose();
+  });
+
+  testWidgets('las pestañas se leen sobre la barra de color', (tester) async {
+    final prefs = await prefsDePrueba();
+    await pumpPadre(
+      tester,
+      home: const InformesScreen(),
+      overrides: [
+        ...overridesDePadre(prefs),
+        usoTelefonoGatewayProvider.overrideWithValue(GatewayFalso()),
+      ],
+    );
+    final pestanas = tester.widget<TabBar>(find.byType(TabBar));
+    expect(pestanas.labelColor, AppColors.celeste.onHeader);
+    expect(pestanas.unselectedLabelColor, AppColors.celeste.onHeader);
   });
 }
