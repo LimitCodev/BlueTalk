@@ -8,6 +8,7 @@ import 'package:bluetalk/app/di.dart';
 import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/inicio/inicio_screen.dart';
 import 'package:bluetalk/features/inicio/menu_centrado.dart';
+import 'package:bluetalk/features/inicio/menu_tarjeta.dart';
 import 'package:bluetalk/features/onboarding/profile_controller.dart';
 
 /// Menú principal (plan 14A): carrusel, flechas, toque y TalkBack.
@@ -93,6 +94,19 @@ void main() {
     await tester.tap(find.text('Modo padre'));
     await tester.pumpAndSettle();
     expect(find.text('en /padre'), findsOneWidget);
+  });
+
+  testWidgets('deja una separación corta entre tarjetas', (tester) async {
+    await _pump(tester);
+    Rect rect(String titulo) => tester.getRect(
+      find.ancestor(of: find.text(titulo), matching: find.byType(MenuTarjeta)),
+    );
+    // Antes (viewportFraction 0,38) el hueco pasaba de 60 dp; con la
+    // página «tarjeta + 28» queda entre 20 y 50 según el tamaño del texto.
+    expect(
+      rect('Aprender').top - rect('Comunicar').bottom,
+      inInclusiveRange(20, 50),
+    );
   });
 
   testWidgets('con TalkBack el menú es una lista con los 5 botones', (
