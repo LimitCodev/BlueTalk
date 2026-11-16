@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../guia/guia_objetivos.dart';
+import '../guia/guia_pasos.dart';
 import 'comunicador_categoria_grid.dart';
 import 'comunicador_resultados.dart';
 import 'comunicador_catalog.dart';
@@ -65,7 +67,12 @@ class HomeContent extends ConsumerWidget {
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
-        Expanded(child: CategoryGrid(catalog: catalog)),
+        Expanded(
+          child: GuiaAncla(
+            objetivo: GuiaObjetivo.categorias,
+            child: CategoryGrid(catalog: catalog),
+          ),
+        ),
       ],
     );
   }

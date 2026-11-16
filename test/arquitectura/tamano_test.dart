@@ -10,7 +10,6 @@ import 'package:flutter_test/flutter_test.dart';
 const limite = 100;
 
 const _deuda = <String, int>{
-  'lib/app/router.dart': 101,
   'lib/core/theme/app_colors.dart': 339,
   'lib/core/theme/app_theme.dart': 213,
   'lib/core/widgets/logo_bluetalk.dart': 136,
@@ -26,7 +25,7 @@ const _deuda = <String, int>{
   'lib/features/onboarding/onboarding_screen.dart': 144,
   'lib/features/padre/control/cambiar_codigo.dart': 146,
   'lib/features/padre/control/control_parental.dart': 159,
-  'lib/features/padre/control/control_screen.dart': 199,
+  'lib/features/padre/control/control_screen.dart': 179,
   'lib/features/padre/control/juegos_gate.dart': 173,
   'lib/features/padre/control/recuperacion_dialogo.dart': 156,
   'lib/features/padre/dashboard/barras.dart': 107,

@@ -103,6 +103,9 @@ void main() {
       expect(find.text('Perfil de edad'), findsOneWidget);
       expect(find.textContaining('Sin perfil'), findsOneWidget);
 
+      // El nombre del niño (plan 14A) va encima y baja esta fila.
+      await tester.ensureVisible(find.text('Perfil de edad'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Perfil de edad'));
       await tester.pumpAndSettle();
 

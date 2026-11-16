@@ -164,3 +164,13 @@ Falta decidir:
 - **Correo e identidad legal reales:** `scripts/aws/publicar_legal.sh` se
   niega a publicar mientras quede `demo@bluetalk.app`.
 
+
+## Mascota de la guía (abierto el 2026-11-12, plan 14B §2)
+
+- **Candado en inglés.** Las posturas `ave_candado.png` y
+  `ave_candado_senala.png` muestran «SECURE» en el candado. Se usan tal cual en
+  el paso 11 y en «¿Saltar la guía?». Pregunta: ¿se pide una versión con
+  «SEGURO» o sin texto?
+- **Carpeta `mascota/` de la raíz.** Es el material original del dueño, sin
+  seguimiento en git. Las copias que usa la app ya están en `assets/mascota/`.
+  Pregunta: ¿se borra la carpeta de la raíz o se guarda en otro sitio?

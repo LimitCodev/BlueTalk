@@ -82,6 +82,7 @@ flutter:
     - assets/seed/
     - assets/pictos/muestra/
     - assets/brand/
+    - assets/mascota/
 
   fonts:
     - family: Nunito

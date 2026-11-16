@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../guia/guia_repetir.dart';
 import '../padre/legal/documento_legal.dart';
 import '../padre/legal/textos_legales.dart';
 
@@ -23,6 +24,7 @@ class ZonaAdultosSection extends StatelessWidget {
           trailing: const Icon(Icons.chevron_right),
           onTap: () => context.go('/padre'),
         ),
+        const RepetirGuiaTile(),
       ],
     );
   }

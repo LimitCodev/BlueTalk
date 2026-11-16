@@ -24,32 +24,37 @@ import 'accessibility_helper.dart';
 /// táctiles ≥48dp para app AAC infantil). Convierte los avisos de
 /// `accessibility_tools` en gate: falla el test.
 void main() {
-  Future<SharedPreferences> givenPrefs() async {
+  Future<SharedPreferences> givenPrefs(WidgetTester tester) async {
+    // El borde de la guía respira en bucle: sin esto `pumpAndSettle` no acaba.
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
     SharedPreferences.setMockInitialValues({});
     return SharedPreferences.getInstance();
   }
 
-  List<Object> overridesCon(SharedPreferences prefs) =>
-      [sharedPreferencesProvider.overrideWithValue(prefs)];
+  List<Object> overridesCon(SharedPreferences prefs) => [
+    sharedPreferencesProvider.overrideWithValue(prefs),
+  ];
 
   // El shell aloja el comunicador real: seeds de disco + TTS falso para
   // tests herméticos (el canal de assets de flutter test solo responde en
   // el primer testWidgets del archivo).
   List<Object> overridesDeShell(SharedPreferences prefs) => [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-        initialProfileProvider.overrideWithValue(
-          const ChildProfile(id: 'local', nickname: 'Sol'),
-        ),
-        ttsSpeakerProvider.overrideWithValue(FakeTtsSpeaker()),
-        seedStoreProvider.overrideWithValue(
-          SeedStore(
-            (path) => SynchronousFuture<String>(File(path).readAsStringSync()),
-          ),
-        ),
-      ];
+    sharedPreferencesProvider.overrideWithValue(prefs),
+    initialProfileProvider.overrideWithValue(
+      const ChildProfile(id: 'local', nickname: 'Sol'),
+    ),
+    ttsSpeakerProvider.overrideWithValue(FakeTtsSpeaker()),
+    seedStoreProvider.overrideWithValue(
+      SeedStore(
+        (path) => SynchronousFuture<String>(File(path).readAsStringSync()),
+      ),
+    ),
+  ];
 
   testWidgets('onboarding: sin problemas de accesibilidad', (tester) async {
-    final prefs = await givenPrefs();
+    final prefs = await givenPrefs(tester);
     await expectSinProblemasDeAccesibilidad(
       tester,
       overrides: overridesCon(prefs),
@@ -58,7 +63,7 @@ void main() {
   });
 
   testWidgets('ajustes: sin problemas de accesibilidad', (tester) async {
-    final prefs = await givenPrefs();
+    final prefs = await givenPrefs(tester);
     await expectSinProblemasDeAccesibilidad(
       tester,
       overrides: overridesCon(prefs),
@@ -67,13 +72,16 @@ void main() {
   });
 
   testWidgets('shell completo: sin problemas de accesibilidad', (tester) async {
-    final prefs = await givenPrefs();
+    final prefs = await givenPrefs(tester);
     // El checker va por encima de la app completa: MediaQuery y Directionality
     // exteriores porque su overlay se construye por encima del WidgetsApp.
     final issues = await problemasDeAccesibilidad(
       tester,
       MediaQuery(
-        data: const MediaQueryData(size: Size(800, 600)),
+        data: const MediaQueryData(
+          size: Size(800, 600),
+          disableAnimations: true,
+        ),
         child: Directionality(
           textDirection: TextDirection.ltr,
           child: AccessibilityTools(
@@ -96,7 +104,7 @@ void main() {
   });
 
   testWidgets('modo calma no rompe la auditoría del shell', (tester) async {
-    final prefs = await givenPrefs();
+    final prefs = await givenPrefs(tester);
     await tester.pumpWidget(
       ProviderScope(
         overrides: overridesDeShell(prefs).cast(),

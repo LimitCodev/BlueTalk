@@ -90,7 +90,7 @@ class _PadreScreenState extends ConsumerState<PadreScreen>
       onSalir();
       return;
     }
-    GoRouter.maybeOf(context)?.go('/home/ajustes');
+    GoRouter.maybeOf(context)?.go('/inicio');
   }
 
   @override
@@ -108,8 +108,8 @@ class _PadreScreenState extends ConsumerState<PadreScreen>
     // Atrás nunca mata el modo padre. Con una subpantalla empujada (p. ej.
     // recuperación del PIN) la cierra Navigator; desde una pestaña que no
     // es el panel se vuelve al panel; y desde el panel (o el gate) el
-    // Atrás sale a Ajustes con la misma lógica del botón «Salir del modo
-    // padre». Si la legal aún no se aceptó, se sale siempre.
+    // Atrás sale como «Salir del modo padre», al menú (plan 14 §2).
+    // Si la legal aún no se aceptó, se sale siempre.
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {

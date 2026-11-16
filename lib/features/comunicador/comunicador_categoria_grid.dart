@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../guia/guia_objetivos.dart';
+import '../guia/guia_pasos.dart';
 import 'comunicador_catalog.dart';
 import 'comunicador_controller.dart';
 
@@ -39,7 +41,7 @@ class CategoryGrid extends ConsumerWidget {
         final borde = colores?.bordeSobre(paleta) ?? paleta.primary;
         final tinta = colores?.texto(paleta) ?? paleta.primaryStrongText;
 
-        return Material(
+        final tarjeta = Material(
           color: fondo,
           clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(
@@ -83,6 +85,10 @@ class CategoryGrid extends ConsumerWidget {
             ),
           ),
         );
+        // Palabras básicas: la guía de la mascota la señala (plan 14B).
+        return category.nuclear
+            ? GuiaAncla(objetivo: GuiaObjetivo.tableroNuclear, child: tarjeta)
+            : tarjeta;
       },
     );
   }

@@ -5,6 +5,7 @@ import '../core/theme/app_colors.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/calm_mode.dart';
 import '../features/ajustes/settings_controller.dart';
+import '../features/guia/guia_capa.dart';
 import '../features/rutinas/recordatorios/recordatorios_controller.dart';
 import 'router.dart';
 
@@ -40,7 +41,8 @@ class BlueTalkApp extends ConsumerWidget {
               media.textScaler.scale(1.0) * appScale,
             ),
           ),
-          child: child ?? const SizedBox.shrink(),
+          // La guía de la mascota va encima de toda la app (plan 14B).
+          child: GuiaCapa(child: child ?? const SizedBox.shrink()),
         );
         return calm
             ? ColorFiltered(colorFilter: calmColorFilter, child: tree)

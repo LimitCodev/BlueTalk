@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/plataforma/edicion.dart';
 import '../../../core/widgets/section_header.dart';
 import '../dashboard/barras.dart';
 import '../gate/biometria.dart';
 import '../gate/gate_controller.dart';
 import '../legal/legal_controller.dart';
 import '../padre_controller.dart';
-import '../perfil_edad.dart';
 import '../permisos/permisos_asistente_screen.dart';
 import 'cambiar_codigo.dart';
 import 'control_dispositivo.dart';
+import 'control_nino.dart';
 import 'control_parental.dart';
 import 'control_rutina_voz.dart';
-import 'perfil_edad_dialogo.dart';
 import 'recuperacion_dialogo.dart';
 
 /// Control parental (plan 05 §4): tiempo de juegos, secciones, pantalla y
@@ -35,12 +33,10 @@ class ControlScreen extends ConsumerWidget {
     final bloqueos = ref.watch(bloqueosProvider);
     final biometria = ref.watch(biometriaHabilitadaProvider);
     final aceptacion = ref.watch(legalProvider);
-    final directa = ref.watch(edicionDirectaProvider);
     // Dónde viven las huellas del código (lo decide `AlmacenPin`): se
     // enseña en pantalla para que un respaldo sin cifrar no pase
     // desapercibido (revisión de la fase 3a).
     final codigoCifrado = ref.watch(almacenPinProvider).cifrado;
-    final perfilEdad = ref.watch(perfilEdadProvider);
 
     return ListView(
       padding: const EdgeInsets.only(bottom: 32),
@@ -105,23 +101,7 @@ class ControlScreen extends ConsumerWidget {
           onChanged: (valor) =>
               ref.read(bloqueosProvider.notifier).setEntorno(!valor),
         ),
-        const SectionHeader('Perfil de edad del niño'),
-        ListTile(
-          leading: const Icon(Icons.child_care_outlined),
-          title: const Text('Perfil de edad'),
-          subtitle: Text(
-            perfilEdad == PerfilEdad.ninguno
-                ? 'Sin perfil: se ve todo. Elige la edad para ocultar '
-                    'categorías del comunicador que no son de esa edad.'
-                : '${perfilEdad.titulo}. Se ven las categorías de esa edad'
-                    '${directa ? ' y el filtro de páginas usa los grupos que corresponden' : ''}.',
-          ),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => showDialog<void>(
-            context: context,
-            builder: (_) => const PerfilEdadDialogo(),
-          ),
-        ),
+        const SeccionNino(),
         const SectionHeader('Permisos del teléfono'),
         ListTile(
           leading: const Icon(Icons.rule_outlined),
