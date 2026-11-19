@@ -13,6 +13,7 @@ class TextScaleSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(settingsProvider.notifier);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -25,8 +26,9 @@ class TextScaleSection extends ConsumerWidget {
             max: 1.6,
             divisions: 7,
             label: '${(settings.textScale * 100).round()}%',
-            onChanged: (value) =>
-                ref.read(settingsProvider.notifier).setTextScale(value),
+            // Vista previa en vivo; el archivo se escribe al soltar.
+            onChanged: notifier.previewTextScale,
+            onChangeEnd: (_) => notifier.guardarCambios(),
           ),
           trailing: Text('${(settings.textScale * 100).round()}%'),
         ),

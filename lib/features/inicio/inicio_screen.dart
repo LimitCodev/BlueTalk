@@ -7,6 +7,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/calm_mode.dart';
 import '../../core/widgets/logo_bluetalk.dart';
 import '../onboarding/profile_controller.dart';
+import '../guia/guia_arranque.dart';
 import '../guia/guia_controller.dart';
 import '../guia/guia_objetivos.dart';
 import '../guia/guia_pasos.dart';
@@ -23,10 +24,6 @@ class InicioScreen extends ConsumerWidget {
     final apodo = ref.watch(profileProvider)?.nickname.trim() ?? '';
     final calm = ref.watch(calmModeProvider);
     final texto = Theme.of(context).textTheme;
-    // Primera vez en el menú: empieza la guía de la mascota (plan 14B).
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => ref.read(guiaProvider.notifier).iniciarSiFalta(),
-    );
     return PopScope(
       canPop: false,
       // El menú es el único punto de salida de la app (plan 14 §2),
@@ -78,15 +75,17 @@ class InicioScreen extends ConsumerWidget {
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 480),
-              child: MediaQuery.accessibleNavigationOf(context)
-                  ? const InicioLista()
-                  : const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: GuiaAncla(
-                        objetivo: GuiaObjetivo.menuCarrusel,
-                        child: MenuCarrusel(),
+              child: GuiaArranque(
+                child: MediaQuery.accessibleNavigationOf(context)
+                    ? const InicioLista()
+                    : const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: GuiaAncla(
+                          objetivo: GuiaObjetivo.menuCarrusel,
+                          child: MenuCarrusel(),
+                        ),
                       ),
-                    ),
+              ),
             ),
           ),
         ),

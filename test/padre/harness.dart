@@ -201,30 +201,28 @@ List<Object> overridesDePadre(
   DerivadorPin? derivador,
   PermisosGateway? permisos,
   bool edicionDirecta = true,
-}) =>
-    [
-      edicionDirectaProvider.overrideWithValue(edicionDirecta),
-      sharedPreferencesProvider.overrideWithValue(prefs),
-      seedStoreProvider.overrideWithValue(
-        SeedStore(
-          (path) => SynchronousFuture<String>(File(path).readAsStringSync()),
-        ),
-      ),
-      relojProvider.overrideWithValue(reloj?.decir ?? _relojFijo),
-      // La PBKDF2 real corre en un isolate, que no completa dentro de
-      // testWidgets (ver [DerivadorPinPrueba]).
-      derivadorPinProvider.overrideWithValue(
-        derivador ?? const DerivadorPinPrueba(),
-      ),
-      if (biometria != null)
-        biometriaProvider.overrideWithValue(biometria),
-      // Doble del canal nativo de permisos: en `flutter test` el canal no
-      // contesta y el diagnóstico se quedaría sin resolver. Todo concedido
-      // es lo inofensivo de esta casa: no bloquea el modo padre.
-      permisosGatewayProvider.overrideWithValue(
-        permisos ?? const _PermisosDePrueba(),
-      ),
-    ];
+}) => [
+  edicionDirectaProvider.overrideWithValue(edicionDirecta),
+  sharedPreferencesProvider.overrideWithValue(prefs),
+  seedStoreProvider.overrideWithValue(
+    SeedStore(
+      (path) => SynchronousFuture<String>(File(path).readAsStringSync()),
+    ),
+  ),
+  relojProvider.overrideWithValue(reloj?.decir ?? _relojFijo),
+  // La PBKDF2 real corre en un isolate, que no completa dentro de
+  // testWidgets (ver [DerivadorPinPrueba]).
+  derivadorPinProvider.overrideWithValue(
+    derivador ?? const DerivadorPinPrueba(),
+  ),
+  if (biometria != null) biometriaProvider.overrideWithValue(biometria),
+  // Doble del canal nativo de permisos: en `flutter test` el canal no
+  // contesta y el diagnóstico se quedaría sin resolver. Todo concedido
+  // es lo inofensivo de esta casa: no bloquea el modo padre.
+  permisosGatewayProvider.overrideWithValue(
+    permisos ?? const _PermisosDePrueba(),
+  ),
+];
 
 /// Bombea una pantalla suelta con seeds del disco y prefs locales.
 Future<ProviderContainer> pumpPadre(
@@ -257,6 +255,7 @@ Future<void> sembrarEventos(
   for (final evento in eventos) {
     await repo.record(evento);
   }
+  await repo.flush();
 }
 
 /// Evento de prueba con fecha relativa a [desde].
@@ -265,13 +264,12 @@ UsageEvent evento(
   DateTime? creado,
   Map<String, dynamic> data = const {},
   String? id,
-}) =>
-    UsageEvent(
-      id: id ?? '${type}_${creado ?? ahoraFija.microsecondsSinceEpoch}',
-      type: type,
-      createdAt: creado ?? ahoraFija,
-      data: data,
-    );
+}) => UsageEvent(
+  id: id ?? '${type}_${creado ?? ahoraFija.microsecondsSinceEpoch}',
+  type: type,
+  createdAt: creado ?? ahoraFija,
+  data: data,
+);
 
 /// Crea un PIN directamente en prefs (para arrancar en fase de petición).
 ///
@@ -286,7 +284,10 @@ UsageEvent evento(
 /// primer acceso. Cualquier otro pin sí pasa por el hash real con
 /// [DerivadorPinPrueba] (solo aplica fuera de FakeAsync o con bombeo
 /// concurrente).
-Future<void> crearPinDePrueba(SharedPreferences prefs, {String pin = '1234'}) async {
+Future<void> crearPinDePrueba(
+  SharedPreferences prefs, {
+  String pin = '1234',
+}) async {
   if (pin != '1234') {
     await PinStore(
       AlmacenPrefs(prefs),
@@ -296,10 +297,7 @@ Future<void> crearPinDePrueba(SharedPreferences prefs, {String pin = '1234'}) as
     ).crear(pin);
     return;
   }
-  await prefs.setString(
-    PinStore.claveSalt,
-    '4c2c421d3df371b269aa7772ee5336d3',
-  );
+  await prefs.setString(PinStore.claveSalt, '4c2c421d3df371b269aa7772ee5336d3');
   await prefs.setString(
     PinStore.claveHash,
     '6ef6f3446c5b72722a63c08103f96e5bf12b9b3263dcab9e547c734b14918fcb',

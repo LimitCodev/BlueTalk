@@ -7,11 +7,14 @@ import '../reloj.dart';
 import 'captura_apps.dart';
 import 'construir_informe.dart';
 import 'informe_modelo.dart';
+import 'resumenes_siembra.dart';
 
 /// Informe del periodo que termina hoy. Antes de calcularlo siembra los
 /// resúmenes (primera vez) y copia el uso de apps que Android conserva.
-final informeProvider =
-    FutureProvider.autoDispose.family<Informe, Periodo>((ref, periodo) async {
+final informeProvider = FutureProvider.autoDispose.family<Informe, Periodo>((
+  ref,
+  periodo,
+) async {
   final ahora = ref.watch(relojProvider)();
   final repo = ref.watch(resumenesRepoProvider);
   await repo.sembrarUnaVez(await ref.watch(usageRepoProvider).events());

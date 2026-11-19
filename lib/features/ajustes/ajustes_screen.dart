@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/calm_mode.dart';
+import '../../core/layout/ancho_lectura.dart';
 import 'settings_controller.dart';
 import 'ajustes_avatar.dart';
 import 'ajustes_info.dart';
@@ -19,33 +20,36 @@ class AjustesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
 
-    return ListView(
-      padding: const EdgeInsets.only(bottom: 32),
-      children: [
-        const CalmModeToggle(),
-        const Divider(),
-        const TemaSection(),
-        const Divider(),
-        switch (settings) {
-          AsyncData(:final value) => TextScaleSection(settings: value),
-          AsyncError() => const SettingsError(),
-          _ => const Padding(
-            padding: EdgeInsets.all(24),
-            child: Center(child: CircularProgressIndicator()),
-          ),
-        },
-        const Divider(),
-        const TtsSection(),
-        const Divider(),
-        const RecordatoriosSection(),
-        const AvatarSection(),
-        const Divider(),
-        const ZonaAdultosSection(),
-        const Divider(),
-        const LegalSection(),
-        const Divider(),
-        const CreditsSection(),
-      ],
+    return AnchoLectura(
+      maxWidth: 840,
+      child: ListView(
+        padding: const EdgeInsets.only(bottom: 32),
+        children: [
+          const CalmModeToggle(),
+          const Divider(),
+          const TemaSection(),
+          const Divider(),
+          switch (settings) {
+            AsyncData(:final value) => TextScaleSection(settings: value),
+            AsyncError() => const SettingsError(),
+            _ => const Padding(
+              padding: EdgeInsets.all(24),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          },
+          const Divider(),
+          const TtsSection(),
+          const Divider(),
+          const RecordatoriosSection(),
+          const AvatarSection(),
+          const Divider(),
+          const ZonaAdultosSection(),
+          const Divider(),
+          const LegalSection(),
+          const Divider(),
+          const CreditsSection(),
+        ],
+      ),
     );
   }
 }

@@ -5,15 +5,25 @@ import '../../core/theme/app_colors.dart';
 import '../../data/models/models.dart';
 
 /// Controlador de ajustes: carga desde `SettingsRepo` y persiste cada cambio.
+///
+/// Los sliders usan la pareja `preview*` + [guardarCambios]: mientras el
+/// dedo se mueve solo cambia el estado en memoria (vista previa) y el JSON
+/// se escribe una vez al soltar (PERF-CORE-02 de la auditoría).
 class SettingsController extends AsyncNotifier<AppSettings> {
   @override
   Future<AppSettings> build() => ref.read(settingsRepoProvider).load();
 
+  void _preview(AppSettings next) => state = AsyncData(next);
+
   Future<void> _update(AppSettings next) async {
     // Estado optimista: la UI responde al instante (gama baja).
-    state = AsyncData(next);
-    await ref.read(settingsRepoProvider).save(next);
+    _preview(next);
+    await guardarCambios();
   }
+
+  /// Escribe en disco el estado actual (una vez por gesto).
+  Future<void> guardarCambios() =>
+      ref.read(settingsRepoProvider).save(state.requireValue);
 
   Future<void> setTextScale(double value) =>
       _update(state.requireValue.copyWith(textScale: value));
@@ -26,6 +36,18 @@ class SettingsController extends AsyncNotifier<AppSettings> {
 
   Future<void> setRemindersEnabled(bool value) =>
       _update(state.requireValue.copyWith(remindersEnabled: value));
+
+  /// Vista previa del tamaño de letra sin escribir en disco.
+  void previewTextScale(double value) =>
+      _preview(state.requireValue.copyWith(textScale: value));
+
+  /// Vista previa de la velocidad de voz sin escribir en disco.
+  void previewTtsRate(double value) =>
+      _preview(state.requireValue.copyWith(ttsRate: value));
+
+  /// Vista previa del tono de voz sin escribir en disco.
+  void previewTtsPitch(double value) =>
+      _preview(state.requireValue.copyWith(ttsPitch: value));
 
   /// Tema de color (plan 13 P4): id de `AppColors.temas`. Un id
   /// desconocido (valor corrupto a mano) no se aplica: se conserva el

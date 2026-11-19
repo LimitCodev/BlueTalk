@@ -30,7 +30,10 @@ class TtsSection extends ConsumerWidget {
             divisions: 7,
             onChanged: enabled
                 ? (value) =>
-                      ref.read(settingsProvider.notifier).setTtsRate(value)
+                      ref.read(settingsProvider.notifier).previewTtsRate(value)
+                : null,
+            onChangeEnd: enabled
+                ? (_) => ref.read(settingsProvider.notifier).guardarCambios()
                 : null,
           ),
         ),
@@ -43,7 +46,10 @@ class TtsSection extends ConsumerWidget {
             divisions: 8,
             onChanged: enabled
                 ? (value) =>
-                      ref.read(settingsProvider.notifier).setTtsPitch(value)
+                      ref.read(settingsProvider.notifier).previewTtsPitch(value)
+                : null,
+            onChangeEnd: enabled
+                ? (_) => ref.read(settingsProvider.notifier).guardarCambios()
                 : null,
           ),
         ),
