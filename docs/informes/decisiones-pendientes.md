@@ -139,6 +139,8 @@ anotadas aquí como constancia.
   real: **no se inventa ninguno**.
 - Pregunta: ¿qué correo de soporte quiere publicar (y crearlo si no
   existe)? La pantalla de FAQ queda pendiente de esa respuesta.
+- El inventario completo de cuentas, dominio, identidad legal y custodia
+  de credenciales está en `docs/informes/pendientes-play-2026-11-18.md` §3 bis.
 
 ## Ruta de Play (resuelto 2026-11-08)
 
@@ -165,6 +167,7 @@ Falta decidir:
   niega a publicar mientras quede `demo@bluetalk.app`.
 
 
+
 ## Mascota de la guía (abierto el 2026-11-12, plan 14B §2)
 
 - **Candado en inglés.** Las posturas `ave_candado.png` y
@@ -174,3 +177,33 @@ Falta decidir:
 - **Carpeta `mascota/` de la raíz.** Es el material original del dueño, sin
   seguimiento en git. Las copias que usa la app ya están en `assets/mascota/`.
   Pregunta: ¿se borra la carpeta de la raíz o se guarda en otro sitio?
+
+## Mejores ajustes del padre: orden y voz propia (abierto el 2026-11-12)
+
+Propuesta de diseño completa en
+[`docs/plan/15-mejores-ajustes-padre.md`](../plan/15-mejores-ajustes-padre.md).
+**No está aprobada ni implementada.** Antes de la fase 1, el dueño debe
+decidir:
+
+- **Plataformas:** ¿solo Android ahora, o también iOS, web y escritorio en la
+  primera entrega? El diseño ya es multiplataforma, pero cada plataforma exige
+  build, permisos y pruebas.
+- **Tablero nuclear:** confirmar que **no** se puede reordenar (recomendado:
+  no, por memoria motora y por el plan 11 §2.1).
+- **Qué se reordena:** categorías y pictogramas temáticos; ¿también los
+  favoritos del inicio? Hoy los favoritos son un conjunto sin orden.
+- **Duración de la voz:** 3, 5 o 10 segundos por pictograma (propuesta: 5 s).
+- **Cifrado en reposo:** cifrar las voces con una clave del keystore o dejar
+  el almacenamiento privado de la app. Cifrar añade complejidad y latencia.
+- **Edición Play:** ¿la grabación entra en la edición Play o solo en el APK
+  `directa`? Play exige declarar micrófono y revisar la política de Familias.
+- **Copia de seguridad:** ¿las voces viajan en la copia del plan 11 §2.4 o
+  quedan fuera por privacidad?
+- **Varios perfiles:** ¿la voz y el orden son por niño o por dispositivo? El
+  modelo deja `perfilId` para la voz, pero hoy hay un solo perfil y el orden
+  se guarda por dispositivo.
+- **Dependencias:** aprobar plugins (`record` + reproductor +
+  `path_provider`) o canal nativo propio, después del spike de la fase 2.
+- **Texto PECS:** confirmar «inspirado en PECS, sin afiliación ni
+  certificación»; no «PECS certificado».
+

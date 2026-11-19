@@ -1,5 +1,7 @@
 # Auditoría de rendimiento — resumen
 
+> **Actualización 2026-11-18:** el estado por módulos, con lo ya corregido en el árbol y lo que sigue abierto, está en `docs/informes/rendimiento-por-modulos-2026-11-18.md`.
+
 Fecha: 2026-11-16 · Base: `8ccbcd6` + arreglo local del menú.
 Emulador de referencia: API 28 x86_64, 720×1280 (360×640 dp), Flutter 3.44.4.
 

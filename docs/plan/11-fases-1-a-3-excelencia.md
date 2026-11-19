@@ -153,6 +153,10 @@ Escribe `docs/informes/fase1-evidencia.md` (§0.3), ejecuta al revisor y corrige
 - Historias sociales editables por el padre.
 - Voz grabada de un familiar (exige `RECORD_AUDIO`; implicaciones de privacidad de un menor: diseño legal primero).
 
+**Nota de diseño escrita (pendiente de aprobación):**
+[`docs/plan/15-mejores-ajustes-padre.md`](15-mejores-ajustes-padre.md). Cubre
+también el orden personalizado de pictogramas temáticos.
+
 ## 2.6 Cierre de Fase 2
 `docs/informes/fase2-evidencia.md` + revisor + corrección de hallazgos graves.
 
