@@ -1,13 +1,13 @@
 # Términos y condiciones de uso de BlueTalk
 
-**Fecha de entrada en vigencia:** 8 de noviembre de 2026
-**Versión:** 1.2.0
+**Fecha de entrada en vigencia:** 19 de noviembre de 2026
+**Versión:** 1.3.0
 
 ## 1. Identificación del servicio
 
-BlueTalk es una aplicación móvil de comunicación aumentativa y alternativa (CAA) dirigida a niñas, niños y a personas que necesitan apoyo para comunicarse. Se distribuye a través de Google Play Store con el identificador de paquete `com.limitcodev.bluetalk`. La persona responsable del desarrollo y del mantenimiento del servicio es LimitCodev (en adelante, «el desarrollador»).
+BlueTalk es una aplicación móvil de comunicación aumentativa y alternativa (CAA) dirigida a niñas, niños y a personas que necesitan apoyo para comunicarse. Se distribuye a través de Google Play Store con el identificador de paquete `com.limitcodev.bluetalk`. El responsable del desarrollo y del mantenimiento del servicio es LimitCodev, desarrollador de BlueTalk en Google Play y CTO de BlueTalk Innovation, emprendimiento peruano (en adelante, «el desarrollador»).
 
-Correo de contacto: demo@bluetalk.app. Es una dirección de demostración para este proyecto; las consultas recibidas allí se atienden en el entorno de pruebas.
+Correo de contacto: bluetalk.soporte@gmail.com.
 
 ## 2. Objeto de estos términos
 
@@ -123,5 +123,5 @@ Estos términos se rigen por la legislación del país donde se instale la app. 
 
 ## 17. Contacto
 
-Correo: demo@bluetalk.app (dirección de demostración de este proyecto).
-Última actualización de este documento: 8 de noviembre de 2026, versión 1.2.0.
+Correo: bluetalk.soporte@gmail.com.
+Última actualización de este documento: 19 de noviembre de 2026, versión 1.3.0.
