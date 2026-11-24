@@ -7,6 +7,7 @@
   <meta name="description" content="Descarga la beta de BlueTalk, comunicación aumentativa para niñas y niños autistas. Pronto en Google Play.">
   <meta name="theme-color" content="#1574C1">
   <link rel="icon" href="logo.png">
+  <script>try { var t = localStorage.getItem('tema'); if (t === 'claro' || t === 'oscuro') document.documentElement.dataset.tema = t; } catch (e) {}</script>
   <style>
     /* Paletas «celeste» y «oscuro» de la app: lib/core/theme/app_colors.dart */
     @font-face {
@@ -38,8 +39,9 @@
       --hero-b: #0F5E9C;
       --sombra: 0 10px 30px rgb(15 94 156 / .12);
     }
+    /* Tema: sigue al sistema; el botón de la cabecera lo fuerza con data-tema="claro|oscuro" */
     @media (prefers-color-scheme: dark) {
-      :root {
+      :root:not([data-tema="claro"]) {
         --bg: #171D26;
         --surface: #1F2733;
         --primary: #3095E8;
@@ -58,9 +60,50 @@
         --hero-a: #1B4F80;
         --hero-b: #13263D;
         --sombra: 0 10px 30px rgb(0 0 0 / .35);
+        color-scheme: dark;
       }
     }
+    :root[data-tema="oscuro"] {
+      --bg: #171D26;
+      --surface: #1F2733;
+      --primary: #3095E8;
+      --primary-ink: #171D26;
+      --primary-strong: #3095E8;
+      --text: #E7EBEF;
+      --muted: #A9B4C2;
+      --border: #2E3A4A;
+      --soft: #1C2A3A;
+      --aviso: #3A3220;
+      --on-aviso: #F3DFA9;
+      --ok: #1D3A2A;
+      --on-ok: #BFE8CD;
+      --error: #3D2224;
+      --on-error: #F5C2C2;
+      --hero-a: #1B4F80;
+      --hero-b: #13263D;
+      --sombra: 0 10px 30px rgb(0 0 0 / .35);
+      color-scheme: dark;
+    }
+    :root { color-scheme: light; }
     * { box-sizing: border-box; }
+
+    /* Botón de tema: luna en claro, sol en oscuro */
+    .tema {
+      width: 44px; height: 44px; flex: none; display: grid; place-items: center; cursor: pointer;
+      border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text);
+    }
+    .tema:hover { background: var(--soft); }
+    .tema:focus-visible { outline: 3px solid var(--primary-strong); outline-offset: 2px; }
+    .tema svg { width: 22px; height: 22px; grid-area: 1 / 1; transition: opacity .3s ease, rotate .5s ease, scale .3s ease; }
+    .tema .sol { opacity: 0; rotate: -90deg; scale: .5; }
+    :root[data-tema="oscuro"] .tema .sol { opacity: 1; rotate: 0deg; scale: 1; }
+    :root[data-tema="oscuro"] .tema .luna { opacity: 0; rotate: 90deg; scale: .5; }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-tema="claro"]) .tema .sol { opacity: 1; rotate: 0deg; scale: 1; }
+      :root:not([data-tema="claro"]) .tema .luna { opacity: 0; rotate: 90deg; scale: .5; }
+    }
+    /* Cambio de tema: círculo que se abre desde el botón (View Transitions) */
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
     html { scroll-behavior: smooth; scroll-padding-top: 76px; }
     body {
       margin: 0;
@@ -240,9 +283,11 @@
     .fx-js .fx-revela.visto { opacity: 1; translate: none; }
 
     @media (prefers-color-scheme: dark) {
-      .tel { background: #0A0E13; box-shadow: inset 0 0 0 1.5px #4A5768, 0 0 0 1px rgb(255 255 255 / .06), 0 22px 44px -16px rgb(0 0 0 / .7); }
-      .tel::after { background: #0A0E13; }
+      :root:not([data-tema="claro"]) .tel { background: #0A0E13; box-shadow: inset 0 0 0 1.5px #4A5768, 0 0 0 1px rgb(255 255 255 / .06), 0 22px 44px -16px rgb(0 0 0 / .7); }
+      :root:not([data-tema="claro"]) .tel::after { background: #0A0E13; }
     }
+    :root[data-tema="oscuro"] .tel { background: #0A0E13; box-shadow: inset 0 0 0 1.5px #4A5768, 0 0 0 1px rgb(255 255 255 / .06), 0 22px 44px -16px rgb(0 0 0 / .7); }
+    :root[data-tema="oscuro"] .tel::after { background: #0A0E13; }
 
     /* Pasos */
     .pasos { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: paso; }
@@ -254,6 +299,65 @@
     }
     .pasos h3 { margin: 0 0 4px; font-size: 1.1rem; }
     .pasos p { margin: 0; color: var(--muted); }
+    .pasos li:nth-child(2) { --d: -6s; }
+    .pasos li:nth-child(3) { --d: -3s; }
+    .ilus {
+      position: relative; height: 104px; margin: 0 0 14px; border-radius: 14px; overflow: hidden;
+      background: var(--soft); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+      font-size: .8rem; font-weight: 800; line-height: 1.2;
+    }
+    .i1-boton { background: var(--primary); color: var(--primary-ink); padding: 8px 14px; border-radius: 10px; }
+    .i1-barra { width: 70%; height: 8px; border-radius: 99px; background: var(--border); overflow: hidden; }
+    .i1-barra i { display: block; height: 100%; background: var(--accent); transform-origin: left; }
+    .i1-mb { color: var(--muted); font-weight: 700; }
+    .i2 { justify-content: flex-start; padding-top: 14px; }
+    .i2-noti {
+      width: 88%; display: flex; gap: 10px; align-items: center; text-align: left; padding: 8px 10px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--sombra);
+    }
+    .i2-ico { flex: none; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: var(--ok); color: var(--on-ok); font-size: .62rem; }
+    .i2-noti small { display: block; color: var(--muted); font-weight: 700; font-size: .72rem; }
+    .i3-dialogo {
+      width: 86%; padding: 10px 12px; text-align: left; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--sombra);
+    }
+    .i3-botones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+    .i3-cancel { padding: 6px 10px; color: var(--primary-strong); }
+    .i3-ok { display: grid; padding: 6px 12px; border-radius: 8px; background: var(--primary); color: var(--primary-ink); }
+    .i3-ok em { grid-area: 1 / 1; font-style: normal; text-align: center; }
+    .i3-ok em + em { opacity: 0; }
+    .toque-mini {
+      position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%;
+      background: rgb(21 116 193 / .35); border: 2px solid var(--primary); opacity: 0; pointer-events: none;
+    }
+    /* Ciclo de 9 s, 3 s por paso. Los retrasos negativos desfasan el reloj: el paso 2 se activa a los 3 s y el 3 a los 6 s.
+       Solo se anima con la sección a la vista; sin animación, cada dibujo queda en su estado final. */
+    .pasos.en-vista li { animation: k-activo 9s var(--d, 0s) infinite; }
+    .pasos.en-vista .i1-boton { animation: k-pulsa 9s infinite; }
+    .pasos.en-vista .i1-barra i { animation: k-carga 9s infinite; }
+    .pasos.en-vista .i1-mb { animation: k-listo 9s infinite; }
+    .pasos.en-vista .i2-noti { animation: k-baja 9s -6s infinite; }
+    .pasos.en-vista .i2 .toque-mini { animation: k-toque 9s -6s infinite; }
+    .pasos.en-vista .i3 .toque-mini { animation: k-toque 9s -3s infinite; }
+    .pasos.en-vista .i3-ok { animation: k-verde 9s -3s infinite; }
+    .pasos.en-vista .i3-ok em:first-child { animation: k-antes 9s -3s infinite; }
+    .pasos.en-vista .i3-ok em + em { animation: k-despues 9s -3s infinite; }
+    @keyframes k-activo {
+      0%, 31% { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 28%, transparent), var(--sombra); }
+      34%, 100% { border-color: var(--border); box-shadow: var(--sombra); }
+    }
+    @keyframes k-pulsa { 0%, 3% { scale: 1; } 5% { scale: .9; } 8%, 100% { scale: 1; } }
+    @keyframes k-carga { 0%, 6% { transform: scaleX(0); } 26%, 100% { transform: scaleX(1); } }
+    @keyframes k-listo { 0%, 25% { opacity: 0; } 28%, 100% { opacity: 1; } }
+    @keyframes k-baja { 0% { transform: translateY(-140%); } 7%, 100% { transform: none; } }
+    @keyframes k-toque {
+      0%, 13% { opacity: 0; scale: .4; }
+      16% { opacity: 1; scale: 1; }
+      22%, 100% { opacity: 0; scale: 1.7; }
+    }
+    @keyframes k-verde { 0%, 17% { background: var(--primary); } 19%, 31% { background: var(--accent); color: var(--on-accent); } 34%, 100% { background: var(--primary); } }
+    @keyframes k-antes { 0%, 17% { opacity: 1; } 19%, 31% { opacity: 0; } 34%, 100% { opacity: 1; } }
+    @keyframes k-despues { 0%, 17% { opacity: 0; } 19%, 31% { opacity: 1; } 34%, 100% { opacity: 0; } }
 
     /* Avisos */
     .avisos-cab { display: grid; grid-template-columns: 1fr 160px; gap: 24px; align-items: center; }
@@ -336,6 +440,7 @@
       .fx-mini { grid-template-columns: 40% 1fr; gap: 16px; }
       .pasos { gap: 10px; }
       .pasos li { padding: 16px 16px 16px 64px; }
+      .ilus { height: 96px; }
       .pasos li::before { top: 16px; left: 16px; }
       .estado .card { padding: 20px; }
     }
@@ -356,6 +461,10 @@
         <a href="#avisos">Avisos</a>
       </nav>
       <span class="pill pill-beta">Beta {{VERSION}}</span>
+      <button class="tema" id="tema" type="button" aria-label="Cambiar a modo oscuro">
+        <svg class="luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg>
+        <svg class="sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
     </div>
   </header>
 
@@ -547,9 +656,24 @@
         <h2>Instálala en 3 pasos</h2>
         <p class="sub">Toma menos de un minuto.</p>
         <ol class="pasos">
-          <li class="card"><h3>Descarga</h3><p>Toca «Descargar beta» en el teléfono.</p></li>
-          <li class="card"><h3>Abre el archivo</h3><p>Búscalo en la barra de notificaciones o en «Descargas».</p></li>
-          <li class="card"><h3>Instala</h3><p>Si aparece un aviso, mira abajo cómo seguir.</p></li>
+          <li class="card">
+            <div class="ilus i1" aria-hidden="true"><span class="i1-boton">Descargar beta</span><span class="i1-barra"><i></i></span><span class="i1-mb">{{TAMANO}} · listo</span></div>
+            <h3>Descarga</h3><p>Toca «Descargar beta» en el teléfono.</p>
+          </li>
+          <li class="card">
+            <div class="ilus i2" aria-hidden="true">
+              <div class="i2-noti"><span class="i2-ico">APK</span><span><b>BlueTalk-beta.apk</b><small>Descarga completa · toca para abrir</small></span></div>
+              <span class="toque-mini" style="left:50%;top:38px"></span>
+            </div>
+            <h3>Abre el archivo</h3><p>Búscalo en la barra de notificaciones o en «Descargas».</p>
+          </li>
+          <li class="card">
+            <div class="ilus i3" aria-hidden="true">
+              <div class="i3-dialogo"><b>¿Quieres instalar esta app?</b><span class="i3-botones"><span class="i3-cancel">Cancelar</span><span class="i3-ok"><em>Instalar</em><em>✓ Instalada</em></span></span></div>
+              <span class="toque-mini" style="left:78%;top:70px"></span>
+            </div>
+            <h3>Instala</h3><p>Si aparece un aviso, mira abajo cómo seguir.</p>
+          </li>
         </ol>
       </div>
     </section>
@@ -685,6 +809,44 @@
       new IntersectionObserver(function (e) {
         barra.classList.toggle('visible', !e[0].isIntersecting);
       }).observe(boton);
+    })();
+  </script>
+  <script>
+    // Tema claro/oscuro: guarda la elección y la aplica con un círculo que se abre desde el botón.
+    (function () {
+      var raiz = document.documentElement, boton = document.getElementById('tema');
+      var meta = document.querySelector('meta[name="theme-color"]');
+      var sistema = matchMedia('(prefers-color-scheme: dark)');
+      var calma = matchMedia('(prefers-reduced-motion: reduce)');
+      function oscuro() { return raiz.dataset.tema ? raiz.dataset.tema === 'oscuro' : sistema.matches; }
+      function pintar() {
+        boton.setAttribute('aria-label', oscuro() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+        meta.setAttribute('content', oscuro() ? '#171D26' : '#1574C1');
+      }
+      pintar();
+      sistema.addEventListener('change', pintar);
+      boton.addEventListener('click', function () {
+        var nuevo = oscuro() ? 'claro' : 'oscuro';
+        function aplicar() {
+          raiz.dataset.tema = nuevo;
+          try { localStorage.setItem('tema', nuevo); } catch (e) {}
+          pintar();
+        }
+        if (!document.startViewTransition || calma.matches) { aplicar(); return; }
+        var r = boton.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+        var radio = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+        document.startViewTransition(aplicar).ready.then(function () {
+          raiz.animate({ clipPath: ['circle(0 at ' + x + 'px ' + y + 'px)', 'circle(' + radio + 'px at ' + x + 'px ' + y + 'px)'] },
+                       { duration: 550, easing: 'ease-in-out', pseudoElement: '::view-transition-new(root)' });
+        });
+      });
+    })();
+
+    // Pasos de instalación: la animación corre solo mientras se ven (y nunca con movimiento reducido).
+    (function () {
+      var pasos = document.querySelector('.pasos');
+      if (!pasos || !('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      new IntersectionObserver(function (e) { pasos.classList.toggle('en-vista', e[0].isIntersecting); }, { threshold: .4 }).observe(pasos);
     })();
   </script>
   <script>
