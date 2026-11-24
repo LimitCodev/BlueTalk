@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/layout/ancho_lectura.dart';
 import '../../../core/plataforma/edicion.dart';
 import '../diagnostico/observaciones.dart';
 import '../informes/informes_screen.dart';
@@ -18,29 +19,32 @@ class ResumenScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final metricas = ref.watch(metricasProvider);
 
-    return ListView(
-      padding: const EdgeInsets.only(bottom: 32),
-      children: [
-        const AccesoInformes(),
-        switch (metricas) {
-          AsyncData(:final value) => Column(
+    return AnchoLectura(
+      maxWidth: 900,
+      child: ListView(
+        padding: const EdgeInsets.only(bottom: 32),
+        children: [
+          const AccesoInformes(),
+          switch (metricas) {
+            AsyncData(:final value) => Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ResumenGraficos(metricas: value),
                 ResumenTarjetas(metricas: value),
               ],
             ),
-          AsyncError() => _SinDatos(
+            AsyncError() => _SinDatos(
               onReintentar: () => ref.invalidate(metricasProvider),
             ),
-          _ => const Padding(
+            _ => const Padding(
               padding: EdgeInsets.all(24),
               child: Center(child: CircularProgressIndicator()),
             ),
-        },
-        if (ref.watch(edicionDirectaProvider)) const UsoTelefonoResumen(),
-        const ObservacionesSection(),
-      ],
+          },
+          if (ref.watch(edicionDirectaProvider)) const UsoTelefonoResumen(),
+          const ObservacionesSection(),
+        ],
+      ),
     );
   }
 }

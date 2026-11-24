@@ -66,9 +66,16 @@ final resumenesRepoProvider = Provider<ResumenesRepo>(
 );
 
 /// Cada evento también suma a su resumen diario (decorador).
+///
+/// El repo concreto se expone aparte para poder vaciar su cola en el ciclo
+/// de vida de la app (PERF-CORE-01).
+final prefsUsageRepoProvider = Provider<PrefsUsageRepo>(
+  (ref) => PrefsUsageRepo(ref.watch(sharedPreferencesProvider)),
+);
+
 final usageRepoProvider = Provider<UsageRepo>(
   (ref) => UsageRepoConResumen(
-    PrefsUsageRepo(ref.watch(sharedPreferencesProvider)),
+    ref.watch(prefsUsageRepoProvider),
     ref.watch(resumenesRepoProvider),
   ),
 );

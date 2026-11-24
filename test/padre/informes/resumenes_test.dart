@@ -4,12 +4,18 @@ import 'package:bluetalk/data/models/models.dart';
 import 'package:bluetalk/features/padre/informes/acumular_evento.dart';
 import 'package:bluetalk/features/padre/informes/resumen_dia.dart';
 import 'package:bluetalk/features/padre/informes/resumenes_repo.dart';
+import 'package:bluetalk/features/padre/informes/resumenes_siembra.dart';
 import 'package:bluetalk/features/padre/informes/usage_repo_con_resumen.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 UsageEvent ev(String tipo, DateTime t, [Map<String, dynamic> d = const {}]) =>
-    UsageEvent(id: '$tipo${t.microsecondsSinceEpoch}', type: tipo, createdAt: t, data: d);
+    UsageEvent(
+      id: '$tipo${t.microsecondsSinceEpoch}',
+      type: tipo,
+      createdAt: t,
+      data: d,
+    );
 
 final lunes = DateTime(2026, 11, 2, 10);
 
@@ -22,8 +28,14 @@ Future<(SharedPreferences, ResumenesRepo)> nuevo() async {
 void main() {
   group('acumular', () {
     test('cuenta toques por categoría y pictograma', () {
-      var r = acumular(null, ev('picto_tap', lunes, {'categoryId': 'comida', 'pictoId': 'agua'}));
-      r = acumular(r, ev('picto_tap', lunes, {'categoryId': 'comida', 'pictoId': 'pan'}));
+      var r = acumular(
+        null,
+        ev('picto_tap', lunes, {'categoryId': 'comida', 'pictoId': 'agua'}),
+      );
+      r = acumular(
+        r,
+        ev('picto_tap', lunes, {'categoryId': 'comida', 'pictoId': 'pan'}),
+      );
       expect((r.dia, r.pictos), ('2026-11-02', 2));
       expect(r.categorias, {'comida': 2});
       expect(r.pictosUsados, {'agua': 1, 'pan': 1});
@@ -42,13 +54,22 @@ void main() {
       r = acumular(r, ev('cuento_completado', lunes));
       r = acumular(r, ev('dibujo_guardado', lunes));
       r = acumular(r, ev('rutina_vista', lunes));
-      expect((r.sesionesJuego, r.segundosJuego, r.cuentos, r.dibujos), (1, 90, 1, 1));
+      expect(
+        (r.sesionesJuego, r.segundosJuego, r.cuentos, r.dibujos),
+        (1, 90, 1, 1),
+      );
     });
 
     test('ida y vuelta por JSON conserva todo, también las apps', () {
       final r = conApps(
-        acumular(null, ev('picto_tap', lunes, {'categoryId': 'c', 'pictoId': 'p'})),
-        const UsoAppsDia(totalSegundos: 60, apps: {'x.y': (nombre: 'Y', segundos: 60)}),
+        acumular(
+          null,
+          ev('picto_tap', lunes, {'categoryId': 'c', 'pictoId': 'p'}),
+        ),
+        const UsoAppsDia(
+          totalSegundos: 60,
+          apps: {'x.y': (nombre: 'Y', segundos: 60)},
+        ),
       );
       final vuelta = ResumenDia.fromMap(Map<String, dynamic>.from(r.toMap()));
       expect(vuelta.toMap(), r.toMap());
@@ -60,6 +81,7 @@ void main() {
       final (prefs, repo) = await nuevo();
       await repo.sumar(ev('picto_tap', DateTime(2026, 10, 31, 23)));
       await repo.sumar(ev('picto_tap', DateTime(2026, 11, 1, 8)));
+      await repo.flush();
       expect(prefs.getString('bluetalk_resumen_2026-10'), isNotNull);
       expect(prefs.getString('bluetalk_resumen_2026-11'), isNotNull);
       final otra = ResumenesRepo(AlmacenPrefs(prefs));
@@ -72,21 +94,29 @@ void main() {
       for (var m = 0; m < 15; m++) {
         await repo.sumar(ev('picto_tap', DateTime(2025, 1 + m, 5)));
       }
+      await repo.flush();
       expect(prefs.getStringList('bluetalk_resumen_meses'), hasLength(13));
       expect(prefs.getString('bluetalk_resumen_2025-01'), isNull);
       expect(prefs.getString('bluetalk_resumen_2026-03'), isNotNull);
     });
 
     test('un mes corrupto se trata como vacío', () async {
-      SharedPreferences.setMockInitialValues({'bluetalk_resumen_2026-11': '{no'});
-      final repo = ResumenesRepo(AlmacenPrefs(await SharedPreferences.getInstance()));
+      SharedPreferences.setMockInitialValues({
+        'bluetalk_resumen_2026-11': '{no',
+      });
+      final repo = ResumenesRepo(
+        AlmacenPrefs(await SharedPreferences.getInstance()),
+      );
       expect(repo.dia('2026-11-02'), isNull);
     });
 
     test('sembrar una vez no cuenta dos veces un día ya resumido', () async {
       final (_, repo) = await nuevo();
       await repo.sumar(ev('picto_tap', lunes));
-      final viejos = [ev('picto_tap', lunes), ev('picto_tap', lunes.subtract(const Duration(days: 1)))];
+      final viejos = [
+        ev('picto_tap', lunes),
+        ev('picto_tap', lunes.subtract(const Duration(days: 1))),
+      ];
       await repo.sembrarUnaVez(viejos);
       await repo.sembrarUnaVez(viejos);
       expect(repo.dia('2026-11-02')!.pictos, 1);
@@ -102,14 +132,19 @@ void main() {
     expect(repo.dia('2026-11-02')!.pictos, 1);
   });
 
-  test('un toque escribe solo su mes; el índice, una vez por mes', () async {
+  test('un lote de toques escribe el mes una vez, no por toque', () async {
     final (prefs, _) = await nuevo();
     final contador = _AlmacenQueCuenta(AlmacenPrefs(prefs));
     final repo = ResumenesRepo(contador);
     for (var i = 0; i < 5; i++) {
       await repo.sumar(ev('picto_tap', lunes.add(Duration(minutes: i))));
     }
-    expect(contador.escrituras, {'bluetalk_resumen_2026-11': 5, 'bluetalk_resumen_meses': 1});
+    expect(contador.escrituras, isEmpty, reason: 'aún no se tocó el disco');
+    await repo.flush();
+    expect(contador.escrituras, {
+      'bluetalk_resumen_2026-11': 1,
+      'bluetalk_resumen_meses': 1,
+    });
   });
 }
 
@@ -117,7 +152,8 @@ class _AlmacenQueCuenta implements AlmacenLocal {
   _AlmacenQueCuenta(this._base);
   final AlmacenLocal _base;
   final escrituras = <String, int>{};
-  void _contar(String c) => escrituras.update(c, (n) => n + 1, ifAbsent: () => 1);
+  void _contar(String c) =>
+      escrituras.update(c, (n) => n + 1, ifAbsent: () => 1);
 
   @override
   String? texto(String c) => _base.texto(c);
@@ -130,13 +166,29 @@ class _AlmacenQueCuenta implements AlmacenLocal {
   @override
   bool contiene(String c) => _base.contiene(c);
   @override
-  Future<void> guardarTexto(String c, String v) { _contar(c); return _base.guardarTexto(c, v); }
+  Future<void> guardarTexto(String c, String v) {
+    _contar(c);
+    return _base.guardarTexto(c, v);
+  }
+
   @override
-  Future<void> guardarBooleano(String c, bool v) { _contar(c); return _base.guardarBooleano(c, v); }
+  Future<void> guardarBooleano(String c, bool v) {
+    _contar(c);
+    return _base.guardarBooleano(c, v);
+  }
+
   @override
-  Future<void> guardarEntero(String c, int v) { _contar(c); return _base.guardarEntero(c, v); }
+  Future<void> guardarEntero(String c, int v) {
+    _contar(c);
+    return _base.guardarEntero(c, v);
+  }
+
   @override
-  Future<void> guardarLista(String c, List<String> v) { _contar(c); return _base.guardarLista(c, v); }
+  Future<void> guardarLista(String c, List<String> v) {
+    _contar(c);
+    return _base.guardarLista(c, v);
+  }
+
   @override
   Future<void> borrar(String c) => _base.borrar(c);
   @override

@@ -9,14 +9,20 @@ import '../padre/perfil_edad.dart';
 ///
 /// Cabe entero en memoria (unos 240 pictos) y se cachea en un
 /// único FutureProvider, así el grid, el buscador y los favoritos leen de
-/// aquí sin repetir cargas de assets.
+/// aquí sin repetir cargas de assets. También guarda un índice
+/// categoría → lista para no recorrer los 240 en cada build.
 class Catalog {
   Catalog({required this.categories, required this.pictograms})
-      : _byId = {for (final picto in pictograms) picto.id: picto};
+    : _byId = {for (final picto in pictograms) picto.id: picto} {
+    for (final picto in pictograms) {
+      (_porCategoria[picto.categoryId] ??= []).add(picto);
+    }
+  }
 
   final List<Category> categories;
   final List<Pictogram> pictograms;
   final Map<String, Pictogram> _byId;
+  final Map<String, List<Pictogram>> _porCategoria = {};
 
   static Future<Catalog> load(PictogramRepo repo) async {
     final categories = await repo.categories();
@@ -35,10 +41,8 @@ class Catalog {
     );
   }
 
-  List<Pictogram> pictogramsOf(String categoryId) => [
-        for (final picto in pictograms)
-          if (picto.categoryId == categoryId) picto,
-      ];
+  List<Pictogram> pictogramsOf(String categoryId) =>
+      _porCategoria[categoryId] ?? const [];
 
   Pictogram? pictogramById(String id) => _byId[id];
 

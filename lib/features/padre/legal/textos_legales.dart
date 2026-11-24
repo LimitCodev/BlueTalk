@@ -35,21 +35,21 @@ class LineaLegal {
 enum LineaLegalTipo { encabezado, vineta, parrafo }
 
 String _limpiar(String texto) => lineasDeEdicion(texto).replaceAll('**', '');
-const versionLegal = '1.2.0';
-const fechaEfectivaLegal = '8 de noviembre de 2026';
-const correoContactoLegal = 'demo@bluetalk.app';
+const versionLegal = '1.3.0';
+const fechaEfectivaLegal = '19 de noviembre de 2026';
+const correoContactoLegal = 'bluetalk.soporte@gmail.com';
 
 final String terminosYCondiciones = _limpiar(r'''
 # Términos y condiciones de uso de BlueTalk
 
-**Fecha de entrada en vigencia:** 8 de noviembre de 2026
-**Versión:** 1.2.0
+**Fecha de entrada en vigencia:** 19 de noviembre de 2026
+**Versión:** 1.3.0
 
 ## 1. Identificación del servicio
 
-BlueTalk es una aplicación móvil de comunicación aumentativa y alternativa (CAA) dirigida a niñas, niños y a personas que necesitan apoyo para comunicarse. Se distribuye a través de Google Play Store con el identificador de paquete `com.limitcodev.bluetalk`. La persona responsable del desarrollo y del mantenimiento del servicio es LimitCodev (en adelante, «el desarrollador»).
+BlueTalk es una aplicación móvil de comunicación aumentativa y alternativa (CAA) dirigida a niñas, niños y a personas que necesitan apoyo para comunicarse. Se distribuye a través de Google Play Store con el identificador de paquete `com.limitcodev.bluetalk`. El responsable del desarrollo y del mantenimiento del servicio es LimitCodev, desarrollador de BlueTalk en Google Play y CTO de BlueTalk Innovation, emprendimiento peruano (en adelante, «el desarrollador»).
 
-Correo de contacto: demo@bluetalk.app. Es una dirección de demostración para este proyecto; las consultas recibidas allí se atienden en el entorno de pruebas.
+Correo de contacto: bluetalk.soporte@gmail.com.
 
 ## 2. Objeto de estos términos
 
@@ -169,18 +169,18 @@ Estos términos se rigen por la legislación del país donde se instale la app. 
 
 ## 17. Contacto
 
-Correo: demo@bluetalk.app (dirección de demostración de este proyecto).
-Última actualización de este documento: 8 de noviembre de 2026, versión 1.2.0.''');
+Correo: bluetalk.soporte@gmail.com.
+Última actualización de este documento: 19 de noviembre de 2026, versión 1.3.0.''');
 
 final String politicaDePrivacidad = _limpiar(r'''
 # Política de privacidad de BlueTalk
 
-**Fecha de entrada en vigencia:** 8 de noviembre de 2026
-**Versión:** 1.2.0
+**Fecha de entrada en vigencia:** 19 de noviembre de 2026
+**Versión:** 1.3.0
 
 ## 1. Responsable del tratamiento
 
-LimitCodev es responsable del tratamiento de los datos descritos en esta política en la aplicación BlueTalk. Correo de contacto: demo@bluetalk.app (dirección de demostración de este proyecto).
+LimitCodev, desarrollador de BlueTalk en Google Play y CTO de BlueTalk Innovation (emprendimiento peruano), es responsable del tratamiento de los datos descritos en esta política en la aplicación BlueTalk. Correo de contacto: bluetalk.soporte@gmail.com.
 
 ## 2. Principio general: los datos se quedan en el teléfono
 
@@ -227,11 +227,13 @@ El reconocimiento de huella o rostro, cuando se activa, lo realiza el sistema An
 
 ## 5. Voz y otras funciones del sistema
 
-La lectura de pictogramas usa el sintetizador de voz instalado en el teléfono. El texto que se lee se pasa al sistema Android para que lo pronuncie; no queda registrado por BlueTalk. Las notificaciones, si se autorizan, se generan localmente con el sistema de notificaciones de Android. El filtro de páginas, si se activa, usa una VPN local de Android que solo intercepta consultas DNS; las consultas permitidas se reenvían al DNS de la red y las bloqueadas se responden en el propio teléfono.
+La lectura de pictogramas usa el sintetizador de voz instalado en el teléfono. El texto que se lee se pasa al sistema Android para que lo pronuncie; no queda registrado por BlueTalk. El motor de voz lo elige quien configura el teléfono y aplica su propia política de privacidad. Las notificaciones, si se autorizan, se generan localmente con el sistema de notificaciones de Android. El filtro de páginas, si se activa, usa una VPN local de Android que solo intercepta consultas DNS; las consultas permitidas se reenvían al DNS de la red y las bloqueadas se responden en el propio teléfono.
 
 ## 6. Base jurídica
 
 El tratamiento se basa en el consentimiento de la persona adulta responsable, otorgado al aceptar los Términos y la Política de privacidad con la casilla de consentimiento parental. Ese consentimiento se guarda con su fecha y su número de versión y puede retirarse borrando los datos de la app o desinstalándola.
+
+Esta política se rige por la Ley N.º 29733, Ley de Protección de Datos Personales del Perú, y su reglamento. Si usas la app desde otro país, también se respetan los derechos que te reconozca la ley de protección de datos de ese país.
 
 ## 7. Menores de edad
 
@@ -261,9 +263,11 @@ BlueTalk desactiva las copias de seguridad automáticas de Android: ni una copia
 
 ## 10. Derechos de las personas
 
-Cualquier persona responsable puede ejercer los derechos de acceso, rectificación, supresión, oposición y limitación escribiendo a demo@bluetalk.app. Como los datos viven en el teléfono y no en un servidor, la vía más rápida de acceso y rectificación es la propia app o el borrado descrito en el apartado 9.
+Cualquier persona responsable puede ejercer los derechos de acceso, rectificación, supresión, oposición y limitación escribiendo a bluetalk.soporte@gmail.com. Como los datos viven en el teléfono y no en un servidor, la vía más rápida de acceso y rectificación es la propia app o el borrado descrito en el apartado 9.
 
 Si en el futuro hay datos en la nube, el mismo correo servirá para solicitar una copia exportable en formato legible y la supresión de la cuenta.
+
+Si consideras que tu solicitud no fue atendida, puedes presentar una reclamación ante la Autoridad Nacional de Protección de Datos Personales del Perú (Ministerio de Justicia y Derechos Humanos) o ante la autoridad de protección de datos de tu país.
 
 ## 11. Seguridad aplicada
 
@@ -286,5 +290,5 @@ Cada versión de la política lleva número y fecha. Los cambios sustanciales ex
 
 ## 14. Contacto
 
-Correo: demo@bluetalk.app (dirección de demostración de este proyecto).
-Última actualización: 8 de noviembre de 2026, versión 1.2.0.''');
+Correo: bluetalk.soporte@gmail.com.
+Última actualización: 19 de noviembre de 2026, versión 1.3.0.''');

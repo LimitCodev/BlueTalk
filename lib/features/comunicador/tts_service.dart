@@ -1,26 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
-/// Abstracción de voz (TTS) del comunicador.
-///
-/// La pantalla solo ve esta interfaz; los tests usan un doble falso y la voz
-/// real del sistema (`flutter_tts`) entra por [ttsSpeakerProvider].
-abstract interface class TtsSpeaker {
-  /// Velocidad de habla (0–1).
-  Future<void> setRate(double rate);
+import 'tts_contrato.dart';
 
-  /// Tono de voz.
-  Future<void> setPitch(double pitch);
-
-  /// Habla [text]. Solo se llama bajo taps del usuario (nunca autoplay).
-  Future<void> speak(String text);
-
-  /// Detiene la locución en curso.
-  Future<void> stop();
-
-  /// true si el sistema ofrece alguna voz en español (es-ES, es-MX, …).
-  Future<bool> hasSpanishVoice();
-}
+// Se reexportan para no cambiar los imports de quien ya los usaba.
+export 'tts_aviso_voz.dart'
+    show SpanishVoiceWarnedController, spanishVoiceWarnedProvider;
+export 'tts_contrato.dart' show TtsSpeaker;
 
 /// Implementación real con la voz del sistema (`flutter_tts`, offline).
 class FlutterTtsSpeaker implements TtsSpeaker {
@@ -30,6 +16,11 @@ class FlutterTtsSpeaker implements TtsSpeaker {
   FlutterTts? _tts;
   double _rate = 0.5;
   double _pitch = 1.0;
+  // Últimos valores que de verdad viajaron al canal nativo. Repetirlos en
+  // cada picto era un viaje de plataforma por toque (PERF-CORE-04).
+  double? _rateAplicada;
+  double? _pitchAplicado;
+  String? _idiomaAplicado;
   List<String>? _spanishLanguages;
 
   Future<FlutterTts> _engine() async {
@@ -38,7 +29,9 @@ class FlutterTtsSpeaker implements TtsSpeaker {
     final tts = FlutterTts();
     _tts = tts;
     await tts.setSpeechRate(_rate);
+    _rateAplicada = _rate;
     await tts.setPitch(_pitch);
+    _pitchAplicado = _pitch;
     return tts;
   }
 
@@ -47,8 +40,9 @@ class FlutterTtsSpeaker implements TtsSpeaker {
     final cached = _spanishLanguages;
     if (cached != null) return cached;
     final dynamic raw = await tts.getLanguages;
-    final languages =
-        raw is List ? raw.whereType<String>().toList() : const <String>[];
+    final languages = raw is List
+        ? raw.whereType<String>().toList()
+        : const <String>[];
     final spanish = languages.where((lang) => lang.startsWith('es')).toList();
     if (spanish.isNotEmpty) _spanishLanguages = spanish; // sin voz, reintenta
     return spanish;
@@ -62,12 +56,19 @@ class FlutterTtsSpeaker implements TtsSpeaker {
     return spanish.isEmpty ? null : spanish.first;
   }
 
+  /// Cambia de idioma solo si de verdad cambió.
+  Future<void> _aplicarIdioma(FlutterTts tts, String? language) async {
+    if (language == null || language == _idiomaAplicado) return;
+    await tts.setLanguage(language);
+    _idiomaAplicado = language;
+  }
+
   @override
   Future<bool> hasSpanishVoice() async {
     try {
       final tts = await _engine();
       final language = await _bestSpanish(tts);
-      if (language != null) await tts.setLanguage(language);
+      await _aplicarIdioma(tts, language);
       return language != null;
     } on Exception {
       return false; // sin motor TTS instalado en el sistema
@@ -79,8 +80,7 @@ class FlutterTtsSpeaker implements TtsSpeaker {
     if (text.trim().isEmpty) return;
     try {
       final tts = await _engine();
-      final language = await _bestSpanish(tts);
-      if (language != null) await tts.setLanguage(language);
+      await _aplicarIdioma(tts, await _bestSpanish(tts));
       // Corta la locución anterior: siempre manda el último toque del niño.
       await tts.stop();
       await tts.speak(text);
@@ -102,7 +102,10 @@ class FlutterTtsSpeaker implements TtsSpeaker {
   Future<void> setRate(double rate) async {
     _rate = rate;
     try {
-      await (await _engine()).setSpeechRate(rate);
+      final tts = await _engine();
+      if (_rateAplicada == rate) return;
+      await tts.setSpeechRate(rate);
+      _rateAplicada = rate;
     } on Exception {
       return;
     }
@@ -112,7 +115,10 @@ class FlutterTtsSpeaker implements TtsSpeaker {
   Future<void> setPitch(double pitch) async {
     _pitch = pitch;
     try {
-      await (await _engine()).setPitch(pitch);
+      final tts = await _engine();
+      if (_pitchAplicado == pitch) return;
+      await tts.setPitch(pitch);
+      _pitchAplicado = pitch;
     } on Exception {
       return;
     }
@@ -121,18 +127,3 @@ class FlutterTtsSpeaker implements TtsSpeaker {
 
 /// Instancia de voz; en tests se sobreescribe con un doble falso.
 final ttsSpeakerProvider = Provider<TtsSpeaker>((ref) => FlutterTtsSpeaker());
-
-/// Aviso de "falta la voz en español" ya mostrado (una sola vez por sesión).
-class SpanishVoiceWarnedController extends Notifier<bool> {
-  @override
-  bool build() => false;
-
-  /// Marca el aviso como mostrado para no repetirlo en la sesión.
-  void markShown() => state = true;
-}
-
-/// true tras mostrar el aviso de voz en español la primera vez.
-final spanishVoiceWarnedProvider =
-    NotifierProvider<SpanishVoiceWarnedController, bool>(
-  SpanishVoiceWarnedController.new,
-);

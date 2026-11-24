@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/layout/ancho_lectura.dart';
 import '../../../core/plataforma/edicion.dart';
 import 'graficos_animo.dart';
 import 'graficos_calendario.dart';
@@ -25,7 +26,9 @@ class InformeVista extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return switch (ref.watch(informeProvider(periodo))) {
-      AsyncData(:final value) => ListView(
+      AsyncData(:final value) => AnchoLectura(
+        maxWidth: 900,
+        child: ListView(
           padding: const EdgeInsets.only(bottom: 32),
           children: [
             CabeceraInforme(informe: value),
@@ -43,13 +46,14 @@ class InformeVista extends ConsumerWidget {
             _BotonCopiar(informe: value),
           ],
         ),
+      ),
       AsyncError() => Center(
-          child: OutlinedButton(
-            style: OutlinedButton.styleFrom(minimumSize: const Size(64, 48)),
-            onPressed: () => ref.invalidate(informeProvider(periodo)),
-            child: const Text('No se pudo calcular. Reintentar'),
-          ),
+        child: OutlinedButton(
+          style: OutlinedButton.styleFrom(minimumSize: const Size(64, 48)),
+          onPressed: () => ref.invalidate(informeProvider(periodo)),
+          child: const Text('No se pudo calcular. Reintentar'),
         ),
+      ),
       _ => const Center(child: CircularProgressIndicator()),
     };
   }
@@ -71,9 +75,13 @@ class _BotonCopiar extends StatelessWidget {
             ClipboardData(text: informeComoTexto(informe)),
           );
           if (!context.mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Informe copiado. Pégalo en WhatsApp o en un correo.'),
-          ));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Informe copiado. Pégalo en WhatsApp o en un correo.',
+              ),
+            ),
+          );
         },
         icon: const Icon(Icons.copy),
         label: const Text('Copiar informe'),

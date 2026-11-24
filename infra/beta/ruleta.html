@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ruleta BlueTalk</title>
+  <meta name="description" content="Gira la ruleta BlueTalk y descubre tu premio.">
+  <meta name="theme-color" content="#1574C1">
+  <link rel="icon" href="logo.png">
+  <style>
+    /* Paleta «celeste» de la app: lib/core/theme/app_colors.dart */
+    @font-face {
+      font-family: "Nunito";
+      src: url("Nunito-Variable.ttf") format("truetype");
+      font-weight: 200 1000;
+      font-display: swap;
+    }
+    :root {
+      --primary: #1574C1;
+      --primary-strong: #0F5E9C;
+      --header: #238EE7;
+      --accent: #37BEA7;
+      --on-accent: #0A3B2E;
+      --menta: #BFF3E8;
+      --aviso: #FBEBC8;
+      --on-aviso: #5B4413;
+      --text: #263442;
+    }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      color: #FFFFFF;
+      font-family: "Nunito", system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      background:
+        radial-gradient(700px 360px at 90% 0%, rgb(55 190 167 / .35), transparent 70%),
+        radial-gradient(600px 320px at 0% 100%, rgb(35 142 231 / .5), transparent 70%),
+        linear-gradient(160deg, var(--primary), var(--primary-strong)) fixed;
+      background-color: var(--primary-strong);
+    }
+    a { color: inherit; }
+    .cab { max-width: 1100px; margin: 0 auto; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+    .cab .logo { height: 38px; width: auto; background: #FFFFFF; border-radius: 10px; padding: 4px 8px; }
+    main {
+      max-width: 1100px; margin: 0 auto; padding: 8px 16px 40px;
+      display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 40px; align-items: center;
+    }
+
+    /* Rueda */
+    .ruleta { position: relative; width: min(100%, 560px); aspect-ratio: 1; justify-self: center; }
+    .ruleta svg.rueda {
+      width: 100%; height: 100%; display: block;
+      filter: drop-shadow(0 22px 40px rgb(0 0 0 / .3));
+      transition: transform 5.2s cubic-bezier(.12, .7, .1, 1);
+    }
+    .rueda text { font-family: "Nunito", system-ui, sans-serif; font-weight: 900; font-size: 18px; }
+    .puntero {
+      position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+      width: 13%; filter: drop-shadow(0 6px 8px rgb(0 0 0 / .3)); z-index: 2;
+    }
+    .centro {
+      position: absolute; inset: 0; margin: auto; width: 30%; height: 30%;
+      border-radius: 50%; background: #FFFFFF; border: 6px solid var(--aviso);
+      box-shadow: 0 8px 20px rgb(0 0 0 / .25), inset 0 0 0 4px var(--menta);
+      display: grid; place-items: center; overflow: hidden;
+    }
+    .centro img { width: 92%; height: auto; transform: translateY(6%); }
+    .girando .centro img { animation: salto .5s ease-in-out infinite alternate; }
+    @keyframes salto { to { transform: translateY(0) scale(1.05); } }
+
+    /* Panel */
+    .panel h1 { font-size: clamp(2rem, 5.4vw, 3.2rem); line-height: 1.05; margin: 0 0 10px; font-weight: 900; }
+    .panel h1 span { color: var(--menta); }
+    .panel p.lema { margin: 0 0 24px; font-size: 1.12rem; opacity: .95; }
+    .girar {
+      font: inherit; font-weight: 900; font-size: 1.35rem; cursor: pointer;
+      min-height: 64px; width: 100%; max-width: 360px; padding: 14px 28px; border: 0; border-radius: 18px;
+      background: var(--aviso); color: var(--on-aviso);
+      box-shadow: 0 8px 0 #E2C98E, 0 18px 30px rgb(0 0 0 / .25);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .girar:hover { transform: translateY(-2px); }
+    .girar:active { transform: translateY(6px); box-shadow: 0 2px 0 #E2C98E, 0 8px 16px rgb(0 0 0 / .25); }
+    .girar:focus-visible { outline: 4px solid var(--menta); outline-offset: 4px; }
+    .girar:disabled { cursor: default; opacity: .75; transform: none; }
+
+    /* Resultado: modal centrado sobre la página oscurecida */
+    .resultado {
+      width: min(100% - 32px, 500px); max-width: none; max-height: none; overflow: visible;
+      margin: auto; padding: 96px 24px 28px; border: 0; border-radius: 30px; text-align: center;
+      color: var(--text); background: linear-gradient(180deg, #FFFFFF 55%, #E8F2FB);
+      box-shadow: 0 0 0 6px var(--aviso), 0 30px 80px rgb(0 0 0 / .45);
+    }
+    .resultado::backdrop { background: rgb(6 26 46 / .72); backdrop-filter: blur(6px); }
+    .resultado[open] { animation: aparece .5s cubic-bezier(.2, 1.4, .4, 1); }
+    .resultado[open]::backdrop { animation: oscurece .3s ease; }
+    @keyframes aparece { from { transform: scale(.6); opacity: 0; } }
+    @keyframes oscurece { from { opacity: 0; } }
+    .rayos {
+      position: absolute; left: 50%; top: 10px; width: 340px; height: 340px; margin-left: -170px;
+      border-radius: 50%; z-index: -1; pointer-events: none;
+      background: repeating-conic-gradient(rgb(251 235 200 / .9) 0 10deg, rgb(251 235 200 / 0) 10deg 20deg);
+      -webkit-mask: radial-gradient(circle, #000 25%, transparent 70%);
+      mask: radial-gradient(circle, #000 25%, transparent 70%);
+      transform: translateY(-50%); animation: rayos 14s linear infinite;
+    }
+    @keyframes rayos { to { transform: translateY(-50%) rotate(360deg); } }
+    .resultado .mascota {
+      position: absolute; left: 50%; top: -110px; width: 190px; height: auto; margin-left: -95px;
+      filter: drop-shadow(0 14px 18px rgb(0 0 0 / .3));
+      animation: entra .6s cubic-bezier(.2, 1.5, .4, 1) both, salta .9s ease-in-out .6s infinite alternate;
+    }
+    @keyframes entra { from { transform: translateY(60px) scale(.4); opacity: 0; } }
+    @keyframes salta { to { transform: translateY(-14px) rotate(-4deg); } }
+    .resultado .titulo {
+      margin: 0; font-weight: 900; font-size: 1rem; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--primary-strong);
+    }
+    .resultado .premio {
+      display: inline-block; margin: 12px 0 10px; padding: 14px 28px; border-radius: 22px;
+      font-weight: 900; font-size: clamp(1.9rem, 8vw, 3rem); line-height: 1.1;
+      color: var(--on-aviso); background: linear-gradient(180deg, #FDF3DC, #F6D98F);
+      box-shadow: inset 0 -5px 0 rgb(91 68 19 / .15), 0 10px 24px rgb(214 168 64 / .4);
+      animation: brilla 1.6s ease-in-out .6s infinite alternate;
+    }
+    @keyframes brilla { to { box-shadow: inset 0 -5px 0 rgb(91 68 19 / .15), 0 10px 34px rgb(214 168 64 / .8); } }
+    .resultado .detalle { margin: 0 0 22px; color: #56657A; font-size: 1.05rem; }
+    .resultado .cerrar {
+      font: inherit; font-weight: 900; font-size: 1.15rem; cursor: pointer;
+      min-height: 56px; width: 100%; max-width: 280px; border: 0; border-radius: 16px;
+      background: var(--primary); color: #FFFFFF; box-shadow: 0 6px 0 var(--primary-strong);
+    }
+    .resultado .cerrar:focus-visible { outline: 4px solid var(--accent); outline-offset: 4px; }
+    /* Beca: tarjeta dorada */
+    .resultado.beca { background: linear-gradient(180deg, #FFFDF6 50%, #FBEBC8); box-shadow: 0 0 0 6px #F6D98F, 0 0 60px rgb(246 217 143 / .6), 0 30px 80px rgb(0 0 0 / .45); }
+    /* Sin premio: tono suave, sin rayos ni confeti, la mascota se balancea */
+    .resultado.nada .rayos, .resultado.nada .confeti { display: none; }
+    .resultado.nada .premio { color: var(--primary-strong); background: #E8F2FB; box-shadow: none; animation: none; }
+    .resultado.nada .mascota { animation: entra .6s cubic-bezier(.2, 1.5, .4, 1) both, duda 1.4s ease-in-out .6s infinite alternate; }
+    @keyframes duda { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+    /* Confeti: sale del centro de la tarjeta */
+    .confeti { position: absolute; left: 50%; top: 45%; width: 0; height: 0; pointer-events: none; }
+    .confeti i {
+      position: absolute; width: 10px; height: 16px; border-radius: 3px; opacity: 0;
+      animation: estalla 1.5s cubic-bezier(.15, .6, .3, 1) var(--d) both;
+    }
+    @keyframes estalla {
+      0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+      100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)); }
+    }
+
+    .lista { margin: 26px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+    .lista li {
+      padding: 5px 12px; border-radius: 999px; font-weight: 700; font-size: .9rem;
+      background: rgb(255 255 255 / .14); border: 1px solid rgb(255 255 255 / .3);
+    }
+    .lista li.ganador { background: var(--aviso); color: var(--on-aviso); border-color: var(--aviso); }
+
+    @media (max-width: 520px) {
+      .resultado { padding-top: 78px; }
+      .resultado .mascota { width: 150px; margin-left: -75px; top: -90px; }
+    }
+    @media (max-width: 820px) {
+      main { grid-template-columns: 1fr; gap: 24px; text-align: center; }
+      .ruleta { width: min(100%, 420px); }
+      .panel p.lema { margin-left: auto; margin-right: auto; }
+      .girar { max-width: none; }
+      .lista { justify-content: center; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ruleta svg.rueda { transition-duration: .01s; }
+      .girando .centro img, .resultado[open], .resultado[open]::backdrop, .rayos,
+      .resultado .mascota, .resultado .premio { animation: none; }
+      .confeti { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="cab">
+    <img class="logo" src="logo.png" alt="BlueTalk">
+  </header>
+
+  <main>
+    <div class="ruleta" id="ruleta">
+      <svg class="puntero" viewBox="0 0 60 70" aria-hidden="true">
+        <path d="M30 68 4 14A26 26 0 0 1 56 14Z" fill="#FBEBC8" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round"/>
+        <circle cx="30" cy="22" r="8" fill="#1574C1"/>
+      </svg>
+      <svg class="rueda" id="rueda" viewBox="0 0 400 400" role="img" aria-label="Ruleta con los premios"></svg>
+      <div class="centro" aria-hidden="true"><img src="mascota-ruleta.png" alt=""></div>
+    </div>
+
+    <div class="panel">
+      <h1>Ruleta <span>BlueTalk</span></h1>
+      <p class="lema">Gira la ruleta y descubre tu premio.</p>
+      <button class="girar" id="girar" type="button">¡Girar la ruleta!</button>
+
+      <ul class="lista" id="lista" aria-label="Premios"></ul>
+    </div>
+  </main>
+
+  <dialog class="resultado" id="resultado" aria-labelledby="titulo-resultado" aria-describedby="premio">
+    <div class="rayos" aria-hidden="true"></div>
+    <div class="confeti" id="confeti" aria-hidden="true"></div>
+    <img class="mascota" id="mascota-resultado" src="mascota-premio.png" width="190" height="206" alt="">
+    <p class="titulo" id="titulo-resultado">¡Ganaste!</p>
+    <p class="premio" id="premio"></p>
+    <p class="detalle" id="detalle"></p>
+    <form method="dialog"><button class="cerrar" id="cerrar" autofocus>¡Genial!</button></form>
+  </dialog>
+
+  <script>
+    // Premios: edita solo esta lista (el orden es el de la rueda, en sentido horario).
+    //   rueda: texto en la casilla (\n parte la línea) · nombre: texto del resultado
+    //   color: [relleno, texto] con contraste AA · nada: casilla sin premio
+    var PREMIOS = [
+      { rueda: 'Pines', color: ['#1574C1', '#FFFFFF'] },
+      { rueda: 'Suerte la\npróxima', nada: true, color: ['#E8F2FB', '#0F5E9C'] },
+      { rueda: 'Lapiceros', color: ['#37BEA7', '#0A3B2E'] },
+      { rueda: 'Suerte la\npróxima', nada: true, color: ['#E8F2FB', '#0F5E9C'] },
+      { rueda: 'Stickers', color: ['#0F5E9C', '#FFFFFF'] },
+      { rueda: 'Curso', color: ['#238EE7', '#061A2E'] },
+      { rueda: 'Suerte la\npróxima', nada: true, color: ['#E8F2FB', '#0F5E9C'] },
+      { rueda: 'Beca\n50%', nombre: 'Beca 50% · Innovación que da voz', color: ['#FBEBC8', '#5B4413'] }
+    ];
+    var VUELTAS = 6;
+
+    var N = PREMIOS.length, PASO = 360 / N, C = 200, R = 188;
+    var rueda = document.getElementById('rueda');
+    var boton = document.getElementById('girar');
+    var caja = document.getElementById('resultado');
+    var ruleta = document.getElementById('ruleta');
+    var lista = document.getElementById('lista');
+    var giro = 0, girando = false;
+
+    function mod(a, b) { return ((a % b) + b) % b; }
+    // Ángulo en grados, en sentido horario desde arriba.
+    function punto(ang, r) {
+      var rad = ang * Math.PI / 180;
+      return (C + r * Math.sin(rad)).toFixed(2) + ' ' + (C - r * Math.cos(rad)).toFixed(2);
+    }
+    // Casilla que queda bajo el puntero (arriba) con la rueda girada `rot` grados.
+    function casillaBajoPuntero(rot) { return Math.floor(mod(-rot, 360) / PASO); }
+
+    function dibujar() {
+      var ns = 'http://www.w3.org/2000/svg', html = '';
+      html += '<circle cx="200" cy="200" r="198" fill="#FFFFFF"/>';
+      PREMIOS.forEach(function (p, i) {
+        var col = p.color, a = i * PASO, medio = a + PASO / 2;
+        html += '<path d="M200 200L' + punto(a, R) + 'A' + R + ' ' + R + ' 0 0 1 ' + punto(a + PASO, R) +
+                'Z" fill="' + col[0] + '" stroke="#FFFFFF" stroke-width="2"/>';
+        html += '<text x="' + (C + R * 0.6) + '" y="' + C + '" fill="' + col[1] +
+                '" text-anchor="middle" dominant-baseline="central" transform="rotate(' + (medio - 90) +
+                ' 200 200)"></text>';
+      });
+      for (var i = 0; i < N * 2; i++) {
+        var p = punto(i * PASO / 2, 194).split(' ');
+        html += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="3.2" fill="' + (i % 2 ? '#FBEBC8' : '#FFFFFF') + '"/>';
+      }
+      rueda.innerHTML = html;
+      // textContent: los nombres de premio nunca se interpretan como HTML.
+      rueda.querySelectorAll('text').forEach(function (t, i) {
+        var lineas = PREMIOS[i].rueda.split('\n');
+        lineas.forEach(function (linea, j) {
+          var ts = document.createElementNS(ns, 'tspan');
+          ts.setAttribute('x', C + R * 0.6);
+          ts.setAttribute('dy', (j ? 1.1 : -(lineas.length - 1) * 0.55) + 'em');
+          ts.textContent = linea;
+          t.appendChild(ts);
+        });
+      });
+      // La lista muestra solo los premios reales, sin repetir «Suerte la próxima».
+      PREMIOS.forEach(function (p, i) {
+        if (p.nada) return;
+        var li = document.createElement('li');
+        li.dataset.i = i;
+        li.textContent = nombreDe(p);
+        lista.appendChild(li);
+      });
+    }
+
+    function nombreDe(p) { return p.nombre || p.rueda.replace('\n', ' '); }
+
+    var CONFETI = ['#1574C1', '#37BEA7', '#238EE7', '#FBEBC8', '#F6D98F', '#BFF3E8', '#FFFFFF'];
+    function mostrarResultado(p) {
+      var beca = /beca/i.test(p.rueda);
+      caja.className = 'resultado' + (p.nada ? ' nada' : '') + (beca ? ' beca' : '');
+      document.getElementById('premio').textContent = nombreDe(p);
+      document.getElementById('titulo-resultado').textContent = p.nada ? '¡Casi!' : '¡Ganaste!';
+      document.getElementById('detalle').textContent = p.nada
+        ? 'Gracias por participar. ¡Sigue con nosotros!'
+        : 'Acércate al equipo BlueTalk para recibir tu premio.';
+      document.getElementById('cerrar').textContent = p.nada ? 'Entendido' : '¡Genial!';
+      document.getElementById('mascota-resultado').src = p.nada ? 'mascota-pensando.png' : 'mascota-premio.png';
+      var confeti = document.getElementById('confeti');
+      confeti.textContent = '';
+      if (!p.nada) {
+        for (var i = 0; i < 46; i++) {
+          var c = document.createElement('i'), ang = azar(Math.PI * 2), dist = 140 + azar(260);
+          c.style.background = CONFETI[i % CONFETI.length];
+          c.style.setProperty('--x', Math.cos(ang) * dist + 'px');
+          c.style.setProperty('--y', Math.sin(ang) * dist + 120 + 'px');
+          c.style.setProperty('--r', azar(720) - 360 + 'deg');
+          c.style.setProperty('--d', azar(0.25) + 's');
+          confeti.appendChild(c);
+        }
+      }
+      caja.showModal();
+    }
+
+    function azar(max) {
+      var u = new Uint32Array(1);
+      (window.crypto || window.msCrypto).getRandomValues(u);
+      return u[0] / 4294967296 * max;
+    }
+
+    function girar() {
+      if (girando) return;
+      girando = true;
+      boton.disabled = true;
+      lista.querySelectorAll('.ganador').forEach(function (li) { li.classList.remove('ganador'); });
+      ruleta.classList.add('girando');
+
+      var ganador = Math.floor(azar(N));
+      var holgura = (azar(1) - 0.5) * PASO * 0.7;  // no cae justo en el centro de la casilla
+      var centro = ganador * PASO + PASO / 2;
+      giro = giro - mod(giro, 360) + 360 * VUELTAS + mod(-centro - holgura, 360);
+      rueda.style.transform = 'rotate(' + giro + 'deg)';
+
+      var hecho = false;
+      function fin() {
+        if (hecho) return;
+        hecho = true;
+        var i = casillaBajoPuntero(giro);
+        var p = PREMIOS[i], chip = lista.querySelector('[data-i="' + i + '"]');
+        if (chip) chip.classList.add('ganador');
+        mostrarResultado(p);
+        ruleta.classList.remove('girando');
+        boton.disabled = false;
+        boton.textContent = '¡Girar otra vez!';
+        girando = false;
+      }
+      rueda.addEventListener('transitionend', fin, { once: true });
+      setTimeout(fin, 6000);  // por si el navegador no emite transitionend
+    }
+
+    // Autocomprobación: el giro calculado deja cada casilla bajo el puntero.
+    (function () {
+      for (var k = 0; k < N; k++) {
+        for (var h = -0.35; h <= 0.35; h += 0.35) {
+          var g = 1234.5 - mod(1234.5, 360) + 360 * VUELTAS + mod(-(k * PASO + PASO / 2) - h * PASO, 360);
+          console.assert(casillaBajoPuntero(g) === k, 'Ruleta: la casilla ' + k + ' no cae bajo el puntero');
+        }
+      }
+    })();
+
+    dibujar();
+    boton.addEventListener('click', girar);
+  </script>
+</body>
+</html>

@@ -27,13 +27,17 @@ class MenuTarjeta extends StatelessWidget {
     final cat = coloresCategorias[opcion.categoria]!;
     final tinta = cat.texto(paleta);
     final t = distancia.clamp(0.0, 1.0);
+    // Las tarjetas que quedan lejos del centro se apagan del todo: en
+    // pantallas altas el carrusel deja ver más de tres y no deben competir
+    // con la del centro.
+    final opacidad = (1 - 0.6 * distancia).clamp(0.0, 1.0);
     final texto = Theme.of(context).textTheme;
     return GuiaAncla(
       objetivo: objetivoTarjeta(opcion),
       child: Transform.scale(
         scale: 1 - 0.1 * t,
         child: Opacity(
-          opacity: 1 - 0.6 * t,
+          opacity: opacidad,
           child: Semantics(
             button: true,
             label: '${opcion.titulo}. ${opcion.descripcion}',
@@ -74,7 +78,12 @@ class MenuTarjeta extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(opcion.descripcion, style: texto.bodyMedium),
+                            Text(
+                              opcion.descripcion,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: texto.bodyMedium,
+                            ),
                           ],
                         ),
                       ),
