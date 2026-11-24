@@ -130,6 +130,13 @@
     }
     .cab .env { display: flex; align-items: center; gap: 16px; height: 64px; }
     .cab .logo { height: 38px; width: auto; }
+    .cab .logo-osc { display: none; }
+    :root[data-tema="oscuro"] .cab .logo-cla { display: none; }
+    :root[data-tema="oscuro"] .cab .logo-osc { display: block; }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-tema="claro"]) .cab .logo-cla { display: none; }
+      :root:not([data-tema="claro"]) .cab .logo-osc { display: block; }
+    }
     .cab nav { margin-left: auto; display: flex; gap: 4px; }
     .cab nav a {
       color: var(--text); text-decoration: none; font-weight: 700;
@@ -152,7 +159,13 @@
         linear-gradient(160deg, var(--hero-a), var(--hero-b));
       padding: 56px 0 72px;
     }
-    .hero .env { display: grid; grid-template-columns: 1.25fr 1fr; gap: 32px; align-items: center; }
+    .hero .env { position: relative; z-index: 1; display: grid; grid-template-columns: 1.25fr 1fr; gap: 32px; align-items: center; }
+    /* Fondo de marca: globos con la cara del logo, tarjetas de pictograma y el check verde */
+    .deco { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .deco .f1 { animation: flota 9s ease-in-out infinite alternate; }
+    .deco .f2 { animation: flota 12s ease-in-out -4s infinite alternate-reverse; }
+    .deco .f3 { animation: flota 15s ease-in-out -7s infinite alternate; }
+    @keyframes flota { to { translate: 0 -14px; rotate: 3deg; } }
     .hero h1 { font-size: clamp(2.1rem, 6vw, 3.4rem); line-height: 1.08; margin: 14px 0 14px; font-weight: 900; }
     .hero h1 span { color: #BFF3E8; }
     .hero p.lema { font-size: 1.15rem; margin: 0 0 22px; opacity: .95; max-width: 34ch; }
@@ -196,9 +209,22 @@
     .linea b { display: block; }
     .linea span { color: var(--muted); font-size: .95rem; }
     .play {
-      display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 14px;
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
       background: linear-gradient(160deg, var(--soft), var(--surface));
     }
+    .play h2 { margin: 6px 0 0; max-width: 11ch; }
+    .play-ave {
+      position: absolute; top: 14px; right: 10px; width: 118px; height: auto;
+      filter: drop-shadow(0 10px 14px rgb(15 94 156 / .25)); animation: vuela 3.2s ease-in-out infinite alternate;
+    }
+    @keyframes vuela { to { translate: -6px -10px; rotate: -4deg; } }
+    .play-estado {
+      margin-top: auto !important; display: flex; align-items: center; gap: 10px; width: 100%;
+      padding: 12px 14px; border-radius: 14px; background: var(--aviso); color: var(--on-aviso) !important; font-weight: 800; font-size: .95rem;
+    }
+    .latido { flex: none; width: 10px; height: 10px; border-radius: 50%; background: currentColor; animation: latido 1.6s ease-out infinite; }
+    @keyframes latido { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 60%, transparent); } 100% { box-shadow: 0 0 0 10px transparent; } }
     .play-insignia {
       display: inline-flex; align-items: center; gap: 12px;
       background: #000000; color: #FFFFFF; border-radius: 12px; padding: 10px 18px 10px 14px;
@@ -396,8 +422,25 @@
     .hash { font-family: ui-monospace, monospace; font-size: .82rem; word-break: break-all; }
     details.experto summary { cursor: pointer; font-weight: 800; }
 
+    /* Globo del logo como marca de agua; sigue el color del tema */
+    #funciones, #instalar { position: relative; overflow-x: clip; }
+    #funciones::before, #instalar::before {
+      content: ""; position: absolute; z-index: -1; pointer-events: none; width: 360px; height: 360px;
+      background: var(--primary); opacity: .07;
+      -webkit-mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round'><path d='M24 5a18 18 0 1 1-9 33.6L6 42l2.8-8.4A18 18 0 0 1 24 5Z'/><path d='M17 28q7 6 14 0'/><circle cx='18' cy='21' r='1' fill='black'/><circle cx='30' cy='21' r='1' fill='black'/></svg>") center / contain no-repeat;
+      mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round'><path d='M24 5a18 18 0 1 1-9 33.6L6 42l2.8-8.4A18 18 0 0 1 24 5Z'/><path d='M17 28q7 6 14 0'/><circle cx='18' cy='21' r='1' fill='black'/><circle cx='30' cy='21' r='1' fill='black'/></svg>") center / contain no-repeat;
+    }
+    #funciones::before { top: 10px; right: -90px; rotate: 8deg; }
+    #instalar::before { top: -40px; left: -120px; width: 260px; height: 260px; rotate: -10deg; scale: -1 1; }
+
     /* CTA final y pie */
-    .final { text-align: center; background: linear-gradient(160deg, var(--hero-a), var(--hero-b)); color: #FFFFFF; border-radius: 28px; padding: 40px 24px; }
+    .final {
+      text-align: center; color: #FFFFFF; border-radius: 28px; padding: 40px 24px;
+      background:
+        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='2.5' stroke-linecap='round'><path d='M24 5a18 18 0 1 1-9 33.6L6 42l2.8-8.4A18 18 0 0 1 24 5Z'/><path d='M17 28q7 6 14 0'/><circle cx='18' cy='21' r='1' fill='rgba(255,255,255,0.2)'/><circle cx='30' cy='21' r='1' fill='rgba(255,255,255,0.2)'/></svg>") right -24px top -30px / 170px no-repeat,
+        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='rgba(255,255,255,0.14)' stroke-width='2.5' stroke-linecap='round'><path d='M24 5a18 18 0 1 1-9 33.6L6 42l2.8-8.4A18 18 0 0 1 24 5Z'/><path d='M17 28q7 6 14 0'/><circle cx='18' cy='21' r='1' fill='rgba(255,255,255,0.14)'/><circle cx='30' cy='21' r='1' fill='rgba(255,255,255,0.14)'/></svg>") left 5% bottom -46px / 120px no-repeat,
+        linear-gradient(160deg, var(--hero-a), var(--hero-b));
+    }
     .final h2 { color: #FFFFFF; }
     .final p { margin: 0 0 22px; opacity: .92; }
     footer.env { color: var(--muted); font-size: .9rem; padding: 32px 16px 48px; text-align: center; }
@@ -448,13 +491,14 @@
       html { scroll-behavior: auto; }
       * { transition: none !important; }
       .toque { display: none; }
+      .deco g, .play-ave, .latido { animation: none; }
     }
   </style>
 </head>
 <body>
   <header class="cab">
     <div class="env">
-      <a href="#inicio" aria-label="BlueTalk, inicio"><img class="logo" src="logo.png" alt="BlueTalk"></a>
+      <a href="#inicio" aria-label="BlueTalk, inicio"><img class="logo logo-cla" src="img/logo-claro.png" width="127" height="38" alt="BlueTalk"><img class="logo logo-osc" src="img/logo-oscuro.png" width="127" height="38" alt="BlueTalk"></a>
       <nav aria-label="Secciones">
         <a href="#funciones">Qué trae</a>
         <a href="#instalar">Instalar</a>
@@ -470,6 +514,16 @@
 
   <main>
     <div class="hero" id="inicio">
+      <svg class="deco" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <g id="bur" fill="none" stroke="#FFFFFF" stroke-opacity=".16" stroke-width="2.5" stroke-linecap="round"><path d="M24 5a18 18 0 1 1-9 33.6L6 42l2.8-8.4A18 18 0 0 1 24 5Z"/><path d="M17 28q7 6 14 0"/><circle cx="18" cy="21" r="2" fill="#FFFFFF" fill-opacity=".16" stroke="none"/><circle cx="30" cy="21" r="2" fill="#FFFFFF" fill-opacity=".16" stroke="none"/></g>
+          <rect id="tar" fill="#FFFFFF" fill-opacity=".05" stroke="#FFFFFF" stroke-opacity=".14" stroke-width="2" width="44" height="44" rx="10"/>
+          <path id="chk" fill="none" stroke="#37BEA7" stroke-opacity=".55" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" d="M4 12l7 7L24 4"/>
+        </defs>
+        <g class="f1"><use href="#bur" transform="translate(40 70) scale(1.7)"/><use href="#tar" transform="translate(470 500) rotate(-8)"/><use href="#chk" transform="translate(905 46)"/></g>
+        <g class="f2"><use href="#bur" transform="translate(590 22) scale(1)"/><use href="#bur" transform="translate(960 470) scale(1.5)"/><use href="#tar" transform="translate(300 24) rotate(10)"/></g>
+        <g class="f3"><use href="#bur" transform="translate(30 450) scale(1.2)"/><use href="#tar" transform="translate(1130 300) rotate(-12)"/><use href="#chk" transform="translate(690 330)"/><use href="#chk" transform="translate(200 548)"/><use href="#bur" transform="translate(1120 40) scale(1.3)"/></g>
+      </svg>
       <div class="env">
         <div>
           <span class="pill pill-pronto">● Pronto en Google Play</span>
@@ -509,7 +563,10 @@
             </svg>
             <span><small>Próximamente en</small><strong>Google Play</strong></span>
           </div>
-          <p>Cuando esté en la tienda, instalarás BlueTalk sin avisos de seguridad y se actualizará sola.</p>
+          <img class="play-ave" src="img/ave-volando.webp" width="118" height="128" alt="">
+          <h2>Muy pronto en la tienda</h2>
+          <p>Cuando esté en Google Play, instalarás BlueTalk sin avisos de seguridad y se actualizará sola.</p>
+          <p class="play-estado"><span class="latido" aria-hidden="true"></span>Google está revisando la app</p>
         </div>
       </div>
 
