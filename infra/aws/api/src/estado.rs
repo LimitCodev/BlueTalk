@@ -9,7 +9,14 @@ type R<T> = Result<T, ErrorApi>;
 /// Persistencia de la API (DynamoDB en producción, memoria en pruebas).
 pub trait Almacen: Send + Sync {
     fn familia(&self, fid: &str) -> impl Future<Output = R<Option<Familia>>> + Send;
-    /// Alta atómica: liga `f.fid` al token (máximo `max` fids por token).
+    /// Alta atómica (condicional, en una sola operación; nunca leer y luego escribir):
+    /// - `f.fid` no existe: lo guarda y lo liga a `token_hash` (máximo `max` fids por token,
+    ///   si no `Llena`) y devuelve `Nueva`.
+    /// - `f.fid` existe con otro `wh`: no cambia nada y devuelve `OtroWh`. Nunca sobrescribe.
+    /// - `f.fid` existe con el mismo `wh`: actualiza `token`, `hasta` y `fin` con los de `f`
+    ///   (renovación o nueva compra) y devuelve `YaExistia`. Si `token_hash` es un token al que
+    ///   el `fid` aún no estaba ligado, lo liga con el mismo tope `max` (si no, `Llena` sin
+    ///   cambios).
     fn alta(&self, f: &Familia, token_hash: &str, max: usize) -> impl Future<Output = R<Alta>> + Send;
     fn vigencia(&self, fid: &str, hasta: u64, fin: u64) -> impl Future<Output = R<()>> + Send;
 }

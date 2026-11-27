@@ -45,16 +45,20 @@ impl Almacen for AlmacenMemoria {
     async fn alta(&self, f: &Familia, token_hash: &str, max: usize) -> Result<Alta, ErrorApi> {
         let mut fams = self.familias.lock().unwrap();
         let mut ligs = self.ligaduras.lock().unwrap();
-        if let Some(previa) = fams.get(&f.fid) {
-            return if previa.wh == f.wh { Ok(Alta::YaExistia) } else { Err(ErrorApi::Token) };
+        let previa = fams.get(&f.fid);
+        if previa.is_some_and(|p| p.wh != f.wh) {
+            return Ok(Alta::OtroWh);
         }
         let fids = ligs.entry(token_hash.to_string()).or_default();
-        if fids.len() >= max {
-            return Ok(Alta::Llena);
+        if !fids.contains(&f.fid) {
+            if fids.len() >= max {
+                return Ok(Alta::Llena);
+            }
+            fids.push(f.fid.clone());
         }
-        fids.push(f.fid.clone());
+        let existia = previa.is_some();
         fams.insert(f.fid.clone(), f.clone());
-        Ok(Alta::Nueva)
+        Ok(if existia { Alta::YaExistia } else { Alta::Nueva })
     }
 
     async fn vigencia(&self, fid: &str, hasta: u64, fin: u64) -> Result<(), ErrorApi> {

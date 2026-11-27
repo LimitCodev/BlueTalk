@@ -52,6 +52,39 @@ async fn cuarto_fid_con_el_mismo_token_da_409() {
     assert_eq!((r.estado, r.cuerpo.as_slice()), (409, br#"{"error":"lleno"}"#.as_slice()));
 }
 
+#[tokio::test]
+async fn reactivar_con_token_nuevo_actualiza_la_familia() {
+    let e = estado();
+    assert_eq!(activar(&e, FID, WTOK, "compra-vieja").await, 201);
+    // La suscripción vieja venció; Play emite un token nuevo con otro fin.
+    e.google.suscripcion.lock().unwrap().as_mut().unwrap().fin = FIN + 2_592_000;
+    assert_eq!(activar(&e, FID, WTOK, "compra-nueva").await, 200);
+    let f = e.almacen.familias.lock().unwrap()[FID].clone();
+    assert_eq!((f.token.as_str(), f.fin, f.hasta), ("compra-nueva", FIN + 2_592_000, AHORA + 86_400));
+    let f = bluetalk_api::auth::familia_autenticada(&e.almacen, Some(AUTH)).await.unwrap();
+    assert_eq!(f.token, "compra-nueva");
+}
+
+#[tokio::test]
+async fn reactivar_con_token_nuevo_ya_lleno_da_409_y_no_cambia_nada() {
+    let e = estado();
+    assert_eq!(activar(&e, FID, WTOK, "compra-vieja").await, 201);
+    for n in 0..3 {
+        assert_eq!(activar(&e, &otro_fid(n), WTOK, "compra-nueva").await, 201);
+    }
+    assert_eq!(activar(&e, FID, WTOK, "compra-nueva").await, 409);
+    assert_eq!(e.almacen.familias.lock().unwrap()[FID].token, "compra-vieja");
+}
+
+#[tokio::test]
+async fn reactivar_con_otro_wh_y_token_nuevo_da_401_sin_robar_la_familia() {
+    let e = estado();
+    assert_eq!(activar(&e, FID, WTOK, "compra-1").await, 201);
+    assert_eq!(activar(&e, FID, &"B".repeat(43), "compra-2").await, 401);
+    let f = e.almacen.familias.lock().unwrap()[FID].clone();
+    assert_eq!((f.token.as_str(), f.wh), ("compra-1", bluetalk_api::auth::autenticar(Some(AUTH)).unwrap().1));
+}
+
 async fn alta_con_veredicto(cambio: impl FnOnce(&mut bluetalk_api::google::Veredicto)) -> u16 {
     let e = estado();
     cambio(&mut e.google.veredicto.lock().unwrap());

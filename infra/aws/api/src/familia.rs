@@ -22,9 +22,14 @@ pub struct Familia {
 
 #[derive(Debug, PartialEq)]
 pub enum Alta {
+    /// `fid` nuevo, guardado y ligado al token de compra.
     Nueva,
+    /// El `fid` ya existía con el mismo `wh`; se actualizaron token, `hasta` y `fin`.
     YaExistia,
+    /// El token de compra ya liga `max` fids (y este no es uno de ellos). No se guardó nada.
     Llena,
+    /// El `fid` ya existe con otro `wh`. No se tocó nada: nunca se sobrescribe una familia ajena.
+    OtroWh,
 }
 
 #[derive(Deserialize)]
@@ -82,6 +87,7 @@ pub async fn activar<A: Almacen, G: Google>(e: &Estado<A, G>, cuerpo: &[u8], aho
         Alta::Nueva => 201,
         Alta::YaExistia => 200,
         Alta::Llena => return Err(ErrorApi::Lleno),
+        Alta::OtroWh => return Err(ErrorApi::Token),
     };
     if !s.reconocida {
         e.google.reconocer(&e.cfg.producto, &f.token).await?;
