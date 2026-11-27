@@ -63,6 +63,10 @@ async fn reactivar_con_token_nuevo_actualiza_la_familia() {
     assert_eq!((f.token.as_str(), f.fin, f.hasta), ("compra-nueva", FIN + 2_592_000, AHORA + 86_400));
     let f = bluetalk_api::auth::familia_autenticada(&e.almacen, Some(AUTH)).await.unwrap();
     assert_eq!(f.token, "compra-nueva");
+    // Con la caché al día escribir no es 402, aunque Google ya no responda.
+    *e.google.suscripcion.lock().unwrap() = None;
+    let dias = br#"{"dias":[{"d":"2026-11-26","b":"eA=="}]}"#;
+    assert_eq!(atender(&e, pet("PUT", "/v1/dias", Some(AUTH), dias), AHORA).await.estado, 204);
 }
 
 #[tokio::test]

@@ -1,3 +1,4 @@
+use crate::dias;
 use crate::error::ErrorApi;
 use crate::estado::{Almacen, Estado, Google};
 use crate::familia;
@@ -21,6 +22,8 @@ async fn despachar<A: Almacen, G: Google>(e: &Estado<A, G>, p: &Peticion, ahora:
     }
     match (p.metodo.as_str(), p.ruta.as_str()) {
         ("POST", "/v1/familia") => familia::activar(e, &p.cuerpo, ahora).await,
+        ("PUT", "/v1/dias") => dias::subir(e, p.auth.as_deref(), &p.cuerpo, ahora).await,
+        ("GET", "/v1/dias") => dias::bajar(e, p.auth.as_deref(), p.consulta.as_deref(), ahora).await,
         (_, ruta) if RUTAS.contains(&ruta) => Err(ErrorApi::Metodo),
         _ => Err(ErrorApi::NoEncontrado),
     }

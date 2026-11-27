@@ -19,6 +19,14 @@ pub trait Almacen: Send + Sync {
     ///   cambios).
     fn alta(&self, f: &Familia, token_hash: &str, max: usize) -> impl Future<Output = R<Alta>> + Send;
     fn vigencia(&self, fid: &str, hasta: u64, fin: u64) -> impl Future<Output = R<()>> + Send;
+    /// Gasta un uso de la cuota `ruta` de `fid` en el `dia` ("AAAA-MM-DD", UTC), en una sola
+    /// operación atómica. `false` si ya llevaba `tope` usos (entonces no cuenta).
+    fn consumir_cuota(&self, fid: &str, ruta: &str, dia: &str, tope: u32) -> impl Future<Output = R<bool>> + Send;
+    /// Guarda (o sobrescribe) los bloques de día, con caducidad `ttl` (segundos Unix).
+    /// `dias` no repite fecha.
+    fn guardar_dias(&self, fid: &str, dias: &[(String, Vec<u8>)], ttl: u64) -> impl Future<Output = R<()>> + Send;
+    /// Hasta `max` bloques con fecha >= `desde`, en orden ascendente.
+    fn leer_dias(&self, fid: &str, desde: &str, max: usize) -> impl Future<Output = R<Vec<(String, Vec<u8>)>>> + Send;
 }
 
 /// Servicios de Google: Play Integrity y Android Publisher.

@@ -1,7 +1,7 @@
 //! Dobles de prueba: almacén en memoria y Google falso. Crecen por tarea.
 #![allow(dead_code)]
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
@@ -35,6 +35,9 @@ pub fn auth_de(fid: &str, wtok: &str) -> String {
 pub struct AlmacenMemoria {
     pub familias: Mutex<HashMap<String, Familia>>,
     pub ligaduras: Mutex<HashMap<String, Vec<String>>>,
+    /// (fid, ruta, día) → usos.
+    pub cuotas: Mutex<HashMap<(String, String, String), u32>>,
+    pub dias: Mutex<HashMap<String, BTreeMap<String, Vec<u8>>>>,
 }
 
 impl Almacen for AlmacenMemoria {
@@ -67,6 +70,25 @@ impl Almacen for AlmacenMemoria {
             f.fin = fin;
         }
         Ok(())
+    }
+
+    async fn consumir_cuota(&self, fid: &str, ruta: &str, dia: &str, tope: u32) -> Result<bool, ErrorApi> {
+        let mut cuotas = self.cuotas.lock().unwrap();
+        let usos = cuotas.entry((fid.into(), ruta.into(), dia.into())).or_insert(0);
+        let cabe = *usos < tope;
+        *usos += u32::from(cabe);
+        Ok(cabe)
+    }
+
+    async fn guardar_dias(&self, fid: &str, dias: &[(String, Vec<u8>)], _ttl: u64) -> Result<(), ErrorApi> {
+        self.dias.lock().unwrap().entry(fid.into()).or_default().extend(dias.iter().cloned());
+        Ok(())
+    }
+
+    async fn leer_dias(&self, fid: &str, desde: &str, max: usize) -> Result<Vec<(String, Vec<u8>)>, ErrorApi> {
+        let todos = self.dias.lock().unwrap();
+        let del_fid = todos.get(fid).into_iter().flatten();
+        Ok(del_fid.filter(|(d, _)| d.as_str() >= desde).take(max).map(|(d, b)| (d.clone(), b.clone())).collect())
     }
 }
 
