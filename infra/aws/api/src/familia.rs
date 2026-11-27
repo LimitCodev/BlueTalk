@@ -46,7 +46,11 @@ fn hex32(s: &str) -> Option<[u8; 32]> {
     Some(out)
 }
 
-/// `POST /v1/familia`: Integrity → suscripción → alta → reconocer compra.
+/// Un veredicto de Integrity vale 5 minutos; se admite 1 minuto de desfase del reloj.
+const VEREDICTO_MAX_EDAD_MS: u64 = 300_000;
+const VEREDICTO_MAX_ADELANTO_MS: u64 = 60_000;
+
+/// `POST /v1/familia`: Integrity (hash de `fid|wh`, reciente) → suscripción → alta → reconocer compra.
 pub async fn activar<A: Almacen, G: Google>(e: &Estado<A, G>, cuerpo: &[u8], ahora: u64) -> Result<Respuesta, ErrorApi> {
     let p: PeticionAlta = serde_json::from_slice(cuerpo).map_err(|_| ErrorApi::Peticion)?;
     let wh = hex32(&p.wh).ok_or(ErrorApi::Peticion)?;
@@ -56,10 +60,13 @@ pub async fn activar<A: Almacen, G: Google>(e: &Estado<A, G>, cuerpo: &[u8], aho
     }
 
     let v = e.google.integridad(&p.integridad).await?;
-    let integra = v.paquete == e.cfg.paquete
+    let ahora_ms = ahora * 1000;
+    let fresco = v.timestamp_ms.saturating_add(VEREDICTO_MAX_EDAD_MS) >= ahora_ms && v.timestamp_ms <= ahora_ms + VEREDICTO_MAX_ADELANTO_MS;
+    let integra = fresco
+        && v.paquete == e.cfg.paquete
         && v.reconocida
         && v.dispositivo_ok
-        && v.hash_peticion == hex(&sha256(p.fid.as_bytes()));
+        && v.hash_peticion == hex(&sha256(format!("{}|{}", p.fid, p.wh).as_bytes()));
     if !integra {
         return Err(ErrorApi::Token);
     }

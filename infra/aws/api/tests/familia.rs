@@ -47,10 +47,7 @@ async fn cuarto_fid_con_el_mismo_token_da_409() {
     for n in 0..3 {
         assert_eq!(activar(&e, &otro_fid(n), WTOK, "compra-1").await, 201);
     }
-    *e.google.veredicto.lock().unwrap() = bluetalk_api::google::Veredicto {
-        hash_peticion: hex_sha(otro_fid(3).as_bytes()),
-        ..e.google.veredicto.lock().unwrap().clone()
-    };
+    e.google.veredicto.lock().unwrap().hash_peticion = hash_activacion(&otro_fid(3), WTOK);
     let r = atender(&e, pet("POST", "/v1/familia", None, &cuerpo_alta(&otro_fid(3), WTOK, "compra-1")), AHORA).await;
     assert_eq!((r.estado, r.cuerpo.as_slice()), (409, br#"{"error":"lleno"}"#.as_slice()));
 }
@@ -67,6 +64,28 @@ async fn integridad_mala_da_401() {
     assert_eq!(alta_con_veredicto(|v| v.reconocida = false).await, 401);
     assert_eq!(alta_con_veredicto(|v| v.dispositivo_ok = false).await, 401);
     assert_eq!(alta_con_veredicto(|v| v.hash_peticion = hex_sha(b"otro")).await, 401);
+}
+
+#[tokio::test]
+async fn hash_de_otro_wh_da_401() {
+    // El veredicto liga `fid` y `wh`: no sirve para activar con otro `wtok`.
+    assert_eq!(alta_con_veredicto(|v| v.hash_peticion = hash_activacion(FID, &"B".repeat(43))).await, 401);
+    // El hash antiguo, solo del `fid`, ya no vale.
+    assert_eq!(alta_con_veredicto(|v| v.hash_peticion = hex_sha(FID.as_bytes())).await, 401);
+}
+
+#[tokio::test]
+async fn veredicto_caducado_o_del_futuro_da_401() {
+    let ahora_ms = AHORA * 1000;
+    assert_eq!(alta_con_veredicto(|v| v.timestamp_ms = ahora_ms - 300_001).await, 401);
+    assert_eq!(alta_con_veredicto(|v| v.timestamp_ms = ahora_ms + 60_001).await, 401);
+}
+
+#[tokio::test]
+async fn veredicto_fresco_da_201() {
+    let ahora_ms = AHORA * 1000;
+    assert_eq!(alta_con_veredicto(|v| v.timestamp_ms = ahora_ms - 300_000).await, 201);
+    assert_eq!(alta_con_veredicto(|v| v.timestamp_ms = ahora_ms + 60_000).await, 201);
 }
 
 #[tokio::test]

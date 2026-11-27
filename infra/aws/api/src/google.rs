@@ -7,6 +7,8 @@ pub struct Veredicto {
     /// `deviceRecognitionVerdict` contiene `MEETS_DEVICE_INTEGRITY`.
     pub dispositivo_ok: bool,
     pub hash_peticion: String,
+    /// `requestDetails.timestampMillis`: cuándo se generó el veredicto.
+    pub timestamp_ms: u64,
 }
 
 /// Estado de una suscripción según Android Publisher.

@@ -22,6 +22,11 @@ pub fn hex_sha(b: &[u8]) -> String {
     Sha256::digest(b).iter().map(|x| format!("{x:02x}")).collect()
 }
 
+/// `requestHash` de la activación: `sha256("<fid>|<wh>")` en hexadecimal.
+pub fn hash_activacion(fid: &str, wtok: &str) -> String {
+    hex_sha(format!("{fid}|{}", hex_sha(wtok.as_bytes())).as_bytes())
+}
+
 pub fn auth_de(fid: &str, wtok: &str) -> String {
     format!("BT1 {fid}.{wtok}")
 }
@@ -70,13 +75,14 @@ pub struct GoogleFalso {
 }
 
 impl GoogleFalso {
-    pub fn para(fid: &str) -> Self {
+    pub fn para(fid: &str, wtok: &str) -> Self {
         Self {
             veredicto: Mutex::new(Veredicto {
                 paquete: "com.limitcodev.bluetalk".into(),
                 reconocida: true,
                 dispositivo_ok: true,
-                hash_peticion: hex_sha(fid.as_bytes()),
+                hash_peticion: hash_activacion(fid, wtok),
+                timestamp_ms: AHORA * 1000,
             }),
             suscripcion: Mutex::new(Some(Suscripcion {
                 activa: true,
@@ -119,7 +125,7 @@ pub type Est = Estado<AlmacenMemoria, GoogleFalso>;
 pub fn estado() -> Est {
     Estado {
         almacen: AlmacenMemoria::default(),
-        google: GoogleFalso::para(FID),
+        google: GoogleFalso::para(FID, WTOK),
         cfg: Config { paquete: "com.limitcodev.bluetalk".into(), producto: "bluetalk_familia".into() },
     }
 }
@@ -140,8 +146,9 @@ pub fn cuerpo_alta(fid: &str, wtok: &str, compra: &str) -> Vec<u8> {
     .unwrap()
 }
 
-/// Da de alta la familia `FID`/`WTOK` y devuelve el estado HTTP.
+/// Da de alta la familia `fid`/`wtok` y devuelve el estado HTTP.
 pub async fn activar(e: &Est, fid: &str, wtok: &str, compra: &str) -> u16 {
-    *e.google.veredicto.lock().unwrap() = Veredicto { hash_peticion: hex_sha(fid.as_bytes()), ..e.google.veredicto.lock().unwrap().clone() };
+    // Un solo `lock()`: dos en la misma sentencia se bloquean entre sí.
+    e.google.veredicto.lock().unwrap().hash_peticion = hash_activacion(fid, wtok);
     bluetalk_api::rutas::atender(e, pet("POST", "/v1/familia", None, &cuerpo_alta(fid, wtok, compra)), AHORA).await.estado
 }

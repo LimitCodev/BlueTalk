@@ -105,7 +105,7 @@ Autenticación: `Authorization: BT1 <fid>.<wtok>`. El servidor compara `SHA-256(
 
 | Ruta | Quién | Qué hace | Tope por familia |
 |---|---|---|---|
-| `POST /familia` | Teléfono del niño, una vez | Recibe `fid`, `sha256(wtok)`, `purchaseToken` e `integrityToken`. Verifica Integrity y la suscripción con `subscriptionsv2.get`, la **reconoce** (*acknowledge*) y guarda la familia. Un token de compra se liga a **3 `fid` como máximo** (hasta 3 niños por pago, decisión del dueño); el cuarto recibe `409` | 3 al día por IP (WAF) |
+| `POST /familia` | Teléfono del niño, una vez | Recibe `fid`, `sha256(wtok)`, `purchaseToken` e `integrityToken`. Verifica Integrity (el `requestHash` es `sha256("<fid>|<wh>")` en hexadecimal, y el veredicto no puede tener más de 5 minutos ni estar más de 1 minuto en el futuro) y la suscripción con `subscriptionsv2.get`, la **reconoce** (*acknowledge*) y guarda la familia. Un token de compra se liga a **3 `fid` como máximo** (hasta 3 niños por pago, decisión del dueño); el cuarto recibe `409` | 3 al día por IP (WAF) |
 | `PUT /dias` | Teléfono del niño | Hasta 7 días por llamada, 4 KB por día | 10 llamadas al día |
 | `GET /dias?desde=AAAA-MM-DD` | Cualquier teléfono vinculado | `Query` de 62 ítems como máximo | 60 al día |
 | `PUT /respaldo` · `GET /respaldo` | Teléfono del niño o uno nuevo | Una sola copia que se sobrescribe; 256 KB como máximo | 4 escrituras y 10 lecturas al día |
