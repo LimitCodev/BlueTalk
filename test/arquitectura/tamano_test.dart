@@ -41,7 +41,7 @@ const _deuda = <String, int>{
   'lib/features/padre/gate/pin_store.dart': 449,
   'lib/features/padre/gate/recuperar_screen.dart': 298,
   'lib/features/padre/legal/legal_screen.dart': 161,
-  'lib/features/padre/legal/textos_legales.dart': 291,
+  'lib/features/padre/legal/textos_legales.dart': 294, // texto legal 1.3.0 (6e77c96); el plan 7 lo reescribe
   'lib/features/padre/monitoreo/uso_telefono_screen.dart': 494,
   'lib/features/padre/padre_screen.dart': 168,
   'lib/features/padre/perfil_edad.dart': 134,
