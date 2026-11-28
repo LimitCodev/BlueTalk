@@ -96,9 +96,20 @@ async fn el_mismo_token_dos_veces_da_401_y_no_suma() {
     assert_eq!(enviar(&e, c()).await, 204);
     assert_eq!(enviar(&e, c()).await, 401);
     assert_eq!(e.almacen.contadores.lock().unwrap().values().sum::<u64>(), 1);
-    // Solo se guarda el hash del token, con su caducidad.
+    // Solo se guarda el hash del veredicto (requestHash|timestampMillis), con su caducidad.
+    let clave = hex_sha(format!("{}|{}", hex_sha(b"2026-W48|1.0.0|salud=0"), AHORA * 1000).as_bytes());
     let usados = e.almacen.tokens_usados.lock().unwrap();
-    assert_eq!(usados.iter().collect::<Vec<_>>(), [(&hex_sha(b"tok-repetido"), &(AHORA + 600))]);
+    assert_eq!(usados.iter().collect::<Vec<_>>(), [(&clave, &(AHORA + 600))]);
+}
+
+#[tokio::test]
+async fn dos_textos_de_token_con_el_mismo_veredicto_cuentan_una_vez() {
+    // Variante no canónica del mismo token: texto distinto, Google devuelve el mismo veredicto.
+    let e = estado();
+    con_hash(&e, SEMANA, "1.0.0", "salud=0");
+    assert_eq!(enviar(&e, cuerpo_con_token(SEMANA, json!({"salud": "0"}), "tok-A")).await, 204);
+    assert_eq!(enviar(&e, cuerpo_con_token(SEMANA, json!({"salud": "0"}), "tok-A=")).await, 401);
+    assert_eq!(e.almacen.contadores.lock().unwrap().values().sum::<u64>(), 1);
 }
 
 #[tokio::test]

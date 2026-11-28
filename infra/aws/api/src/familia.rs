@@ -3,6 +3,7 @@ use serde::Deserialize;
 use crate::auth::{familia_autenticada, fid_valido, hex, sha256};
 use crate::error::ErrorApi;
 use crate::estado::{Almacen, Estado, Google};
+use crate::google::Veredicto;
 use crate::http::Respuesta;
 
 /// Segundos que se confía en una suscripción verificada antes de volver a
@@ -56,13 +57,14 @@ const VEREDICTO_MAX_EDAD_MS: u64 = 300_000;
 const VEREDICTO_MAX_ADELANTO_MS: u64 = 60_000;
 
 /// Integrity: veredicto reciente, de nuestra app, en dispositivo íntegro y ligado a `peticion`
-/// (su `requestHash` es el SHA-256 hexadecimal de ese texto). Si no, `Token`.
-pub async fn verificar_integridad<A: Almacen, G: Google>(e: &Estado<A, G>, token: &str, peticion: &str, ahora: u64) -> Result<(), ErrorApi> {
+/// (su `requestHash` es el SHA-256 hexadecimal de ese texto). Si no, `Token`. Devuelve el
+/// veredicto que Google verificó.
+pub async fn verificar_integridad<A: Almacen, G: Google>(e: &Estado<A, G>, token: &str, peticion: &str, ahora: u64) -> Result<Veredicto, ErrorApi> {
     let v = e.google.integridad(token).await?;
     let ahora_ms = ahora * 1000;
     let fresco = v.timestamp_ms.saturating_add(VEREDICTO_MAX_EDAD_MS) >= ahora_ms && v.timestamp_ms <= ahora_ms + VEREDICTO_MAX_ADELANTO_MS;
     let integra = fresco && v.paquete == e.cfg.paquete && v.reconocida && v.dispositivo_ok && v.hash_peticion == hex(&sha256(peticion.as_bytes()));
-    if integra { Ok(()) } else { Err(ErrorApi::Token) }
+    if integra { Ok(v) } else { Err(ErrorApi::Token) }
 }
 
 /// `POST /v1/familia`: Integrity (hash de `fid|wh`, reciente) → suscripción → alta → reconocer compra.

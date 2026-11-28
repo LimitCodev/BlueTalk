@@ -23,7 +23,7 @@ struct PeticionContadores {
 /// Cuánto se recuerda un token de Integrity ya usado (su veredicto vale 5 min, más el desfase).
 const TTL_TOKEN_USADO: u64 = 600;
 
-/// `POST /v1/contadores`: validar → Integrity (hash de `semana|version|c`) → token de un solo
+/// `POST /v1/contadores`: validar → Integrity (hash de `semana|version|c`) → veredicto de un solo
 /// uso → sumar. Sin `fid` ni autenticación; la `version` solo entra en el hash y no se guarda.
 pub async fn sumar<A: Almacen, G: Google>(e: &Estado<A, G>, cuerpo: &[u8], ahora: u64) -> Result<Respuesta, ErrorApi> {
     let p: PeticionContadores = serde_json::from_slice(cuerpo).map_err(|_| ErrorApi::Peticion)?;
@@ -36,8 +36,11 @@ pub async fn sumar<A: Almacen, G: Google>(e: &Estado<A, G>, cuerpo: &[u8], ahora
     // `c` va en el hash (pares `funcion=tramo` por orden de `funcion`, unidos por `,`): un
     // veredicto robado no sirve para contar otra cosa. `BTreeMap` ya los ordena por bytes.
     let canonico = p.c.iter().map(|(f, t)| format!("{f}={t}")).collect::<Vec<_>>().join(",");
-    verificar_integridad(e, &p.integridad, &format!("{}|{}|{canonico}", p.semana, p.version), ahora).await?;
-    if !e.almacen.usar_token(&hex(&sha256(p.integridad.as_bytes())), ahora + TTL_TOKEN_USADO).await? {
+    let v = verificar_integridad(e, &p.integridad, &format!("{}|{}|{canonico}", p.semana, p.version), ahora).await?;
+    // La clave sale del veredicto que Google verificó, no del texto del token: una variante no
+    // canónica del mismo token daría otra clave y se podría repetir.
+    let clave = hex(&sha256(format!("{}|{}", v.hash_peticion, v.timestamp_ms).as_bytes()));
+    if !e.almacen.usar_token(&clave, ahora + TTL_TOKEN_USADO).await? {
         return Err(ErrorApi::Token);
     }
     let pares: Vec<(String, String)> = p.c.into_iter().collect();

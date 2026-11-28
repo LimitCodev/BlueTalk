@@ -38,7 +38,8 @@ pub trait Almacen: Send + Sync {
     /// Suma 1 a cada `(funcion, tramo)` de `pares`, guardado como `<funcion>#<tramo>` en
     /// `C#<semana>`. Solo cuentas anónimas: nada que identifique al emisor.
     fn sumar_contadores(&self, semana: &str, pares: &[(String, String)]) -> impl Future<Output = R<()>> + Send;
-    /// Marca un token de Integrity como usado (`hash_token` = SHA-256 hexadecimal, nunca el token),
+    /// Marca un veredicto de Integrity como usado (`hash_token` = SHA-256 hexadecimal de
+    /// `<requestHash>|<timestampMillis>` del veredicto, nunca el token),
     /// con caducidad `ttl` (segundos Unix). Put condicional: `false` si ya estaba marcado.
     fn usar_token(&self, hash_token: &str, ttl: u64) -> impl Future<Output = R<bool>> + Send;
 }

@@ -41,7 +41,7 @@ pub struct AlmacenMemoria {
     pub respaldos: Mutex<HashMap<String, (Vec<u8>, u64)>>,
     /// ("C#<semana>", "<funcion>#<tramo>") → cuenta.
     pub contadores: Mutex<HashMap<(String, String), u64>>,
-    /// hash del token → ttl.
+    /// hash del veredicto → ttl.
     pub tokens_usados: Mutex<HashMap<String, u64>>,
 }
 
