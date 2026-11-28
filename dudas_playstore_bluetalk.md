@@ -19,7 +19,13 @@ Decisiones que el agente no tomó solo. Se definen con el grupo.
 - **Bloquea:** la tarea «Seguridad de los datos» del Panel (1 de las 12 de «Termina de configurar tu app»). No bloquea guardar las demás declaraciones ni la ficha.
 - **Decisión del dueño (2026-11-26):** «Sí, recopila». Condición: el proyecto se adapta para que la versión publicada cumpla la propuesta inicial (suscripción que financia servicios en AWS, con controles contra el abuso).
 - **Cómo se aplica:** el formulario se rellena cuando el diseño fije qué datos salen del teléfono (tipos, fin, cifrado en tránsito y borrado). Marcar «Sí» sin esos tipos obligaría a adivinarlos. Hasta entonces la tarea sigue abierta en el Panel.
-- **Estado:** decidida; formulario pendiente del diseño de la suscripción
+- **Estado:** resuelta. Formulario guardado en Play Console el 28-nov-2026 con lo que enviará la versión con nube (spec §5, §7 y §9):
+  - Recopila datos: sí. Comparte: no (AWS actúa como proveedor del desarrollador). Cifrado en tránsito: sí. Sin cuentas de usuario. Compromiso con la Política de Familias: sí.
+  - Historial de compras (token de compra de la suscripción): recopilado, no efímero, opcional, fines «Funciones de la app» y «Seguridad, cumplimiento y prevención de fraudes».
+  - Interacciones en la app (contadores anónimos de investigación): recopilado, no efímero, opcional, fin «Estadísticas».
+  - Dispositivo u otros IDs (`fid` aleatorio de la familia, no es un ID del dispositivo): recopilado, no efímero, opcional, fin «Funciones de la app».
+  - No se declaran los días ni la copia de seguridad: van cifrados de extremo a extremo (exentos).
+  - **Pendiente:** la pregunta opcional «método para solicitar el borrado» quedó sin responder. Pide una URL pública con los pasos; se añade cuando el plan 7 publique esa página (el borrado ya existe en la app: `DELETE /v1/familia`).
 
 ### D-2. Capturas de la ficha
 - **Fecha:** 2026-11-26
