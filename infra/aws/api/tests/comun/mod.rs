@@ -41,6 +41,8 @@ pub struct AlmacenMemoria {
     pub respaldos: Mutex<HashMap<String, (Vec<u8>, u64)>>,
     /// ("C#<semana>", "<funcion>#<tramo>") → cuenta.
     pub contadores: Mutex<HashMap<(String, String), u64>>,
+    /// hash del token → ttl.
+    pub tokens_usados: Mutex<HashMap<String, u64>>,
 }
 
 impl Almacen for AlmacenMemoria {
@@ -120,6 +122,10 @@ impl Almacen for AlmacenMemoria {
         }
         Ok(())
     }
+
+    async fn usar_token(&self, hash_token: &str, ttl: u64) -> Result<bool, ErrorApi> {
+        Ok(self.tokens_usados.lock().unwrap().insert(hash_token.into(), ttl).is_none())
+    }
 }
 
 pub struct GoogleFalso {
@@ -127,6 +133,7 @@ pub struct GoogleFalso {
     /// `None` simula a Google caído.
     pub suscripcion: Mutex<Option<Suscripcion>>,
     pub consultas: AtomicUsize,
+    pub integridades: AtomicUsize,
     pub reconocidas: AtomicUsize,
 }
 
@@ -147,12 +154,17 @@ impl GoogleFalso {
                 reconocida: false,
             })),
             consultas: AtomicUsize::new(0),
+            integridades: AtomicUsize::new(0),
             reconocidas: AtomicUsize::new(0),
         }
     }
 
     pub fn n_consultas(&self) -> usize {
         self.consultas.load(Ordering::SeqCst)
+    }
+
+    pub fn n_integridades(&self) -> usize {
+        self.integridades.load(Ordering::SeqCst)
     }
 
     pub fn n_reconocidas(&self) -> usize {
@@ -162,6 +174,7 @@ impl GoogleFalso {
 
 impl Google for GoogleFalso {
     async fn integridad(&self, _token: &str) -> Result<Veredicto, ErrorApi> {
+        self.integridades.fetch_add(1, Ordering::SeqCst);
         Ok(self.veredicto.lock().unwrap().clone())
     }
 
