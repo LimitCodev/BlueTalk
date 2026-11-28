@@ -13,7 +13,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-11-26-suscripcion-familia-nube-design.md`:
 - §6: `POST /contadores`.
-- §7: Integrity con `requestHash = sha256("<semana>|<version>")`.
+- §7: Integrity con `requestHash = sha256("<semana>|<version>|<c canónico>")` (`c canónico` = pares `funcion=tramo` ordenados por `funcion` en orden de bytes, unidos por `,`; token de un solo uso).
 - §9: contadores D-1.
 
 Contrato: Plan 1, Tarea 5. El servidor acepta solo la semana ISO actual o la anterior, como mucho 6 claves, y las funciones `comunicar`, `aprender`, `rutinas`, `salud`, `calma` y `voces`.
@@ -62,7 +62,7 @@ Claves del almacén:
 
 1. **Nada sin permiso.** Con el interruptor apagado, ni registro ni red, comprobado con el almacén y el falso (Tareas 2 y 3).
 2. **Semana ISO correcta** en los bordes de año: la semana 53 y el lunes que pertenece al año siguiente (Tarea 1).
-3. **El hash de Integrity** es `sha256("<semana>|<version>")` con la misma `semana` y `version` del cuerpo (Tarea 2).
+3. **El hash de Integrity** es `sha256("<semana>|<version>|<c canónico>")` con la misma `semana`, `version` y `c` del cuerpo (`c canónico` = pares `funcion=tramo` ordenados por `funcion` en orden de bytes y unidos por `,`; ej. `2026-W48|1.0.0|comunicar=21+,rutinas=1-5`); cada token de Integrity se usa una sola vez (el servidor responde `401 token` a un token repetido) (Tarea 2).
 4. **Anonimato.** El cuerpo solo lleva tramos, y el falso lo comprueba campo por campo (Tarea 2).
 
 ---
