@@ -30,8 +30,10 @@ pub trait Almacen: Send + Sync {
     /// Guarda (o sobrescribe) la única copia de seguridad, con caducidad `ttl` (segundos Unix).
     fn guardar_respaldo(&self, fid: &str, b: &[u8], ttl: u64) -> impl Future<Output = R<()>> + Send;
     fn leer_respaldo(&self, fid: &str) -> impl Future<Output = R<Option<Vec<u8>>>> + Send;
-    /// Borra todos los ítems de la familia (ella, días, copia, cuotas) y quita `fid` de la
-    /// ligadura de `token_hash`, que libera su cupo. Si ya no existe, no hace nada.
+    /// Borra todos los ítems de la familia (ella, días y copia) y quita `fid` de la ligadura de
+    /// `token_hash`, que libera su cupo. NO borra los contadores de cuota (sin datos personales,
+    /// caducan por TTL): si no, borrar y reactivar reiniciaría la cuota del día. Si ya no
+    /// existe, no hace nada.
     fn borrar_familia(&self, fid: &str, token_hash: &str) -> impl Future<Output = R<()>> + Send;
 }
 

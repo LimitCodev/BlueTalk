@@ -7,8 +7,9 @@ use crate::http::Respuesta;
 use crate::vigencia::{Uso, exigir_vigencia};
 
 const RESPALDO_MAX: usize = 262_144;
-/// La copia caduca con la familia: 90 días después del fin de la suscripción.
-const TTL_TRAS_FIN: u64 = 90 * 86_400;
+/// La copia caduca a los 400 días de escrita, igual que los días. No se usa `f.fin`: puede
+/// estar viejo si `exigir_vigencia` acaba de renovar la suscripción.
+const TTL_RESPALDO: u64 = 400 * 86_400;
 
 /// `PUT /v1/respaldo`: autenticar → vigencia → validar → cuota → guardar.
 pub async fn subir<A: Almacen, G: Google>(e: &Estado<A, G>, auth: Option<&str>, cuerpo: &[u8], ahora: u64) -> Result<Respuesta, ErrorApi> {
@@ -23,7 +24,7 @@ pub async fn subir<A: Almacen, G: Google>(e: &Estado<A, G>, auth: Option<&str>, 
     if !e.almacen.consumir_cuota(&f.fid, "respaldo_put", &dia_civil(ahora), cuotas::RESPALDO_PUT).await? {
         return Err(ErrorApi::Cuota);
     }
-    e.almacen.guardar_respaldo(&f.fid, cuerpo, f.fin + TTL_TRAS_FIN).await?;
+    e.almacen.guardar_respaldo(&f.fid, cuerpo, ahora + TTL_RESPALDO).await?;
     Ok(Respuesta::vacia(204))
 }
 

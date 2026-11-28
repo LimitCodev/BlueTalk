@@ -38,6 +38,23 @@ async fn guarda_262144_bytes_y_lee_los_mismos() {
 }
 
 #[tokio::test]
+async fn la_copia_caduca_a_los_400_dias_de_escrita() {
+    let e = familia_activa().await;
+    assert_eq!(put(&e, b"x").await, 204);
+    assert_eq!(e.almacen.respaldos.lock().unwrap()[FID].1, AHORA + 34_560_000);
+}
+
+#[tokio::test]
+async fn el_ttl_cuenta_desde_ahora_aunque_la_suscripcion_se_renueve_en_la_llamada() {
+    let e = familia_activa().await;
+    // Caché vencida y Google confirma una renovación: `fin` sube dentro de la misma llamada.
+    let tarde = AHORA + 2 * 86_400;
+    e.google.suscripcion.lock().unwrap().as_mut().unwrap().fin = FIN + 10 * 86_400 * 365;
+    assert_eq!(atender(&e, pet("PUT", "/v1/respaldo", Some(AUTH), b"x"), tarde).await.estado, 204);
+    assert_eq!(e.almacen.respaldos.lock().unwrap()[FID].1, tarde + 34_560_000);
+}
+
+#[tokio::test]
 async fn una_copia_nueva_sobrescribe_la_anterior() {
     let e = familia_activa().await;
     assert_eq!(put(&e, b"vieja").await, 204);
@@ -123,7 +140,17 @@ async fn borrar_da_204_y_deja_la_familia_sin_nada() {
     assert!(e.almacen.familias.lock().unwrap().is_empty());
     assert!(e.almacen.dias.lock().unwrap().is_empty());
     assert!(e.almacen.respaldos.lock().unwrap().is_empty());
-    assert!(e.almacen.cuotas.lock().unwrap().is_empty());
+}
+
+#[tokio::test]
+async fn borrar_y_reactivar_no_reinicia_la_cuota_del_dia() {
+    let e = familia_activa().await;
+    for _ in 0..4 {
+        assert_eq!(put(&e, b"x").await, 204);
+    }
+    assert_eq!(borrar(&e).await, 204);
+    assert_eq!(activar(&e, FID, WTOK, "compra-1").await, 201);
+    assert_eq!(put(&e, b"x").await, 429);
 }
 
 #[tokio::test]
