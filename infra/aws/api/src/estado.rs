@@ -27,6 +27,12 @@ pub trait Almacen: Send + Sync {
     fn guardar_dias(&self, fid: &str, dias: &[(String, Vec<u8>)], ttl: u64) -> impl Future<Output = R<()>> + Send;
     /// Hasta `max` bloques con fecha >= `desde`, en orden ascendente.
     fn leer_dias(&self, fid: &str, desde: &str, max: usize) -> impl Future<Output = R<Vec<(String, Vec<u8>)>>> + Send;
+    /// Guarda (o sobrescribe) la única copia de seguridad, con caducidad `ttl` (segundos Unix).
+    fn guardar_respaldo(&self, fid: &str, b: &[u8], ttl: u64) -> impl Future<Output = R<()>> + Send;
+    fn leer_respaldo(&self, fid: &str) -> impl Future<Output = R<Option<Vec<u8>>>> + Send;
+    /// Borra todos los ítems de la familia (ella, días, copia, cuotas) y quita `fid` de la
+    /// ligadura de `token_hash`, que libera su cupo. Si ya no existe, no hace nada.
+    fn borrar_familia(&self, fid: &str, token_hash: &str) -> impl Future<Output = R<()>> + Send;
 }
 
 /// Servicios de Google: Play Integrity y Android Publisher.

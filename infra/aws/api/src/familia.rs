@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::auth::{fid_valido, hex, sha256};
+use crate::auth::{familia_autenticada, fid_valido, hex, sha256};
 use crate::error::ErrorApi;
 use crate::estado::{Almacen, Estado, Google};
 use crate::http::Respuesta;
@@ -93,4 +93,12 @@ pub async fn activar<A: Almacen, G: Google>(e: &Estado<A, G>, cuerpo: &[u8], aho
         e.google.reconocer(&e.cfg.producto, &f.token).await?;
     }
     Ok(Respuesta::json(estado, &serde_json::json!({ "hasta": hasta })))
+}
+
+/// `DELETE /v1/familia`: derecho de supresión. Solo autentica; no exige vigencia ni cuota,
+/// así que vale aunque la suscripción haya vencido.
+pub async fn borrar<A: Almacen, G: Google>(e: &Estado<A, G>, auth: Option<&str>) -> Result<Respuesta, ErrorApi> {
+    let f = familia_autenticada(&e.almacen, auth).await?;
+    e.almacen.borrar_familia(&f.fid, &hex(&sha256(f.token.as_bytes()))).await?;
+    Ok(Respuesta::vacia(204))
 }

@@ -3,6 +3,7 @@ use crate::error::ErrorApi;
 use crate::estado::{Almacen, Estado, Google};
 use crate::familia;
 use crate::http::{Peticion, Respuesta};
+use crate::respaldo;
 
 /// Cuerpo máximo aceptado (300 KB); se mira antes que nada.
 pub const CUERPO_MAX: usize = 307_200;
@@ -24,6 +25,9 @@ async fn despachar<A: Almacen, G: Google>(e: &Estado<A, G>, p: &Peticion, ahora:
         ("POST", "/v1/familia") => familia::activar(e, &p.cuerpo, ahora).await,
         ("PUT", "/v1/dias") => dias::subir(e, p.auth.as_deref(), &p.cuerpo, ahora).await,
         ("GET", "/v1/dias") => dias::bajar(e, p.auth.as_deref(), p.consulta.as_deref(), ahora).await,
+        ("PUT", "/v1/respaldo") => respaldo::subir(e, p.auth.as_deref(), &p.cuerpo, ahora).await,
+        ("GET", "/v1/respaldo") => respaldo::bajar(e, p.auth.as_deref(), ahora).await,
+        ("DELETE", "/v1/familia") => familia::borrar(e, p.auth.as_deref()).await,
         (_, ruta) if RUTAS.contains(&ruta) => Err(ErrorApi::Metodo),
         _ => Err(ErrorApi::NoEncontrado),
     }

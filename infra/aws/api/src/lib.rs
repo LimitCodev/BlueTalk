@@ -10,5 +10,6 @@ pub mod familia;
 pub mod fecha;
 pub mod google;
 pub mod http;
+pub mod respaldo;
 pub mod rutas;
 pub mod vigencia;

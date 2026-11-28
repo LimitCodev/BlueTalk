@@ -38,6 +38,7 @@ pub struct AlmacenMemoria {
     /// (fid, ruta, día) → usos.
     pub cuotas: Mutex<HashMap<(String, String, String), u32>>,
     pub dias: Mutex<HashMap<String, BTreeMap<String, Vec<u8>>>>,
+    pub respaldos: Mutex<HashMap<String, Vec<u8>>>,
 }
 
 impl Almacen for AlmacenMemoria {
@@ -89,6 +90,26 @@ impl Almacen for AlmacenMemoria {
         let todos = self.dias.lock().unwrap();
         let del_fid = todos.get(fid).into_iter().flatten();
         Ok(del_fid.filter(|(d, _)| d.as_str() >= desde).take(max).map(|(d, b)| (d.clone(), b.clone())).collect())
+    }
+
+    async fn guardar_respaldo(&self, fid: &str, b: &[u8], _ttl: u64) -> Result<(), ErrorApi> {
+        self.respaldos.lock().unwrap().insert(fid.into(), b.to_vec());
+        Ok(())
+    }
+
+    async fn leer_respaldo(&self, fid: &str) -> Result<Option<Vec<u8>>, ErrorApi> {
+        Ok(self.respaldos.lock().unwrap().get(fid).cloned())
+    }
+
+    async fn borrar_familia(&self, fid: &str, token_hash: &str) -> Result<(), ErrorApi> {
+        self.familias.lock().unwrap().remove(fid);
+        self.dias.lock().unwrap().remove(fid);
+        self.respaldos.lock().unwrap().remove(fid);
+        self.cuotas.lock().unwrap().retain(|(f, _, _), _| f != fid);
+        if let Some(fids) = self.ligaduras.lock().unwrap().get_mut(token_hash) {
+            fids.retain(|f| f != fid);
+        }
+        Ok(())
     }
 }
 

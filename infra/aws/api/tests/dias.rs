@@ -118,7 +118,8 @@ async fn undecima_subida_del_dia_da_429() {
     }
     let r = atender(&e, pet("PUT", "/v1/dias", Some(AUTH), &cuerpo_dias(&[(D0, b"x")])), AHORA).await;
     assert_eq!((r.estado, r.cuerpo.as_slice()), (429, br#"{"error":"cuota"}"#.as_slice()));
-    // Al día siguiente la cuota vuelve (y la vigencia en caché sigue valiendo).
+    // Al día siguiente la cuota vuelve (la caché de vigencia ya venció: `hasta == AHORA + 86_400`,
+    // y `hasta > ahora` es falso, así que se pregunta a Google y la suscripción sigue activa).
     assert_eq!(put(&e, &[(D0, b"x")], AHORA + 86_400).await, 204);
 }
 
