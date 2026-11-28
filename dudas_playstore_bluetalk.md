@@ -38,9 +38,14 @@ Decisiones que el agente no tomó solo. Se definen con el grupo.
 - **Fecha:** 2026-11-26
 - **Dueño:** «la versión más reciente», después de editar el proyecto para que sea funcional.
 - **Criterio del agente:** el primer AAB de Play sale como `1.0.0+1` (recomendación de `requisitosPlayStore.md` §8, decisión 13). Cada subida posterior sube el número tras el `+`.
-- **Estado:** decidida (número a confirmar al compilar)
+- **Estado:** resuelta. AAB `1.0.0+1` (versionCode 1) compilado el 28-nov-2026 con la app actual, sin nube, para abrir ya la prueba interna o cerrada. La versión con nube saldrá como `1.1.0+2`.
 
 ### D-4. Keystore
 - **Fecha:** 2026-11-26
-- **Decisión del dueño:** tiene copia y la restaura en `~/keystores/bluetalk-release.keystore`. El agente no lee ni copia sus contraseñas.
-- **Estado:** pendiente del dueño
+- **Decisión inicial del dueño:** restaurar su copia en `~/keystores/bluetalk-release.keystore`.
+- **Decisión del dueño (28-nov):** «resuélvelo tú». El agente creó un keystore nuevo:
+  - PKCS12, RSA 4096, alias `bluetalk`, válido 10 000 días.
+  - Certificado `CN=LimitCodev, O=LimitCodev, C=PE`, SHA-256 `9D:8C:C1:28:…:CA:42:A4`.
+  - La contraseña es aleatoria y vive solo en `~/keystores/bluetalk-release.password` y en `android/key.properties`, ignorado por git.
+  - Nunca se subió ningún AAB con otra clave, así que esta es la clave de subida desde el primer envío. Play App Signing guarda la clave de firma de la app.
+- **Estado:** resuelta. **Pendiente del dueño:** copiar `~/keystores/` fuera de la laptop. Sin esa copia, cambiar la clave de subida exige pedírselo al soporte de Play.
