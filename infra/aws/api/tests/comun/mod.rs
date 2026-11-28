@@ -39,6 +39,8 @@ pub struct AlmacenMemoria {
     pub cuotas: Mutex<HashMap<(String, String, String), u32>>,
     pub dias: Mutex<HashMap<String, BTreeMap<String, Vec<u8>>>>,
     pub respaldos: Mutex<HashMap<String, (Vec<u8>, u64)>>,
+    /// ("C#<semana>", "<funcion>#<tramo>") → cuenta.
+    pub contadores: Mutex<HashMap<(String, String), u64>>,
 }
 
 impl Almacen for AlmacenMemoria {
@@ -107,6 +109,14 @@ impl Almacen for AlmacenMemoria {
         self.respaldos.lock().unwrap().remove(fid);
         if let Some(fids) = self.ligaduras.lock().unwrap().get_mut(token_hash) {
             fids.retain(|f| f != fid);
+        }
+        Ok(())
+    }
+
+    async fn sumar_contadores(&self, semana: &str, pares: &[(String, String)]) -> Result<(), ErrorApi> {
+        let mut cs = self.contadores.lock().unwrap();
+        for (f, t) in pares {
+            *cs.entry((format!("C#{semana}"), format!("{f}#{t}"))).or_insert(0) += 1;
         }
         Ok(())
     }

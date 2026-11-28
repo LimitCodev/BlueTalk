@@ -55,6 +55,16 @@ fn hex32(s: &str) -> Option<[u8; 32]> {
 const VEREDICTO_MAX_EDAD_MS: u64 = 300_000;
 const VEREDICTO_MAX_ADELANTO_MS: u64 = 60_000;
 
+/// Integrity: veredicto reciente, de nuestra app, en dispositivo íntegro y ligado a `peticion`
+/// (su `requestHash` es el SHA-256 hexadecimal de ese texto). Si no, `Token`.
+pub async fn verificar_integridad<A: Almacen, G: Google>(e: &Estado<A, G>, token: &str, peticion: &str, ahora: u64) -> Result<(), ErrorApi> {
+    let v = e.google.integridad(token).await?;
+    let ahora_ms = ahora * 1000;
+    let fresco = v.timestamp_ms.saturating_add(VEREDICTO_MAX_EDAD_MS) >= ahora_ms && v.timestamp_ms <= ahora_ms + VEREDICTO_MAX_ADELANTO_MS;
+    let integra = fresco && v.paquete == e.cfg.paquete && v.reconocida && v.dispositivo_ok && v.hash_peticion == hex(&sha256(peticion.as_bytes()));
+    if integra { Ok(()) } else { Err(ErrorApi::Token) }
+}
+
 /// `POST /v1/familia`: Integrity (hash de `fid|wh`, reciente) → suscripción → alta → reconocer compra.
 pub async fn activar<A: Almacen, G: Google>(e: &Estado<A, G>, cuerpo: &[u8], ahora: u64) -> Result<Respuesta, ErrorApi> {
     let p: PeticionAlta = serde_json::from_slice(cuerpo).map_err(|_| ErrorApi::Peticion)?;
@@ -64,17 +74,7 @@ pub async fn activar<A: Almacen, G: Google>(e: &Estado<A, G>, cuerpo: &[u8], aho
         return Err(ErrorApi::Peticion);
     }
 
-    let v = e.google.integridad(&p.integridad).await?;
-    let ahora_ms = ahora * 1000;
-    let fresco = v.timestamp_ms.saturating_add(VEREDICTO_MAX_EDAD_MS) >= ahora_ms && v.timestamp_ms <= ahora_ms + VEREDICTO_MAX_ADELANTO_MS;
-    let integra = fresco
-        && v.paquete == e.cfg.paquete
-        && v.reconocida
-        && v.dispositivo_ok
-        && v.hash_peticion == hex(&sha256(format!("{}|{}", p.fid, p.wh).as_bytes()));
-    if !integra {
-        return Err(ErrorApi::Token);
-    }
+    verificar_integridad(e, &p.integridad, &format!("{}|{}", p.fid, p.wh), ahora).await?;
 
     let s = e.google.suscripcion(&p.compra).await?;
     if !s.activa || s.producto != e.cfg.producto {

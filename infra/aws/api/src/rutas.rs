@@ -1,3 +1,4 @@
+use crate::contadores;
 use crate::dias;
 use crate::error::ErrorApi;
 use crate::estado::{Almacen, Estado, Google};
@@ -28,6 +29,7 @@ async fn despachar<A: Almacen, G: Google>(e: &Estado<A, G>, p: &Peticion, ahora:
         ("PUT", "/v1/respaldo") => respaldo::subir(e, p.auth.as_deref(), &p.cuerpo, ahora).await,
         ("GET", "/v1/respaldo") => respaldo::bajar(e, p.auth.as_deref(), ahora).await,
         ("DELETE", "/v1/familia") => familia::borrar(e, p.auth.as_deref()).await,
+        ("POST", "/v1/contadores") => contadores::sumar(e, &p.cuerpo, ahora).await,
         (_, ruta) if RUTAS.contains(&ruta) => Err(ErrorApi::Metodo),
         _ => Err(ErrorApi::NoEncontrado),
     }

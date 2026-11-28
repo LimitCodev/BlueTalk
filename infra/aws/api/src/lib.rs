@@ -2,6 +2,7 @@
 //! recibe una [`http::Peticion`] y devuelve una [`http::Respuesta`].
 pub mod auth;
 pub mod b64;
+pub mod contadores;
 pub mod cuotas;
 pub mod dias;
 pub mod error;

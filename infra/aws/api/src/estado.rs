@@ -35,6 +35,9 @@ pub trait Almacen: Send + Sync {
     /// caducan por TTL): si no, borrar y reactivar reiniciaría la cuota del día. Si ya no
     /// existe, no hace nada.
     fn borrar_familia(&self, fid: &str, token_hash: &str) -> impl Future<Output = R<()>> + Send;
+    /// Suma 1 a cada `(funcion, tramo)` de `pares`, guardado como `<funcion>#<tramo>` en
+    /// `C#<semana>`. Solo cuentas anónimas: nada que identifique al emisor.
+    fn sumar_contadores(&self, semana: &str, pares: &[(String, String)]) -> impl Future<Output = R<()>> + Send;
 }
 
 /// Servicios de Google: Play Integrity y Android Publisher.
