@@ -50,7 +50,7 @@
 
 - `fid` cumple `^[a-z2-7]{26}$`; `wh` es el SHA-256 de `wtok` en 64 caracteres hexadecimales en minúscula.
 - Cabecera: `Authorization: BT1 <fid>.<wtok>`, donde `wtok` es base64url sin relleno de 43 caracteres.
-- Integrity: `requestHash` es el hexadecimal de `sha256("<fid>|<wh>")` en la activación (con `wh` en hexadecimal; el veredicto debe tener como máximo 300 000 ms de antigüedad y 60 000 ms de adelanto), y de `sha256("<semana>|<version>|<c canónico>")` en los contadores (`c canónico` = pares `funcion=tramo` ordenados por `funcion` en orden de bytes y unidos por `,`; ej. `2026-W48|1.0.0|comunicar=21+,rutinas=1-5`). Cada token de Integrity de contadores es de un solo uso (el servidor guarda su hash 10 min y la segunda vez responde `401 token`).
+- Integrity: `requestHash` es el hexadecimal de `sha256("<fid>|<wh>")` en la activación (con `wh` en hexadecimal; el veredicto debe tener como máximo 300 000 ms de antigüedad y 60 000 ms de adelanto), y de `sha256("<semana>|<version>|<c canónico>")` en los contadores (`c canónico` = pares `funcion=tramo` ordenados por `funcion` en orden de bytes y unidos por `,`; ej. `2026-W48|1.0.0|comunicar=21+,rutinas=1-5`). Cada token de Integrity de contadores es de un solo uso (el servidor guarda 10 min el `sha256("<requestHash>|<timestampMillis>")` del veredicto verificado, no el texto del token, y la segunda vez responde `401 token`).
 - `funcion` admite `comunicar`, `aprender`, `rutinas`, `salud`, `calma` y `voces`. `tramo` admite `0`, `1-5`, `6-20` y `21+`. `semana` solo puede ser la semana ISO actual o la anterior.
 
 ## Review Focus

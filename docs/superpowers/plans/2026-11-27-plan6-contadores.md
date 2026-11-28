@@ -62,7 +62,7 @@ Claves del almacén:
 
 1. **Nada sin permiso.** Con el interruptor apagado, ni registro ni red, comprobado con el almacén y el falso (Tareas 2 y 3).
 2. **Semana ISO correcta** en los bordes de año: la semana 53 y el lunes que pertenece al año siguiente (Tarea 1).
-3. **El hash de Integrity** es `sha256("<semana>|<version>|<c canónico>")` con la misma `semana`, `version` y `c` del cuerpo (`c canónico` = pares `funcion=tramo` ordenados por `funcion` en orden de bytes y unidos por `,`; ej. `2026-W48|1.0.0|comunicar=21+,rutinas=1-5`); cada token de Integrity se usa una sola vez (el servidor responde `401 token` a un token repetido) (Tarea 2).
+3. **El hash de Integrity** es `sha256("<semana>|<version>|<c canónico>")` con la misma `semana`, `version` y `c` del cuerpo (`c canónico` = pares `funcion=tramo` ordenados por `funcion` en orden de bytes y unidos por `,`; ej. `2026-W48|1.0.0|comunicar=21+,rutinas=1-5`); cada token de Integrity se usa una sola vez (el servidor guarda 10 min el `sha256("<requestHash>|<timestampMillis>")` del veredicto verificado, no el texto del token, y responde `401 token` a un veredicto repetido) (Tarea 2).
 4. **Anonimato.** El cuerpo solo lleva tramos, y el falso lo comprueba campo por campo (Tarea 2).
 
 ---

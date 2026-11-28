@@ -41,7 +41,7 @@
 
 - `fid` cumple `^[a-z2-7]{26}$`; `wh` es el SHA-256 de `wtok` en 64 caracteres hexadecimales en minúscula.
 - Cabecera: `Authorization: BT1 <fid>.<wtok>`, donde `wtok` es base64url sin relleno de 43 caracteres.
-- Integrity: `requestHash` es el hexadecimal de `sha256("<fid>|<wh>")` en la activación (con `wh` en hexadecimal; el veredicto debe tener como máximo 300 000 ms de antigüedad y 60 000 ms de adelanto), y de `sha256("<semana>|<version>|<c canónico>")` en los contadores (`c canónico` = pares `funcion=tramo` ordenados por `funcion` en orden de bytes y unidos por `,`; ej. `2026-W48|1.0.0|comunicar=21+,rutinas=1-5`). Cada token de Integrity de contadores es de un solo uso (el servidor guarda su hash 10 min y la segunda vez responde `401 token`).
+- Integrity: `requestHash` es el hexadecimal de `sha256("<fid>|<wh>")` en la activación (con `wh` en hexadecimal; el veredicto debe tener como máximo 300 000 ms de antigüedad y 60 000 ms de adelanto), y de `sha256("<semana>|<version>|<c canónico>")` en los contadores (`c canónico` = pares `funcion=tramo` ordenados por `funcion` en orden de bytes y unidos por `,`; ej. `2026-W48|1.0.0|comunicar=21+,rutinas=1-5`). Cada token de Integrity de contadores es de un solo uso (el servidor guarda 10 min el `sha256("<requestHash>|<timestampMillis>")` del veredicto verificado, no el texto del token, y la segunda vez responde `401 token`).
 - `funcion` admite `comunicar`, `aprender`, `rutinas`, `salud`, `calma` y `voces`. `tramo` admite `0`, `1-5`, `6-20` y `21+`. `semana` solo puede ser la semana ISO actual o la anterior.
 
 Precisiones verificadas en el código del servidor (`infra/aws/api/src/`):
@@ -479,8 +479,8 @@ kenc       = 8da99c3dfec9b74b235e686713922137d55a3a7eb92de70bbf1cc3f467208e41
 código     = AAAQ-EAYE-AUDA-OCAJ-BIFQ-YDIO-B4IB-CEQT-CQKR-MFYY-DENB-WHA5-DYPW
 requestHash activación  = sha256("fu7wu6tv3pzmf6yuhhqlkatvtm|60fec683…f8ef")
                         = 6d0514ab8d27b2518ed0d50e6c17529fe98d75d132cfbba72ae6ed474965cacb
-requestHash contadores  = sha256("2026-W48|1.0.0|comunicar=21+,rutinas=1-5")  = 95e39cfd94634f11abcd94a61bb31fd73734e9853de559e56fd7e399b0cc3e46  (c canónico: pares funcion=tramo por funcion, unidos por ","; token de un solo uso)
-                        = 5608795d8d31a3271e50080e365614a21e33db3fb1f9cc9f759cac5b93a5c377
+requestHash contadores  = sha256("2026-W48|1.0.0|comunicar=21+,rutinas=1-5")
+                        = 95e39cfd94634f11abcd94a61bb31fd73734e9853de559e56fd7e399b0cc3e46
 nonce      = 000102…17 (24 bytes)
 aad        = "fu7wu6tv3pzmf6yuhhqlkatvtm|dia|2026-11-26"
 claro      = {"r":{"dia":"2026-11-26","p":3}}
